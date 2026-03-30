@@ -452,32 +452,63 @@ elif st.session_state.page == 'chap3':
         with col_c:
             st.altair_chart(final_chart, use_container_width=False, theme=None)
 
-# --- NOUVELLE SECTION : TABLEAUX DE VARIATION ET DE SIGNES ---
+# --- SECTION TABLEAUX GRAPHIQUES ---
         st.divider()
-        st.write("### 📋 Tableaux de l'exemple : $f(x) = 2(x + 1)^2 - 8$")
+        st.write("### 📋 Synthèse de l'étude : $f(x) = 2x^2 + 4x - 6$")
         
+        # Style CSS pour les tableaux personnalisés
+        st.markdown("""
+            <style>
+            .tab-container {
+                border: 2px solid #444;
+                border-radius: 10px;
+                padding: 15px;
+                background-color: #161b22;
+                text-align: center;
+                font-family: 'Courier New', Courier, monospace;
+            }
+            .tab-title { color: #ff0000; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
+            .row-x { border-bottom: 1px solid #444; padding: 5px; font-weight: bold; color: #00d4ff; }
+            .row-f { padding: 10px; height: 80px; position: relative; }
+            .arrow-down { position: absolute; left: 20%; top: 20%; font-size: 25px; }
+            .arrow-up { position: absolute; right: 20%; top: 20%; font-size: 25px; }
+            .val-beta { position: absolute; left: 50%; bottom: 10%; transform: translateX(-50%); color: #ff0000; font-weight: bold; font-size: 20px; }
+            .sign-box { display: flex; justify-content: space-around; align-items: center; padding-top: 15px; font-size: 18px; }
+            </style>
+        """, unsafe_allow_html=True)
+
         col_var, col_sign = st.columns(2)
 
         with col_var:
-            st.subheader("📈 Variations")
             st.markdown(f"""
-            | $x$ | $-\infty$ | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $-1$ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | $+\infty$ |
-            | :--- | :--- | :---: | :--- |
-            | $f(x)$ | &nbsp; | &nbsp; | &nbsp; |
-            | | ↘️ | | ↗️ |
-            | | | **-8** (Min) | |
-            """)
-            st.caption("La fonction décroît car $a > 0$, atteint son minimum $\\beta = -8$ en $\\alpha = -1$, puis recroît.")
+            <div class="tab-container">
+                <div class="tab-title">📈 Variations</div>
+                <div class="row-x">x : -∞ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +∞</div>
+                <div class="row-f">
+                    <span class="arrow-down">↘️</span>
+                    <span class="arrow-up">↗️</span>
+                    <span class="val-beta">-8</span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            st.caption("Le minimum est -8, atteint pour x = -1.")
 
         with col_sign:
-            st.subheader("✨ Signe")
             st.markdown(f"""
-            | $x$ | $-\infty$ | $-3$ | &nbsp;&nbsp; | $1$ | $+\infty$ |
-            | :--- | :--- | :---: | :---: | :---: | :--- |
-            | $f(x)$ | &nbsp;&nbsp;&nbsp; **+** | **0** | &nbsp;&nbsp; **-** &nbsp;&nbsp; | **0** | **+** &nbsp;&nbsp;&nbsp; |
-            """)
-            st.caption("La fonction est **négative** entre les racines ($1$ et $-3$) car elle passe sous l'axe jaune.")
-            
+            <div class="tab-container">
+                <div class="tab-title">✨ Signe de f(x)</div>
+                <div class="row-x">x : -∞ &nbsp;&nbsp; -3 &nbsp;&nbsp; 1 &nbsp;&nbsp; +∞</div>
+                <div class="sign-box">
+                    <span>+</span>
+                    <span style="color:#ff0000">0</span>
+                    <span>-</span>
+                    <span style="color:#ff0000">0</span>
+                    <span>+</span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            st.caption("F(x) est négatif (sous l'axe) entre les racines.")
+    
     # --- ONGLET SIMULATEUR ---
     with t_calc:
         st.write("### 🕹️ Simulateur Interactif")
