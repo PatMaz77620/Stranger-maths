@@ -452,63 +452,101 @@ elif st.session_state.page == 'chap3':
         with col_c:
             st.altair_chart(final_chart, use_container_width=False, theme=None)
 
-# --- SECTION TABLEAUX GRAPHIQUES ---
+# --- SECTION TABLEAUX GRAPHIQUES OPTIMISÉS ---
         st.divider()
         st.write("### 📋 Synthèse de l'étude : $f(x) = 2x^2 + 4x - 6$")
         
-        # Style CSS pour les tableaux personnalisés
         st.markdown("""
             <style>
             .tab-container {
                 border: 2px solid #444;
                 border-radius: 10px;
-                padding: 15px;
                 background-color: #161b22;
-                text-align: center;
                 font-family: 'Courier New', Courier, monospace;
+                width: 100%;
+                margin-bottom: 10px;
             }
-            .tab-title { color: #ff0000; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
-            .row-x { border-bottom: 1px solid #444; padding: 5px; font-weight: bold; color: #00d4ff; }
-            .row-f { padding: 10px; height: 80px; position: relative; }
-            .arrow-down { position: absolute; left: 20%; top: 20%; font-size: 25px; }
-            .arrow-up { position: absolute; right: 20%; top: 20%; font-size: 25px; }
-            .val-beta { position: absolute; left: 50%; bottom: 10%; transform: translateX(-50%); color: #ff0000; font-weight: bold; font-size: 20px; }
-            .sign-box { display: flex; justify-content: space-around; align-items: center; padding-top: 15px; font-size: 18px; }
+            .tab-title { 
+                background-color: #ff0000; color: white; padding: 5px; 
+                font-weight: bold; text-align: center; border-radius: 8px 8px 0 0;
+            }
+            
+            /* STRUCTURE GRILLE VARIATIONS */
+            .grid-var {
+                display: grid;
+                grid-template-columns: 1fr 2fr 1fr;
+                text-align: center;
+                color: #00d4ff;
+            }
+            .var-arrows {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                height: 100px;
+                align-items: center;
+                position: relative;
+            }
+            .arrow-big { font-size: 50px; color: white; }
+            .min-val { font-size: 24px; color: #ff0000; font-weight: bold; margin-top: -20px; }
+
+            /* STRUCTURE GRILLE SIGNES */
+            .grid-sign {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+                text-align: center;
+                align-items: center;
+                color: #00d4ff;
+                padding: 10px 0;
+            }
+            .sep-zero {
+                border-left: 2px solid #444;
+                height: 60px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+            .zero-circle { color: #ff0000; font-weight: bold; font-size: 18px; margin-bottom: 2px; }
             </style>
         """, unsafe_allow_html=True)
 
         col_var, col_sign = st.columns(2)
 
         with col_var:
-            st.markdown(f"""
+            st.markdown("""
             <div class="tab-container">
                 <div class="tab-title">📈 Variations</div>
-                <div class="row-x">x : -∞ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +∞</div>
-                <div class="row-f">
-                    <span class="arrow-down">↘️</span>
-                    <span class="arrow-up">↗️</span>
-                    <span class="val-beta">-8</span>
+                <div class="grid-var" style="border-bottom: 1px solid #444; padding: 5px;">
+                    <span>-∞</span><span>-1</span><span>+∞</span>
+                </div>
+                <div class="var-arrows">
+                    <div class="arrow-big">↘️</div>
+                    <div class="arrow-big">↗️</div>
+                </div>
+                <div style="text-align: center; width: 100%; margin-top: -25px; padding-bottom: 10px;">
+                    <span class="min-val">-8</span>
                 </div>
             </div>
             """, unsafe_allow_html=True)
-            st.caption("Le minimum est -8, atteint pour x = -1.")
 
         with col_sign:
-            st.markdown(f"""
+            st.markdown("""
             <div class="tab-container">
                 <div class="tab-title">✨ Signe de f(x)</div>
-                <div class="row-x">x : -∞ &nbsp;&nbsp; -3 &nbsp;&nbsp; 1 &nbsp;&nbsp; +∞</div>
-                <div class="sign-box">
-                    <span>+</span>
-                    <span style="color:#ff0000">0</span>
-                    <span>-</span>
-                    <span style="color:#ff0000">0</span>
-                    <span>+</span>
+                <div class="grid-var" style="border-bottom: 1px solid #444; padding: 5px;">
+                    <span>-∞</span><span>-3</span><span>&nbsp;</span><span>1</span><span>+∞</span>
+                </div>
+                <div class="grid-sign">
+                    <div style="font-size: 25px;">+</div>
+                    <div class="sep-zero"><span class="zero-circle">0</span></div>
+                    <div style="font-size: 25px;">-</div>
+                    <div class="sep-zero"><span class="zero-circle">0</span></div>
+                    <div style="font-size: 25px;">+</div>
                 </div>
             </div>
             """, unsafe_allow_html=True)
-            st.caption("F(x) est négatif (sous l'axe) entre les racines.")
-    
+
+        st.caption("💡 Le minimum -8 correspond au sommet. Les '0' correspondent aux intersections avec l'axe jaune (racines).")
+
+        
     # --- ONGLET SIMULATEUR ---
     with t_calc:
         st.write("### 🕹️ Simulateur Interactif")
