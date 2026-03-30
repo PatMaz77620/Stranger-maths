@@ -342,7 +342,7 @@ elif st.session_state.page == 'chap3':
     
     t_cours, t_galerie, t_calc = st.tabs(["📚 Les 3 Formes (Cours)", "🖼️ Galerie de Paraboles", "📈 Simulateur"])
 
-    # --- ONGLET COURS (AVEC EXEMPLE UNIQUE) ---
+ # --- ONGLET COURS (AVEC EXEMPLE UNIQUE) ---
     with t_cours:
         st.write("### 🧬 Les 3 visages d'une même fonction")
         st.write("Pour comprendre les formes, nous allons utiliser un exemple unique :")
@@ -356,16 +356,21 @@ elif st.session_state.page == 'chap3':
         with st.expander("2. Forme Canonique : f(x) = a(x - α)² + β"):
             st.write("**Notre exemple :** $f(x) = 2(x + 1)^2 - 8$")
             st.success(r"""
-            **Le Sommet $S(\alpha \ ; \ \beta)$ :** - $\alpha = -1$ est l'abscisse du sommet.  
-            - $\beta = -8$ est la **valeur minimale** de la fonction.  
-            - Ce minimum est atteint pour $x = -1$.
+            **Le Sommet $S(\alpha \ ; \ \beta)$ :** * **Calcul de $\alpha$ :** On utilise la formule $\alpha = \frac{-b}{2a}$.  
+              *Ici : $\alpha = \frac{-4}{2 \times 2} = -1$* * **Calcul de $\beta$ :** C'est l'image de $\alpha$ par la fonction.  
+              *Ici : $\beta = f(-1) = 2(-1)^2 + 4(-1) - 6 = -8$* * $\beta$ est la **valeur minimale** (car $a>0$) atteinte pour $x = \alpha$.
             """)
             st.latex(r"S = (-1 \ ; \ -8)")
             
         with st.expander("3. Forme Factorisée : f(x) = a(x - x₁)(x - x₂)"):
             st.write("**Notre exemple :** $f(x) = 2(x - 1)(x + 3)$")
-            st.warning("**Interprétation :** Les nombres **x₁ = 1** et **x₂ = -3** sont les racines (là où la courbe coupe l'axe horizontal).")
-
+            st.warning(r"""
+            **Interprétation :** Les nombres **$x_1 = 1$** et **$x_2 = -3$** sont les **racines**.  
+            Ce sont les solutions de l'équation **$f(x) = 0$**.  
+            Graphiquement, ce sont les points où la courbe coupe l'axe des abscisses (horizontal).
+            """)
+            st.latex(r"f(1) = 0 \quad \text{et} \quad f(-3) = 0")
+            
     # --- ONGLET GALERIE (VISUALISATION DE L'EXEMPLE) ---
     with t_galerie:
         st.write("### 🖼️ Visualisation de notre exemple unique")
