@@ -1,7 +1,4 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
-import altair as alt
 from PIL import Image
 import random
 
@@ -384,59 +381,74 @@ elif st.session_state.page == 'chap3':
             """)
             st.latex(r"f(1) = 0 \quad \text{et} \quad f(-3) = 0")
             
-# --- ONGLET GALERIE (VISUALISATION COMPLÈTE) ---
+# --- ONGLET GALERIE (VISUALISATION COMPLÈTE CORRIGÉE) ---
     with t_galerie:
+        import pandas as pd
+        import numpy as np
+        import altair as alt
+
         st.write("### 🖼️ Analyse Visuelle de l'exemple Unique")
         
         # 1. PRÉSENTATION DES 3 FORMES
         st.info(r"""
-        **Les 3 écritures de la même fonction $f$ :** * **Forme Développée :** $f(x) = 2x^2 + 4x - 6$  
+        **Les 3 écritures de la même fonction $f$ :**
+        * **Forme Développée :** $f(x) = 2x^2 + 4x - 6$  
         * **Forme Canonique :** $f(x) = 2(x + 1)^2 - 8$  
         * **Forme Factorisée :** $f(x) = 2(x - 1)(x + 3)$
         """)
-
-        # 2. PRÉPARATION DES POINTS CLÉS (Format DataFrame pour Altair)
+        
+        # 2. PRÉPARATION DES DONNÉES
+        # Points singuliers
         df_points = pd.DataFrame([
-            {'name': 'Sommet S', 'x': -1, 'y': -8},
-            {'name': 'Racine R1', 'x': 1, 'y': 0},
-            {'name': 'Racine R2', 'x': -3, 'y': 0},
-            {'name': 'Ordonnée C', 'x': 0, 'y': -6}
+            {'name': 'S (Sommet)', 'x': -1, 'y': -8},
+            {'name': 'R1 (Racine)', 'x': 1, 'y': 0},
+            {'name': 'R2 (Racine)', 'x': -3, 'y': 0},
+            {'name': 'C (Ordonnée y)', 'x': 0, 'y': -6}
         ])
         
-        # 3. GÉNÉRATION DE LA COURBE
+        # Courbe (200 points pour un tracé lisse)
         x_plot = np.linspace(-5, 3, 200)
         y_plot = 2 * (x_plot - 1) * (x_plot + 3)
         df_courbe = pd.DataFrame({'x': x_plot, 'y': y_plot})
         
-        # 4. CRÉATION DU GRAPHIQUE
-        # La ligne rouge (la parabole)
-        curve = alt.Chart(df_courbe).mark_line(color='#ff0000', size=3).encode(
-            x=alt.X('x', title='Axe des Abscisses (x)', scale=alt.Scale(domain=[-5, 3])),
-            y=alt.Y('y', title='Axe des Ordonnées (y)')
+        # 3. CRÉATION DU GRAPHIQUE ALTAIR
+        # La courbe rouge
+        base = alt.Chart(df_courbe).encode(
+            x=alt.X('x', title='Abscisses (x)', scale=alt.Scale(domain=[-5, 3])),
+            y=alt.Y('y', title='Ordonnées (y)')
         )
         
-        # Les points blancs (les points singuliers)
-        points = alt.Chart(df_points).mark_circle(size=120, color='#ffffff', border=True).encode(
+        curve = base.mark_line(color='#ff0000', size=3)
+        
+        # Les points blancs
+        points = alt.Chart(df_points).mark_point(size=100, filled=True, color='white').encode(
             x='x',
             y='y',
             tooltip=['name', 'x', 'y']
         )
 
-        # Les étiquettes (noms des points affichés à côté)
-        text = points.mark_text(align='left', dx=10, dy=-10, color='white').encode(
+        # Les noms des points (étiquettes)
+        text = points.mark_text(align='left', dx=10, dy=-10, color='white', fontWeight='bold').encode(
             text='name'
         )
+
+        # Les axes du repère (lignes pointillées)
+        horiz_line = alt.Chart(pd.DataFrame({'y': [0]})).mark_rule(color='white', strokeDash=[4,4], opacity=0.5).encode(y='y')
+        vert_line = alt.Chart(pd.DataFrame({'x': [0]})).mark_rule(color='white', strokeDash=[4,4], opacity=0.5).encode(x='x')
         
-        # On superpose tout : Courbe + Points + Noms
-        st.altair_chart(curve + points + text, use_container_width=True)
+        # Affichage du combiné
+        st.altair_chart(curve + points + text + horiz_line + vert_line, use_container_width=True)
         
-        # 5. LÉGENDE PÉDAGOGIQUE
+        # 4. LÉGENDE PÉDAGOGIQUE RÉCAPITULATIVE
         st.success(r"""
-        **💡 Légende des Points Clés (survolez pour voir) :** - **⚪ S :** Le Sommet $S(-1 \ ; \ -8)$. Il donne le minimum (-8) pour $x = -1$ (visible dans la forme Canonique).
-        - **⚪ R1 & R2 :** Les Racines $(1 \ ; \ 0)$ et $(-3 \ ; \ 0)$. Elles sont les solutions de $f(x)=0$ (visibles dans la forme Factorisée).
-        - **⚪ C :** L'Ordonnée à l'origine $(0 \ ; \ -6)$. C'est le point où la courbe coupe l'axe $y$ (visible dans la forme Développée).
-        """)
+        **🎯 Ce qu'il faut retenir du graphique :**
         
+        * **Le Sommet $S(-1 \ ; \ -8)$ :** C'est le point le plus bas. On lit $\alpha=-1$ et $\beta=-8$ dans la **forme canonique**.
+        * **Les Racines $1$ et $-3$ :** Là où la courbe coupe l'axe horizontal. On les voit dans la **forme factorisée**.
+        * **L'ordonnée à l'origine $-6$ :** Là où la courbe coupe l'axe vertical. C'est le coefficient $c$ de la **forme développée**.
+        """)
+
+    
     # --- ONGLET SIMULATEUR ---
     with t_calc:
         st.write("### 🕹️ Simulateur Interactif")
