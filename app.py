@@ -381,15 +381,15 @@ elif st.session_state.page == 'chap3':
             """)
             st.latex(r"f(1) = 0 \quad \text{et} \quad f(-3) = 0")
 
-# --- ONGLET GALERIE (VERSION HAUTE VISIBILITÉ) ---
+# --- ONGLET GALERIE (VERSION ORTHONORMÉE) ---
     with t_galerie:
         import pandas as pd
         import numpy as np
         import altair as alt
 
-        st.write("### 🖼️ Analyse Visuelle Complète")
+        st.write("### 🖼️ Analyse Visuelle Complète (Repère Orthonormé)")
         
-        # 1. PRÉSENTATION DES 3 FORMES
+        # 1. PRÉSENTATION DES 3 FORMES [cite: 55]
         st.info(r"""
         **Les 3 écritures de la même fonction $f$ :**
         * **Forme Développée :** $f(x) = 2x^2 + 4x - 6$  
@@ -397,43 +397,57 @@ elif st.session_state.page == 'chap3':
         * **Forme Factorisée :** $f(x) = 2(x - 1)(x + 3)$
         """)
         
-        # 2. DONNÉES
+        # 2. DONNÉES [cite: 56, 57, 58]
         df_pts = pd.DataFrame([
             {'name': 'S (-1 ; -8)', 'x': -1, 'y': -8},
             {'name': 'R1 (1 ; 0)', 'x': 1, 'y': 0},
             {'name': 'R2 (-3 ; 0)', 'x': -3, 'y': 0},
             {'name': 'C (0 ; -6)', 'x': 0, 'y': -6}
         ])
-        x_p = np.linspace(-5, 3, 200)
+        x_p = np.linspace(-5, 5, 400) # Élargi pour l'aspect visuel
         y_p = 2 * (x_p - 1) * (x_p + 3)
         df_c = pd.DataFrame({'x': x_p, 'y': y_p})
 
-        # 3. CRÉATION DES ÉLÉMENTS VISUELS
-        # La courbe rouge
-        curve = alt.Chart(df_c).mark_line(color='#ff0000', size=4).encode(
-            x=alt.X('x', scale=alt.Scale(domain=[-5, 3]), title="Abscisses"),
-            y=alt.Y('y', scale=alt.Scale(domain=[-10, 25]), title="Ordonnées")
+        # 3. CRÉATION DU GRAPHIQUE
+        # On définit des axes avec un 'tickCount' ou 'step' de 1
+        base = alt.Chart(df_c).encode(
+            x=alt.X('x', 
+                scale=alt.Scale(domain=[-6, 6]), 
+                title="Abscisses (x)",
+                axis=alt.Axis(tickMinStep=1, grid=True, gridColor='#333333')
+            ),
+            y=alt.Y('y', 
+                scale=alt.Scale(domain=[-10, 10]), # Zoomé pour mieux voir l'unité
+                title="Ordonnées (y)",
+                axis=alt.Axis(tickMinStep=1, grid=True, gridColor='#333333')
+            )
+        )
+        
+        curve = base.mark_line(color='#ff0000', size=4).transform_filter(
+            (alt.datum.y <= 12) & (alt.datum.y >= -10) # On coupe la courbe pour le zoom
         )
 
-        # LES AXES : On utilise du JAUNE (#ffff00) car le blanc est parfois grisé par Streamlit
+        # Axes Jaunes [cite: 60, 61]
         axe_h = alt.Chart(pd.DataFrame({'y': [0]})).mark_rule(color='#ffff00', size=2).encode(y='y')
         axe_v = alt.Chart(pd.DataFrame({'x': [0]})).mark_rule(color='#ffff00', size=2).encode(x='x')
 
-        # Les points et textes en CYAN
+        # Points et Textes Cyan [cite: 62]
         points = alt.Chart(df_pts).mark_point(size=180, filled=True, color='#00d4ff').encode(x='x', y='y')
-        text = points.mark_text(align='left', dx=15, dy=-15, fontSize=14, fontWeight='bold', color='#00d4ff').encode(text='name')
+        text = points.mark_text(align='left', dx=15, dy=-15, fontSize=13, fontWeight='bold', color='#00d4ff').encode(text='name')
 
-        # 4. AFFICHAGE SANS THÈME (Indispensable pour garder nos couleurs)
+        # 4. CONFIGURATION ET ASPECT "CARRÉ"
         chart = (curve + axe_h + axe_v + points + text).configure_axis(
             labelColor='white',
             titleColor='white',
-            grid=False,
             domain=False
-        ).properties(height=500)
+        ).properties(
+            width=500, # Largeur et hauteur proches pour l'aspect orthonormé
+            height=500
+        )
 
-        st.altair_chart(chart, use_container_width=True, theme=None)
+        st.altair_chart(chart, use_container_width=False, theme=None) # use_container_width=False pour garder le ratio
 
-        st.success("💡 Les axes sont en jaune pour une visibilité maximale sur fond sombre.")
+        st.success("📏 Le repère est maintenant gradué de 1 en 1.")
 
 
     # --- ONGLET SIMULATEUR ---
