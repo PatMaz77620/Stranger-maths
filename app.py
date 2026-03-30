@@ -230,11 +230,20 @@ elif st.session_state.page == 'chap2':
     with t_gen:
         st.subheader("📚 Guide de survie : Généralités")
         with st.expander("🤔 Comment différencier Explicite et Récurrence ?"):
-            st.write("**Tuyau de Dustin :** Regarde ce qu'il y a après le signe égal.")
-            st.write("- Si tu vois un **n** seul : c'est **Explicite**.")
-            st.latex(r"u_n = 5n - 2 \rightarrow u_{10} = 48")
-            st.write("- Si tu vois un **u_n** : c'est **Récurrence**.")
-            st.latex(r"u_{n+1} = u_n + 10")
+            st.write("**Tuyau de Dustin :** Regarde bien la structure de l'énoncé.")
+            
+            st.write("#### 1️⃣ Forme Explicite (Le raccourci)")
+            st.write("Il n'y a **qu'une seule ligne**. On calcule n'importe quel terme directement avec **n**.")
+            st.latex(r"u_n = 5n - 2")
+            st.write("👉 *Exemple : Pour $u_{10}$, on remplace juste n par 10.*")
+            
+            st.divider()
+            
+            st.write("#### 2️⃣ Forme Récurrence (L'escalier)")
+            st.warning("⚠️ **Attention :** Une suite par récurrence comporte **TOUJOURS 2 lignes** !")
+            st.write("Il faut la valeur de départ ET la règle pour monter à la marche suivante.")
+            st.latex(r"\begin{cases} u_0 = 3 & \text{(Le premier terme)} \\ u_{n+1} = u_n + 10 & \text{(La relation de récurrence)} \end{cases}")
+            st.write("👉 *Ici, on ne peut pas calculer $u_{10}$ sans avoir calculé tous les termes avant.*")
 
         with st.expander("🛠️ Comment démontrer le type de suite ?"):
             st.write("### ➕ Arithmétique ?")
