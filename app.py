@@ -452,7 +452,32 @@ elif st.session_state.page == 'chap3':
         with col_c:
             st.altair_chart(final_chart, use_container_width=False, theme=None)
 
+# --- NOUVELLE SECTION : TABLEAUX DE VARIATION ET DE SIGNES ---
+        st.divider()
+        st.write("### 📋 Tableaux de l'exemple : $f(x) = 2(x + 1)^2 - 8$")
         
+        col_var, col_sign = st.columns(2)
+
+        with col_var:
+            st.subheader("📈 Variations")
+            st.markdown(f"""
+            | $x$ | $-\infty$ | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $-1$ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | $+\infty$ |
+            | :--- | :--- | :---: | :--- |
+            | $f(x)$ | &nbsp; | &nbsp; | &nbsp; |
+            | | ↘️ | | ↗️ |
+            | | | **-8** (Min) | |
+            """)
+            st.caption("La fonction décroît car $a > 0$, atteint son minimum $\\beta = -8$ en $\\alpha = -1$, puis recroît.")
+
+        with col_sign:
+            st.subheader("✨ Signe")
+            st.markdown(f"""
+            | $x$ | $-\infty$ | $-3$ | &nbsp;&nbsp; | $1$ | $+\infty$ |
+            | :--- | :--- | :---: | :---: | :---: | :--- |
+            | $f(x)$ | &nbsp;&nbsp;&nbsp; **+** | **0** | &nbsp;&nbsp; **-** &nbsp;&nbsp; | **0** | **+** &nbsp;&nbsp;&nbsp; |
+            """)
+            st.caption("La fonction est **négative** entre les racines ($1$ et $-3$) car elle passe sous l'axe jaune.")
+            
     # --- ONGLET SIMULATEUR ---
     with t_calc:
         st.write("### 🕹️ Simulateur Interactif")
