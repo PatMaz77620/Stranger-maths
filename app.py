@@ -381,7 +381,7 @@ elif st.session_state.page == 'chap3':
             """)
             st.latex(r"f(1) = 0 \quad \text{et} \quad f(-3) = 0")
 
-# --- ONGLET GALERIE (VERSION SÉCURITÉ MAXIMALE) ---
+# --- ONGLET GALERIE (VERSION HAUTE VISIBILITÉ) ---
     with t_galerie:
         import pandas as pd
         import numpy as np
@@ -389,52 +389,52 @@ elif st.session_state.page == 'chap3':
 
         st.write("### 🖼️ Analyse Visuelle Complète")
         
-        # 1. DONNÉES DE LA COURBE
-        x_plot = np.linspace(-5, 3, 200)
-        y_plot = 2 * (x_plot - 1) * (x_plot + 3)
-        df_courbe = pd.DataFrame({'x': x_plot, 'y': y_plot})
-
-        # 2. DONNÉES DES POINTS (Cyan)
+        # 1. PRÉSENTATION DES 3 FORMES
+        st.info(r"""
+        **Les 3 écritures de la même fonction $f$ :**
+        * **Forme Développée :** $f(x) = 2x^2 + 4x - 6$  
+        * **Forme Canonique :** $f(x) = 2(x + 1)^2 - 8$  
+        * **Forme Factorisée :** $f(x) = 2(x - 1)(x + 3)$
+        """)
+        
+        # 2. DONNÉES
         df_pts = pd.DataFrame([
             {'name': 'S (-1 ; -8)', 'x': -1, 'y': -8},
             {'name': 'R1 (1 ; 0)', 'x': 1, 'y': 0},
             {'name': 'R2 (-3 ; 0)', 'x': -3, 'y': 0},
             {'name': 'C (0 ; -6)', 'x': 0, 'y': -6}
         ])
+        x_p = np.linspace(-5, 3, 200)
+        y_p = 2 * (x_p - 1) * (x_p + 3)
+        df_c = pd.DataFrame({'x': x_p, 'y': y_p})
 
-        # 3. DONNÉES DES AXES (On les traite comme des segments de droite)
-        # Axe horizontal de x=-5 à x=3 pour y=0
-        df_axe_h = pd.DataFrame({'x': [-5, 3], 'y': [0, 0]})
-        # Axe vertical de y=-10 à y=25 pour x=0
-        df_axe_v = pd.DataFrame({'x': [0, 0], 'y': [-10, 25]})
-
-        # --- CONSTRUCTION COUCHE PAR COUCHE ---
-        
-        # Fond : Les axes en BLANC (très épais)
-        line_h = alt.Chart(df_axe_h).mark_line(color='white', size=4).encode(x='x', y='y')
-        line_v = alt.Chart(df_axe_v).mark_line(color='white', size=4).encode(x='x', y='y')
-
-        # Milieu : La courbe en ROUGE
-        main_curve = alt.Chart(df_courbe).mark_line(color='#ff0000', size=4).encode(
+        # 3. CRÉATION DES ÉLÉMENTS VISUELS
+        # La courbe rouge
+        curve = alt.Chart(df_c).mark_line(color='#ff0000', size=4).encode(
             x=alt.X('x', scale=alt.Scale(domain=[-5, 3]), title="Abscisses"),
             y=alt.Y('y', scale=alt.Scale(domain=[-10, 25]), title="Ordonnées")
         )
 
-        # Sommet : Points et Textes en CYAN
-        scatter_pts = alt.Chart(df_pts).mark_point(size=200, filled=True, color='#00d4ff').encode(x='x', y='y')
-        labels = alt.Chart(df_pts).mark_text(align='left', dx=15, dy=-15, fontSize=15, fontWeight='bold', color='#00d4ff').encode(x='x', y='y', text='name')
+        # LES AXES : On utilise du JAUNE (#ffff00) car le blanc est parfois grisé par Streamlit
+        axe_h = alt.Chart(pd.DataFrame({'y': [0]})).mark_rule(color='#ffff00', size=2).encode(y='y')
+        axe_v = alt.Chart(pd.DataFrame({'x': [0]})).mark_rule(color='#ffff00', size=2).encode(x='x')
 
-        # ASSEMBLAGE FINAL
-        # On force l'affichage sans aucun thème Streamlit
-        st.altair_chart(
-            (line_h + line_v + main_curve + scatter_pts + labels).configure_axis(
-                grid=False, 
-                labelColor='white', 
-                titleColor='white'
-            ).properties(height=500), 
-            use_container_width=True, 
-            theme=None
-        )
+        # Les points et textes en CYAN
+        points = alt.Chart(df_pts).mark_point(size=180, filled=True, color='#00d4ff').encode(x='x', y='y')
+        text = points.mark_text(align='left', dx=15, dy=-15, fontSize=14, fontWeight='bold', color='#00d4ff').encode(text='name')
+
+        # 4. AFFICHAGE SANS THÈME (Indispensable pour garder nos couleurs)
+        chart = (curve + axe_h + axe_v + points + text).configure_axis(
+            labelColor='white',
+            titleColor='white',
+            grid=False,
+            domain=False
+        ).properties(height=500)
+
+        st.altair_chart(chart, use_container_width=True, theme=None)
+
+        st.success("💡 Les axes sont en jaune pour une visibilité maximale sur fond sombre.")
+
 
     # --- ONGLET SIMULATEUR ---
     with t_calc:
