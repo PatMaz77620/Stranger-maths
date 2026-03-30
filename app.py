@@ -381,7 +381,7 @@ elif st.session_state.page == 'chap3':
             """)
             st.latex(r"f(1) = 0 \quad \text{et} \quad f(-3) = 0")
 
-# --- ONGLET GALERIE (VERSION RÉALITÉ AUGMENTÉE - CONTRASTE TOTAL) ---
+# --- ONGLET GALERIE (VERSION SÉCURITÉ MAXIMALE) ---
     with t_galerie:
         import pandas as pd
         import numpy as np
@@ -389,57 +389,52 @@ elif st.session_state.page == 'chap3':
 
         st.write("### 🖼️ Analyse Visuelle Complète")
         
-        # 1. PRÉSENTATION DES 3 FORMES [cite: 122]
-        st.info(r"""
-        **Les 3 écritures de la même fonction $f$ :**
-        * **Forme Développée :** $f(x) = 2x^2 + 4x - 6$  
-        * **Forme Canonique :** $f(x) = 2(x + 1)^2 - 8$  
-        * **Forme Factorisée :** $f(x) = 2(x - 1)(x + 3)$
-        """)
-        
-        # 2. DONNÉES [cite: 123, 124, 125]
-        df_points = pd.DataFrame([
+        # 1. DONNÉES DE LA COURBE
+        x_plot = np.linspace(-5, 3, 200)
+        y_plot = 2 * (x_plot - 1) * (x_plot + 3)
+        df_courbe = pd.DataFrame({'x': x_plot, 'y': y_plot})
+
+        # 2. DONNÉES DES POINTS (Cyan)
+        df_pts = pd.DataFrame([
             {'name': 'S (-1 ; -8)', 'x': -1, 'y': -8},
             {'name': 'R1 (1 ; 0)', 'x': 1, 'y': 0},
             {'name': 'R2 (-3 ; 0)', 'x': -3, 'y': 0},
             {'name': 'C (0 ; -6)', 'x': 0, 'y': -6}
         ])
-        x_plot = np.linspace(-5, 3, 200)
-        y_plot = 2 * (x_plot - 1) * (x_plot + 3)
-        df_courbe = pd.DataFrame({'x': x_plot, 'y': y_plot})
 
-        # 3. COMPOSANTS DU GRAPHIQUE 
+        # 3. DONNÉES DES AXES (On les traite comme des segments de droite)
+        # Axe horizontal de x=-5 à x=3 pour y=0
+        df_axe_h = pd.DataFrame({'x': [-5, 3], 'y': [0, 0]})
+        # Axe vertical de y=-10 à y=25 pour x=0
+        df_axe_v = pd.DataFrame({'x': [0, 0], 'y': [-10, 25]})
+
+        # --- CONSTRUCTION COUCHE PAR COUCHE ---
         
-        # Courbe de base
-        base = alt.Chart(df_courbe).encode(
+        # Fond : Les axes en BLANC (très épais)
+        line_h = alt.Chart(df_axe_h).mark_line(color='white', size=4).encode(x='x', y='y')
+        line_v = alt.Chart(df_axe_v).mark_line(color='white', size=4).encode(x='x', y='y')
+
+        # Milieu : La courbe en ROUGE
+        main_curve = alt.Chart(df_courbe).mark_line(color='#ff0000', size=4).encode(
             x=alt.X('x', scale=alt.Scale(domain=[-5, 3]), title="Abscisses"),
             y=alt.Y('y', scale=alt.Scale(domain=[-10, 25]), title="Ordonnées")
         )
-        
-        curve = base.mark_line(color='#ff0000', size=4)
 
-        # AXES FORCÉS (Lignes blanches pleines)
-        # On les définit comme des graphiques indépendants pour plus de force
-        rule_h = alt.Chart(pd.DataFrame({'y': [0]})).mark_rule(color='white', size=3, opacity=1).encode(y='y')
-        rule_v = alt.Chart(pd.DataFrame({'x': [0]})).mark_rule(color='white', size=3, opacity=1).encode(x='x')
+        # Sommet : Points et Textes en CYAN
+        scatter_pts = alt.Chart(df_pts).mark_point(size=200, filled=True, color='#00d4ff').encode(x='x', y='y')
+        labels = alt.Chart(df_pts).mark_text(align='left', dx=15, dy=-15, fontSize=15, fontWeight='bold', color='#00d4ff').encode(x='x', y='y', text='name')
 
-        # Points et Textes Cyan [cite: 129]
-        points = alt.Chart(df_points).mark_point(size=200, filled=True, color='#00d4ff').encode(x='x', y='y')
-        text = points.mark_text(align='left', dx=15, dy=-15, fontSize=15, fontWeight='bold', color='#00d4ff').encode(text='name')
-
-        # 4. ASSEMBLAGE ET CONFIGURATION AXES [cite: 130, 131]
-        # L'ordre compte : on met les règles (axes) EN DERNIER pour qu'elles soient par-dessus la grille
-        final_chart = (curve + points + text + rule_h + rule_v).configure_axis(
-            grid=True,
-            gridColor='#444444',
-            labelColor='white',
-            titleColor='white',
-            tickColor='white',
-            domain=False # On cache le domaine par défaut d'Altair car on a nos propres règles blanches
-        ).properties(height=500, width='container')
-
-        # CRUCIAL : theme=None empêche Streamlit de modifier les couleurs
-        st.altair_chart(final_chart, use_container_width=True, theme=None)
+        # ASSEMBLAGE FINAL
+        # On force l'affichage sans aucun thème Streamlit
+        st.altair_chart(
+            (line_h + line_v + main_curve + scatter_pts + labels).configure_axis(
+                grid=False, 
+                labelColor='white', 
+                titleColor='white'
+            ).properties(height=500), 
+            use_container_width=True, 
+            theme=None
+        )
 
     # --- ONGLET SIMULATEUR ---
     with t_calc:
