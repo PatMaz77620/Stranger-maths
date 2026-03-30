@@ -179,12 +179,10 @@ elif st.session_state.page == 'chap1':
             st.balloons(); st.success("Bravo !")
         else:
             st.error(f"Faux, c'était {formater_fr(corr)}")
-
 # =================================================================
-# CHAPITRE 2 : SUITES NUMÉRIQUES
+# CHAPITRE 2 : SUITES NUMÉRIQUES (AVEC COURS)
 # =================================================================
 elif st.session_state.page == 'chap2':
-    # Container pour styliser le bouton retour différemment
     st.markdown('<div class="btn-retour">', unsafe_allow_html=True)
     st.button("⬅️ Menu principal", on_click=aller_a_home)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -193,6 +191,7 @@ elif st.session_state.page == 'chap2':
     
     t_gen, t_ari, t_geo = st.tabs(["📚 Généralités", "➕ Arithmétiques", "✖️ Géométriques"])
 
+    # --- ONGLET GÉNÉRALITÉS ---
     with t_gen:
         st.subheader("📚 Guide de survie : Généralités")
         with st.expander("🤔 Comment différencier Explicite et Récurrence ?"):
@@ -210,20 +209,46 @@ elif st.session_state.page == 'chap2':
 
         with st.expander("📉 Comment démontrer la Monotonie ?"):
             st.write(r"**Tuyau de Lucas :** Calcule $u_{n+1} - u_n$ et regarde son signe.")
-            # Utilisation du 'r' pour corriger les flèches (r"$\rightarrow$")
             st.success(r"Signe Positif (+) $\rightarrow$ La suite est **Croissante**.")
             st.warning(r"Signe Négatif (-) $\rightarrow$ La suite est **Décroissante**.")
 
+    # --- ONGLET ARITHMÉTIQUES (AVEC RAPPEL) ---
     with t_ari:
-        u0_a = st.number_input("u0", value=10.0, key="u0a_input")
-        r_a = st.number_input("Raison r", value=2.0, key="ra_input")
-        st.line_chart([u0_a + (i * r_a) for i in range(11)])
+        st.markdown("### 🪜 La progression constante")
+        st.info(r"""
+        **Concept :** On passe d'un terme au suivant en **ajoutant** toujours le même nombre $r$ (la raison).  
+        * **Récurrence :** $u_{n+1} = u_n + r$  
+        * **Explicite :** $u_n = u_0 + n \times r$
+        """)
+        
+        c1, c2 = st.columns([1, 2])
+        with c1:
+            st.write("**Paramètres :**")
+            u0_a = st.number_input("Premier terme u0", value=10.0, key="u0a_input")
+            r_a = st.number_input("Raison r", value=2.0, key="ra_input")
+        with c2:
+            st.write("**Visualisation :**")
+            st.line_chart([u0_a + (i * r_a) for i in range(11)])
 
+    # --- ONGLET GÉOMÉTRIQUES (AVEC RAPPEL) ---
     with t_geo:
-        u0_g = st.number_input("Capital (€)", value=1000.0, key="u0g_input")
-        q_g = st.number_input("Raison q", value=1.03, step=0.01, key="qg_input")
-        st.area_chart([u0_g * (q_g ** i) for i in range(11)])
+        st.markdown("### 🚀 La progression explosive")
+        st.info(r"""
+        **Concept :** On passe d'un terme au suivant en **multipliant** toujours par le même nombre $q$ (la raison).  
+        * **Récurrence :** $u_{n+1} = u_n \times q$  
+        * **Explicite :** $u_n = u_0 \times q^n$
+        """)
+        
+        c1, c2 = st.columns([1, 2])
+        with c1:
+            st.write("**Paramètres :**")
+            u0_g = st.number_input("Premier terme u0", value=1000.0, key="u0g_input")
+            q_g = st.number_input("Raison q", value=1.03, step=0.01, key="qg_input")
+        with c2:
+            st.write("**Visualisation :**")
+            st.area_chart([u0_g * (q_g ** i) for i in range(11)])
 
+    # --- DÉFI ---
     st.divider()
     st.write("### ❓ Défi des Suites")
 
@@ -248,9 +273,9 @@ elif st.session_state.page == 'chap2':
     col_s1, col_s2 = st.columns(2)
     if col_s1.button("Vérifier"):
         if abs(rep_suite - corr_suite) < 0.01:
-            st.balloons(); st.success(f"Bravo ! C'était {corr_suite}")
+            st.balloons(); st.success(f"Bravo ! C'était bien {formater_fr(corr_suite)}")
         else:
-            st.error(f"Faux ! Le résultat était {corr_suite}")
+            st.error(f"Faux ! Le résultat était {formater_fr(corr_suite)}")
 
     if col_s2.button("Autre défi 🔄"):
         del st.session_state.suite_type
