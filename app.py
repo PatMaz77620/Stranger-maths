@@ -355,13 +355,23 @@ elif st.session_state.page == 'chap3':
             
         with st.expander("2. Forme Canonique : f(x) = a(x - α)² + β"):
             st.write("**Notre exemple :** $f(x) = 2(x + 1)^2 - 8$")
+            
             st.success(r"""
-            **Le Sommet $S(\alpha \ ; \ \beta)$ :** * **Calcul de $\alpha$ :** On utilise la formule $\alpha = \frac{-b}{2a}$.  
-              *Ici : $\alpha = \frac{-4}{2 \times 2} = -1$* * **Calcul de $\beta$ :** C'est l'image de $\alpha$ par la fonction.  
-              *Ici : $\beta = f(-1) = 2(-1)^2 + 4(-1) - 6 = -8$* * $\beta$ est la **valeur minimale** (car $a>0$) atteinte pour $x = \alpha$.
+            **🎯 Le Sommet $S(\alpha \ ; \ \beta)$ :**
+            
+            * **Calcul de $\alpha$ :** On utilise la formule $\alpha = \frac{-b}{2a}$
+                * *Ici :* $\alpha = \frac{-4}{2 \times 2} = \mathbf{-1}$
+            
+            * **Calcul de $\beta$ :** C'est l'image de $\alpha$ par la fonction ($f(\alpha)$)
+                * *Ici :* $\beta = f(-1) = 2(-1)^2 + 4(-1) - 6 = \mathbf{-8}$
+            
+            **💡 Interprétation :**
+            Le sommet de la parabole est le point **$S(-1 \ ; \ -8)$**.  
+            Comme $a > 0$, la valeur **$\beta = -8$** est le **minimum** de la fonction.  
+            Il est atteint pour **$x = -1$**.
             """)
             st.latex(r"S = (-1 \ ; \ -8)")
-            
+    
         with st.expander("3. Forme Factorisée : f(x) = a(x - x₁)(x - x₂)"):
             st.write("**Notre exemple :** $f(x) = 2(x - 1)(x + 3)$")
             st.warning(r"""
