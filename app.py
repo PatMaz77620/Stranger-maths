@@ -126,22 +126,27 @@ if st.session_state.page == 'home':
     st.write("### 🎮 Choisissez votre mission :")
     st.write("")
 
-    col1, col2 = st.columns(2)
+    # On crée 3 colonnes pour nos 3 chapitres
+    col1, col2, col3 = st.columns(3)
 
     with col1:
-        # 🎯 LA CARTE EST LE BOUTON 🎯
-        # Le CSS transforme ce bouton en carte avec l'icône 📟
+        # La carte 1 : Information Chiffrée (icône 📟 gérée par CSS via key)
         if st.button("Information Chiffrée", key="c1-btn"):
             st.session_state.page = 'chap1'
             st.rerun()
 
     with col2:
-        # 🎯 LA CARTE EST LE BOUTON 🎯
-        # Le CSS transforme ce bouton en carte avec l'icône 📈
+        # La carte 2 : Suites Numériques (icône 📈 gérée par CSS via key)
         if st.button("Suites Numériques", key="c2-btn"):
             st.session_state.page = 'chap2'
             st.rerun()
 
+    with col3:
+        # La carte 3 : 2nd Degré (icône 🛸 gérée par CSS via key)
+        if st.button("2nd Degré", key="c3-btn"):
+            st.session_state.page = 'chap3'
+            st.rerun()
+            
 # =================================================================
 # CHAPITRE 1 : INFORMATION CHIFFRÉE (AVEC COURS)
 # =================================================================
