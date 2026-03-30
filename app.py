@@ -500,7 +500,7 @@ elif st.session_state.page == 'chap3':
         
         
         st.caption("💡 Le minimum -8 correspond au sommet, qui représente ici le minimum de la fonction. Les '0' correspondent aux intersections avec l'axe jaune (racines ou solutions de l'équation f(x)=0).")
-        st.caption("💡 Ici a=2 est positif ; si a avait été négatif, la courbe aurait été inversée et on aurait eu un maximum et non pas un minimum ; de la même façon, le tableau de variation et le tableau de signes auraient été inversés.")
+        st.caption("💡 Ici a=2 est positif ; si a avait été négatif, la courbe aurait été inversée et on aurait eu un maximum et non pas un minimum ; de la même façon, le tableau de variations et le tableau de signes auraient été inversés.")
 
         
     # --- ONGLET SIMULATEUR ---
