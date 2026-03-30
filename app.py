@@ -381,18 +381,57 @@ elif st.session_state.page == 'chap3':
             """)
             st.latex(r"f(1) = 0 \quad \text{et} \quad f(-3) = 0")
             
-    # --- ONGLET GALERIE (VISUALISATION DE L'EXEMPLE) ---
+# --- ONGLET GALERIE (VISUALISATION COMPLÈTE) ---
     with t_galerie:
-        st.write("### 🖼️ Visualisation de notre exemple unique")
-        st.latex(r"f(x) = 2(x - 1)(x + 3) \quad \text{ou} \quad 2(x + 1)^2 - 8")
+        st.write("### 🖼️ Analyse Visuelle de l'exemple Unique")
         
-        # Calcul de la courbe précise pour l'exemple unique
-        x_galerie = [x / 10 for x in range(-50, 31)] # Plage de -5 à 3 pour bien voir les racines
-        y_galerie = [2 * (x - 1) * (x + 3) for x in x_galerie]
+        # 1. PRÉSENTATION DES 3 FORMES
+        st.info(r"""
+        **Les 3 écritures de la même fonction $f$ :** * **Forme Développée :** $f(x) = 2x^2 + 4x - 6$  
+        * **Forme Canonique :** $f(x) = 2(x + 1)^2 - 8$  
+        * **Forme Factorisée :** $f(x) = 2(x - 1)(x + 3)$
+        """)
         
-        st.line_chart(dict(zip(x_galerie, y_galerie)))
-        st.info("💡 **Analyse :** On voit bien que le minimum est -8 (en y) pour x = -1. Et la courbe coupe l'axe horizontal en x=1 et x=-3.")
-
+        # 2. CALCUL DES POINTS CLÉS
+        points_cles = {
+            'Sommet S': (-1, -8),
+            'Racine R1': (1, 0),
+            'Racine R2': (-3, 0),
+            'Ordonnée C': (0, -6)
+        }
+        
+        # 3. GÉNÉRATION DES DONNÉES DE LA COURBE (Plus de points pour la lisser)
+        import numpy as np # Assure-toi d'avoir importé numpy tout en haut de ton code
+        x_plot = np.linspace(-5, 3, 200) # De -5 à 3, avec 200 points
+        y_plot = 2 * (x_plot - 1) * (x_plot + 3)
+        
+        # 4. CRÉATION DU GRAPHIQUE INTERACTIF (Avec axes et points clés)
+        # On utilise st.altair_chart pour plus de contrôle sur les axes
+        import altair as alt # Assure-toi d'avoir importé altair tout en haut de ton code
+        
+        # Fond de la courbe
+        curve_data = alt.Chart(dict(x=x_plot, y=y_plot)).mark_line(color='#ff0000').encode(
+            x=alt.X('x', title='Axe des Abscisses (x)'),
+            y=alt.Y('y', title='Axe des Ordonnées (y)')
+        )
+        
+        # Points singuliers
+        points_data = alt.Chart(points_cles).mark_circle(size=100, color='#ffffff').encode(
+            x='x', y='y',
+            tooltip=['name', 'x', 'y'] # Affiche le nom du point au survol
+        )
+        
+        # Combinaison des deux
+        final_chart = curve_data + points_data
+        st.altair_chart(final_chart, use_container_width=True)
+        
+        # 5. LÉGENDE PÉDAGOGIQUE
+        st.success(r"""
+        **💡 Légende des Points Clés (survolez pour voir) :** - **⚪ S :** Le Sommet $S(-1 \ ; \ -8)$. Il donne le minimum (-8) pour $x = -1$ (visible dans la forme Canonique).
+        - **⚪ R1 & R2 :** Les Racines $(1 \ ; \ 0)$ et $(-3 \ ; \ 0)$. Elles sont les solutions de $f(x)=0$ (visibles dans la forme Factorisée).
+        - **⚪ C :** L'Ordonnée à l'origine $(0 \ ; \ -6)$. C'est le point où la courbe coupe l'axe $y$ (visible dans la forme Développée).
+        """)
+        
     # --- ONGLET SIMULATEUR ---
     with t_calc:
         st.write("### 🕹️ Simulateur Interactif")
