@@ -354,7 +354,7 @@ elif st.session_state.page == 'chap3':
             st.latex(r"f(0) = -6")
             
         with st.expander("2. Forme Canonique : f(x) = a(x - α)² + β"):
-            st.write("**Notre exemple :** $f(x) = 2(x + 1)^2 + (-8)$")
+            st.write("**Notre exemple :** $f(x) = 2(x + 1)^2 - 8$")
             st.success(r"""
             **Le Sommet $S(\alpha \ ; \ \beta)$ :** - $\alpha = -1$ est l'abscisse du sommet.  
             - $\beta = -8$ est la **valeur minimale** de la fonction.  
