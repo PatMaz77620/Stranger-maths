@@ -381,7 +381,7 @@ elif st.session_state.page == 'chap3':
             """)
             st.latex(r"f(1) = 0 \quad \text{et} \quad f(-3) = 0")
 
-# --- ONGLET GALERIE (VISUALISATION "STRANGER MATHS" POUR FOND SOMBRE) ---
+# --- ONGLET GALERIE (VERSION FINALE CONTRASTE CYAN/ROUGE) ---
     with t_galerie:
         import pandas as pd
         import numpy as np
@@ -398,75 +398,55 @@ elif st.session_state.page == 'chap3':
         """)
         
         # 2. PRÉPARATION DES DONNÉES
-        # On définit les points avec leurs coordonnées directement dans le nom
+        # Utilisation du CYAN (#00d4ff) pour détacher du rouge
         df_points = pd.DataFrame([
-            {'name': 'S (-1 ; -8)', 'x': -1, 'y': -8, 'color': '#ffffff', 'align': 'right'},
-            {'name': 'R1 (1 ; 0)', 'x': 1, 'y': 0, 'color': '#ff0000', 'align': 'left'},
-            {'name': 'R2 (-3 ; 0)', 'x': -3, 'y': 0, 'color': '#ff0000', 'align': 'right'},
-            {'name': 'C (0 ; -6)', 'x': 0, 'y': -6, 'color': '#ffffff', 'align': 'left'}
+            {'name': 'S (-1 ; -8)', 'x': -1, 'y': -8},
+            {'name': 'R1 (1 ; 0)', 'x': 1, 'y': 0},
+            {'name': 'R2 (-3 ; 0)', 'x': -3, 'y': 0},
+            {'name': 'C (0 ; -6)', 'x': 0, 'y': -6}
         ])
         
         x_plot = np.linspace(-5, 3, 200)
         y_plot = 2 * (x_plot - 1) * (x_plot + 3)
         df_courbe = pd.DataFrame({'x': x_plot, 'y': y_plot})
         
-        # 3. DÉFINITION D'UN THÈME ALTAIR "STRANGER MATHS" (INDISPENSABLE !)
-        # Cela force Altair à utiliser des couleurs contrastées pour les axes et les titres
-        def stranger_maths_theme():
-            return {
-                'config': {
-                    'axis': {
-                        'labelColor': '#e0e0e0', # Gris très clair pour les chiffres des graduations
-                        'titleColor': '#e0e0e0', # Gris très clair pour les titres d'axes (x, y)
-                        'gridColor': '#333333',  # Gris foncé pour la grille
-                        'domainColor': '#e0e0e0' # Gris très clair pour la ligne de l'axe lui-même
-                    },
-                    'view': {
-                        'stroke': 'transparent' # Pas de cadre autour du graphique
-                    }
-                }
-            }
-        
-        # On active ce thème pour tout le graphique
-        alt.themes.register('stranger_maths', stranger_maths_theme)
-        alt.themes.enable('stranger_maths')
-
-        # 4. CRÉATION DU GRAPHIQUE ALTAIR
+        # 3. CONSTRUCTION DU GRAPHIQUE
         base = alt.Chart(df_courbe).encode(
-            x=alt.X('x', title='Axe des Abscisses (x)', scale=alt.Scale(domain=[-5, 3])),
-            y=alt.Y('y', title='Axe des Ordonnées (y)', scale=alt.Scale(domain=[-10, 25]))
+            x=alt.X('x', title='Abscisses (x)', scale=alt.Scale(domain=[-5, 3])),
+            y=alt.Y('y', title='Ordonnées (y)', scale=alt.Scale(domain=[-10, 25]))
         )
         
-        # Courbe rouge épaisse
+        # La Courbe en ROUGE
         curve = base.mark_line(color='#ff0000', size=4)
         
-        # Points blancs pour S, R1, R2, C
-        points = alt.Chart(df_points).mark_point(size=120, filled=True, color='white').encode(
-            x='x', y='y', tooltip=['name']
+        # Les points en CYAN
+        points = alt.Chart(df_points).mark_point(size=200, filled=True, color='#00d4ff').encode(
+            x='x', y='y'
         )
 
-        # Noms des points FORCÉS EN ROUGE pour le contraste
+        # Le texte en CYAN GRAS (forcé pour être lisible)
         text = alt.Chart(df_points).mark_text(
-            align='left', dx=12, dy=-12, fontSize=14, fontWeight='bold', color='#ff0000' # Rouge néon pour le nom
+            align='left', dx=15, dy=-15, fontSize=15, fontWeight='bold', color='#00d4ff'
         ).encode(
             x='x', y='y', text='name'
         )
 
-        # Axes du repère (x=0 et y=0) FORCÉS EN GRIS TRÈS CLAIR
-        horiz_axis = alt.Chart(pd.DataFrame({'y': [0]})).mark_rule(color='#e0e0e0', size=1.5).encode(y='y')
-        vert_axis = alt.Chart(pd.DataFrame({'x': [0]})).mark_rule(color='#e0e0e0', size=1.5).encode(x='x')
+        # LES AXES DU REPÈRE EN BLANC PUR (ÉPAIS)
+        horiz_axis = alt.Chart(pd.DataFrame({'y': [0]})).mark_rule(color='#ffffff', size=2.5).encode(y='y')
+        vert_axis = alt.Chart(pd.DataFrame({'x': [0]})).mark_rule(color='#ffffff', size=2.5).encode(x='x')
         
-        # Affichage du combiné (on applique une hauteur pour aérer)
-        st.altair_chart((curve + points + text + horiz_axis + vert_axis).properties(height=400), use_container_width=True)
+        # CONFIGURATION RADICALE DES AXES ET GRADUATIONS
+        final_chart = (curve + points + text + horiz_axis + vert_axis).configure_axis(
+            labelColor='white',    # Chiffres des graduations en BLANC
+            titleColor='white',    # Titres x et y en BLANC
+            domainColor='white',   # Ligne de l'axe en BLANC
+            tickColor='white',     # Traits de graduation en BLANC
+            gridColor='#444444',   # Grille grise pour le repère
+            labelFontSize=13,
+            titleFontSize=15
+        ).properties(height=500)
         
-        # 5. LÉGENDE PÉDAGOGIQUE
-        st.success(r"""
-        **🎯 Points clés à repérer sur le graphique :**
-        * **Le Sommet $S$ :** Coordonnées $(-1 \ ; \ -8)$.
-        * **Les Racines $R1$ et $R2$ :** Intersection avec l'axe horizontal.
-        * **L'ordonnée à l'origine $C$ :** Intersection avec l'axe vertical à $-6$.
-        """) 
-        
+        st.altair_chart(final_chart, use_container_width=True)        
     # --- ONGLET SIMULATEUR ---
     with t_calc:
         st.write("### 🕹️ Simulateur Interactif")
