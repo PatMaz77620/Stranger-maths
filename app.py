@@ -499,7 +499,7 @@ elif st.session_state.page == 'chap3':
         st.pyplot(fig)
         
         
-        st.caption("💡 Le minimum -8 correspond au sommet. Les '0' correspondent aux intersections avec l'axe jaune (racines).")
+        st.caption("💡 Le minimum -8 correspond au sommet. Les '0' correspondent aux intersections avec l'axe jaune (racines ou solutions de l'équation f(x)=0). NB : ici a=2 est positif ; si a avait été négatif, la courbe aurait été inversée et on aurait eu un maximum et non pas un minimum ; de la même façon, le tableau de variation et le tableau de signes auraient été inversés ")
 
         
     # --- ONGLET SIMULATEUR ---
