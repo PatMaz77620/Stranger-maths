@@ -13,16 +13,22 @@ st.set_page_config(
 
 # --- 2. STYLE CSS (CORRECTION FINALE DU MENU) ---
 st.markdown("""
+
     <style>
-    /* 1. FOND ET TEXTE GENERAUX */
     .stApp { background-color: #0e1117; }
-    .stMarkdown, p, span, label, li, .stExpander p { color: #ffffff !important; }
-    h1, h2, h3 { color: #ff0000 !important; font-family: 'Helvetica'; text-shadow: 2px 2px 8px #ff0000; }
+    
+    /* --- MASQUER LE BOUTON DE FERMETURE SIDEBAR --- */
+    [data-testid="sidebar-collapse-button"] {
+        display: none !important;
+    }
 
-    /* 2. SIDEBAR */
-    [data-testid="collapsedControl"] { display: none !important; }
-    section[data-testid="stSidebar"] { background-color: #12151d !important; border-right: 2px solid #ff0000; }
+    /* --- SIDEBAR FIXE --- */
+    section[data-testid="stSidebar"] { 
+        background-color: #12151d !important; 
+        border-right: 2px solid #ff0000; 
+    }
 
+ 
     /* 3. 🎯 FIX ULTIME DU MENU DÉROULANT (LA PARTIE BLANCHE) */
 
     /* On force le conteneur du menu fermé en noir/rouge */
