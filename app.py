@@ -380,14 +380,14 @@ elif st.session_state.page == 'chap3':
             Graphiquement, ce sont les points où la courbe coupe l'axe des abscisses (horizontal).
             """)
             st.latex(r"f(1) = 0 \quad \text{et} \quad f(-3) = 0")
-            
-# --- ONGLET GALERIE (VISUALISATION COMPLÈTE CORRIGÉE) ---
+
+# --- ONGLET GALERIE (VISUALISATION OPTIMISÉE POUR FOND SOMBRE) ---
     with t_galerie:
         import pandas as pd
         import numpy as np
         import altair as alt
 
-        st.write("### 🖼️ Analyse Visuelle de l'exemple Unique")
+        st.write("### 🖼️ Analyse Visuelle Complète")
         
         # 1. PRÉSENTATION DES 3 FORMES
         st.info(r"""
@@ -398,57 +398,63 @@ elif st.session_state.page == 'chap3':
         """)
         
         # 2. PRÉPARATION DES DONNÉES
-        # Points singuliers
         df_points = pd.DataFrame([
-            {'name': 'S (Sommet)', 'x': -1, 'y': -8},
-            {'name': 'R1 (Racine)', 'x': 1, 'y': 0},
-            {'name': 'R2 (Racine)', 'x': -3, 'y': 0},
-            {'name': 'C (Ordonnée y)', 'x': 0, 'y': -6}
+            {'name': 'S (-1 ; -8)', 'x': -1, 'y': -8, 'align': 'right'},
+            {'name': 'R1 (1 ; 0)', 'x': 1, 'y': 0, 'align': 'left'},
+            {'name': 'R2 (-3 ; 0)', 'x': -3, 'y': 0, 'align': 'right'},
+            {'name': 'C (0 ; -6)', 'x': 0, 'y': -6, 'align': 'left'}
         ])
         
-        # Courbe (200 points pour un tracé lisse)
         x_plot = np.linspace(-5, 3, 200)
         y_plot = 2 * (x_plot - 1) * (x_plot + 3)
         df_courbe = pd.DataFrame({'x': x_plot, 'y': y_plot})
         
-        # 3. CRÉATION DU GRAPHIQUE ALTAIR
-        # La courbe rouge
+        # 3. CRÉATION DU GRAPHIQUE ALTAIR AVEC STYLE FORCÉ
         base = alt.Chart(df_courbe).encode(
             x=alt.X('x', title='Abscisses (x)', scale=alt.Scale(domain=[-5, 3])),
-            y=alt.Y('y', title='Ordonnées (y)')
+            y=alt.Y('y', title='Ordonnées (y)', scale=alt.Scale(domain=[-10, 25]))
         )
         
-        curve = base.mark_line(color='#ff0000', size=3)
+        # Courbe rouge épaisse
+        curve = base.mark_line(color='#ff0000', size=4)
         
-        # Les points blancs
-        points = alt.Chart(df_points).mark_point(size=100, filled=True, color='white').encode(
-            x='x',
-            y='y',
-            tooltip=['name', 'x', 'y']
-        )
-
-        # Les noms des points (étiquettes)
-        text = points.mark_text(align='left', dx=10, dy=-10, color='white', fontWeight='bold').encode(
-            text='name'
+        # Points blancs bien visibles
+        points = alt.Chart(df_points).mark_point(size=150, filled=True, color='white', stroke='red').encode(
+            x='x', y='y', tooltip=['name']
         )
 
-        # Les axes du repère (lignes pointillées)
-        horiz_line = alt.Chart(pd.DataFrame({'y': [0]})).mark_rule(color='white', strokeDash=[4,4], opacity=0.5).encode(y='y')
-        vert_line = alt.Chart(pd.DataFrame({'x': [0]})).mark_rule(color='white', strokeDash=[4,4], opacity=0.5).encode(x='x')
+        # Noms des points FORCÉS EN BLANC et décalés
+        text = alt.Chart(df_points).mark_text(
+            align='left', dx=12, dy=-12, fontSize=14, fontWeight='bold', color='white'
+        ).encode(
+            x='x', y='y', text='name'
+        )
+
+        # Axes (x=0 et y=0) FORCÉS EN BLANC
+        horiz_axis = alt.Chart(pd.DataFrame({'y': [0]})).mark_rule(color='white', size=1.5).encode(y='y')
+        vert_axis = alt.Chart(pd.DataFrame({'x': [0]})).mark_rule(color='white', size=1.5).encode(x='x')
         
-        # Affichage du combiné
-        st.altair_chart(curve + points + text + horiz_line + vert_line, use_container_width=True)
+        # --- CONFIGURATION DU THÈME SOMBRE ---
+        chart = (curve + points + text + horiz_axis + vert_axis).configure_axis(
+            labelColor='white',
+            titleColor='white',
+            gridColor='#333333'
+        ).configure_view(
+            strokeOpacity=0
+        ).properties(
+            height=400
+        )
         
-        # 4. LÉGENDE PÉDAGOGIQUE RÉCAPITULATIVE
+        st.altair_chart(chart, use_container_width=True)
+        
+        # 4. LÉGENDE PÉDAGOGIQUE
         st.success(r"""
-        **🎯 Ce qu'il faut retenir du graphique :**
-        
-        * **Le Sommet $S(-1 \ ; \ -8)$ :** C'est le point le plus bas. On lit $\alpha=-1$ et $\beta=-8$ dans la **forme canonique**.
-        * **Les Racines $1$ et $-3$ :** Là où la courbe coupe l'axe horizontal. On les voit dans la **forme factorisée**.
-        * **L'ordonnée à l'origine $-6$ :** Là où la courbe coupe l'axe vertical. C'est le coefficient $c$ de la **forme développée**.
+        **🎯 Points clés à repérer sur le graphique :**
+        * **Le Sommet $S$ :** Coordonnées $(-1 \ ; \ -8)$.
+        * **Les Racines $R1$ et $R2$ :** Intersection avec l'axe horizontal.
+        * **L'ordonnée à l'origine $C$ :** Intersection avec l'axe vertical à $-6$.
         """)
-
-    
+        
     # --- ONGLET SIMULATEUR ---
     with t_calc:
         st.write("### 🕹️ Simulateur Interactif")
