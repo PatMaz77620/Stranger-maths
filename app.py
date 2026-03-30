@@ -381,13 +381,14 @@ elif st.session_state.page == 'chap3':
             """)
             st.latex(r"f(1) = 0 \quad \text{et} \quad f(-3) = 0")
 
-# --- ONGLET GALERIE (VERSION ORTHONORMÉE STRICTE 1:1) ---
+
+    # --- ONGLET GALERIE (VERSION QUADRILLAGE PARFAIT 1:1) ---
     with t_galerie:
         import pandas as pd
         import numpy as np
         import altair as alt
 
-        st.write("### 🖼️ Analyse Visuelle (Repère Orthonormé 1:1)")
+        st.write("### 🖼️ Analyse Visuelle (Quadrillage 1x1)")
         
         # 1. DONNÉES
         df_pts = pd.DataFrame([
@@ -397,61 +398,73 @@ elif st.session_state.page == 'chap3':
             {'name': 'C (0 ; -6)', 'x': 0, 'y': -6}
         ])
         
-        # On définit un domaine identique pour X et Y pour l'orthonormie
-        # On va de -11 à 11 pour bien voir le sommet à -8
-        limite = 11
+        # Domaine de -10 à 10 pour un beau carré
+        limite = 10
+        ticks = list(range(-limite, limite + 1))
         
-        x_p = np.linspace(-limite, limite, 500)
+        x_p = np.linspace(-limite, limite, 400)
         y_p = 2 * (x_p - 1) * (x_p + 3)
         df_c = pd.DataFrame({'x': x_p, 'y': y_p})
 
         # 2. CONSTRUCTION DU GRAPHIQUE
-        # Important : on définit 'values' pour forcer le 1, 2, 3...
-        ticks = list(range(-limite, limite + 1))
-
         base = alt.Chart(df_c).encode(
             x=alt.X('x', 
                 scale=alt.Scale(domain=[-limite, limite]), 
-                axis=alt.Axis(values=ticks, title="Abscisses (x)", gridColor='#444444')
+                axis=alt.Axis(
+                    values=ticks,           # Force les nombres affichés
+                    tickMinStep=1,          # Force le pas minimum
+                    grid=True, 
+                    gridColor='#444444',
+                    labelOverlap=False      # Empêche de cacher des labels
+                ),
+                title="Abscisses (x)"
             ),
             y=alt.Y('y', 
                 scale=alt.Scale(domain=[-limite, limite]), 
-                axis=alt.Axis(values=ticks, title="Ordonnées (y)", gridColor='#444444')
+                axis=alt.Axis(
+                    values=ticks,           # Force les nombres affichés
+                    tickMinStep=1, 
+                    grid=True, 
+                    gridColor='#444444',
+                    labelOverlap=False
+                ),
+                title="Ordonnées (y)"
             )
         )
         
-        # La courbe (on ne dessine que ce qui est dans le cadre)
+        # Courbe rouge (limitée au cadre)
         curve = base.mark_line(color='#ff0000', size=4).transform_filter(
             (alt.datum.y <= limite) & (alt.datum.y >= -limite)
         )
 
-        # Les axes jaunes (épais pour la visibilité)
+        # AXES JAUNES (La croix centrale)
         axe_h = alt.Chart(pd.DataFrame({'y': [0]})).mark_rule(color='#ffff00', size=3).encode(y='y')
         axe_v = alt.Chart(pd.DataFrame({'x': [0]})).mark_rule(color='#ffff00', size=3).encode(x='x')
 
         # Points et textes Cyan
         points = alt.Chart(df_pts).mark_point(size=200, filled=True, color='#00d4ff').encode(x='x', y='y')
         text = alt.Chart(df_pts).mark_text(
-            align='left', dx=10, dy=-10, fontSize=14, fontWeight='bold', color='#00d4ff'
+            align='left', dx=10, dy=-10, fontSize=13, fontWeight='bold', color='#00d4ff'
         ).encode(x='x', y='y', text='name')
 
-        # 3. CONFIGURATION FINALE
-        # On force la taille à être carrée (ex: 600x600)
+        # 3. CONFIGURATION ET TAILLE
         final_chart = (curve + axe_h + axe_v + points + text).configure_axis(
             labelColor='white',
             titleColor='white',
-            domain=False
+            domain=False,
+            labelFontSize=10  # Taille réduite pour que tous les chiffres rentrent
         ).properties(
             width=600,
             height=600
         )
 
-        # On centre le graphique avec des colonnes Streamlit
-        _, col_center, _ = st.columns([1, 6, 1])
+        # Centrage
+        _, col_center, _ = st.columns([1, 8, 1])
         with col_center:
             st.altair_chart(final_chart, use_container_width=False, theme=None)
 
-        st.success("📏 Graduation de 1 en 1 sur les deux axes. Un carreau = 1 unité.")
+        st.success("✅ Le quadrillage affiche désormais chaque unité (1, 2, 3...).")
+
         
     # --- ONGLET SIMULATEUR ---
     with t_calc:
