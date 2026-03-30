@@ -72,7 +72,7 @@ def formater_fr(valeur, decimales=2):
 
 
 # --- 3. SIDEBAR & LOGO ---
-chemin_logo = r"C:\Users\patri\OneDrive - HOPAZE\PYTHON\Stranger_Maths_Logo.png"
+chemin_logo = "Stranger_Maths_Logo.png"
 try:
     img = Image.open(chemin_logo)
     logo = img.resize((220, int(220 * img.size[1] / img.size[0])), Image.LANCZOS)
