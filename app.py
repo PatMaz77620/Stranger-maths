@@ -455,95 +455,50 @@ elif st.session_state.page == 'chap3':
 # --- SECTION TABLEAUX GRAPHIQUES OPTIMISÉS ---
         st.divider()
         st.write("### 📋 Synthèse de l'étude : $f(x) = 2x^2 + 4x - 6$")
+
+        import matplotlib.pyplot as plt
+
+        # On crée une figure avec deux sous-graphiques (1 ligne, 2 colonnes)
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
+        fig.patch.set_facecolor('#0e1117') # Fond sombre comme ton app
+
+        # --- TABLEAU DE VARIATION ---
+        ax1.set_facecolor('#161b22')
+        ax1.set_title("📈 VARIATIONS", color='#ff0000', fontweight='bold', pad=20)
+        # Dessin des flèches
+        ax1.annotate('', xy=(0.5, 0.1), xytext=(0.1, 0.9), arrowprops=dict(arrowstyle='->', color='white', lw=2))
+        ax1.annotate('', xy=(0.9, 0.9), xytext=(0.5, 0.1), arrowprops=dict(arrowstyle='->', color='white', lw=2))
+        # Textes
+        ax1.text(0.1, 1.05, "-∞", color='#00d4ff', ha='center')
+        ax1.text(0.5, 1.05, "-1", color='#00d4ff', ha='center')
+        ax1.text(0.9, 1.05, "+∞", color='#00d4ff', ha='center')
+        ax1.text(0.5, -0.1, "-8", color='#ff0000', ha='center', fontsize=14, fontweight='bold')
+        ax1.axis('off')
+
+        # --- TABLEAU DE SIGNES ---
+        ax2.set_facecolor('#161b22')
+        ax2.set_title("✨ SIGNE DE f(x)", color='#00d4ff', fontweight='bold', pad=20)
+        # Ligne horizontale
+        ax2.axhline(0.7, color='white', lw=1)
+        # Textes x
+        ax2.text(0.1, 0.85, "-∞", color='white', ha='center')
+        ax2.text(0.35, 0.85, "-3", color='white', ha='center')
+        ax2.text(0.65, 0.85, "1", color='white', ha='center')
+        ax2.text(0.9, 0.85, "+∞", color='white', ha='center')
+        # Signes et zéros
+        ax2.text(0.2, 0.4, "+", color='white', fontsize=18, ha='center')
+        ax2.text(0.5, 0.4, "-", color='white', fontsize=18, ha='center')
+        ax2.text(0.8, 0.4, "+", color='white', fontsize=18, ha='center')
+        # Barres verticales pour les zéros
+        ax2.axvline(0.35, ymin=0.2, ymax=0.7, color='white', lw=1)
+        ax2.axvline(0.65, ymin=0.2, ymax=0.7, color='white', lw=1)
+        ax2.text(0.35, 0.4, "0", color='#ff0000', fontweight='bold', ha='center', bbox=dict(facecolor='#161b22', edgecolor='none'))
+        ax2.text(0.65, 0.4, "0", color='#ff0000', fontweight='bold', ha='center', bbox=dict(facecolor='#161b22', edgecolor='none'))
+        ax2.axis('off')
+
+        st.pyplot(fig)
         
-        st.markdown("""
-            <style>
-            .tab-container {
-                border: 2px solid #444;
-                border-radius: 10px;
-                background-color: #161b22;
-                font-family: 'Courier New', Courier, monospace;
-                width: 100%;
-                margin-bottom: 10px;
-            }
-            .tab-title { 
-                background-color: #ff0000; color: white; padding: 5px; 
-                font-weight: bold; text-align: center; border-radius: 8px 8px 0 0;
-            }
-            
-            /* STRUCTURE GRILLE VARIATIONS */
-            .grid-var {
-                display: grid;
-                grid-template-columns: 1fr 2fr 1fr;
-                text-align: center;
-                color: #00d4ff;
-            }
-            .var-arrows {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                height: 100px;
-                align-items: center;
-                position: relative;
-            }
-            .arrow-big { font-size: 50px; color: white; }
-            .min-val { font-size: 24px; color: #ff0000; font-weight: bold; margin-top: -20px; }
-
-            /* STRUCTURE GRILLE SIGNES */
-            .grid-sign {
-                display: grid;
-                grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-                text-align: center;
-                align-items: center;
-                color: #00d4ff;
-                padding: 10px 0;
-            }
-            .sep-zero {
-                border-left: 2px solid #444;
-                height: 60px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-            }
-            .zero-circle { color: #ff0000; font-weight: bold; font-size: 18px; margin-bottom: 2px; }
-            </style>
-        """, unsafe_allow_html=True)
-
-        col_var, col_sign = st.columns(2)
-
-        with col_var:
-            st.markdown("""
-            <div class="tab-container">
-                <div class="tab-title">📈 Variations</div>
-                <div class="grid-var" style="border-bottom: 1px solid #444; padding: 5px;">
-                    <span>-∞</span><span>-1</span><span>+∞</span>
-                </div>
-                <div class="var-arrows">
-                    <div class="arrow-big">↘️</div>
-                    <div class="arrow-big">↗️</div>
-                </div>
-                <div style="text-align: center; width: 100%; margin-top: -25px; padding-bottom: 10px;">
-                    <span class="min-val">-8</span>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
-        with col_sign:
-            st.markdown("""
-            <div class="tab-container">
-                <div class="tab-title">✨ Signe de f(x)</div>
-                <div class="grid-var" style="border-bottom: 1px solid #444; padding: 5px;">
-                    <span>-∞</span><span>-3</span><span>&nbsp;</span><span>1</span><span>+∞</span>
-                </div>
-                <div class="grid-sign">
-                    <div style="font-size: 25px;">+</div>
-                    <div class="sep-zero"><span class="zero-circle">0</span></div>
-                    <div style="font-size: 25px;">-</div>
-                    <div class="sep-zero"><span class="zero-circle">0</span></div>
-                    <div style="font-size: 25px;">+</div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
+        
         st.caption("💡 Le minimum -8 correspond au sommet. Les '0' correspondent aux intersections avec l'axe jaune (racines).")
 
         
