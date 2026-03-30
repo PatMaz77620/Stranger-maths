@@ -381,75 +381,78 @@ elif st.session_state.page == 'chap3':
             """)
             st.latex(r"f(1) = 0 \quad \text{et} \quad f(-3) = 0")
 
-# --- ONGLET GALERIE (VERSION ORTHONORMÉE) ---
+# --- ONGLET GALERIE (VERSION ORTHONORMÉE STRICTE 1:1) ---
     with t_galerie:
         import pandas as pd
         import numpy as np
         import altair as alt
 
-        st.write("### 🖼️ Analyse Visuelle Complète (Repère Orthonormé)")
+        st.write("### 🖼️ Analyse Visuelle (Repère Orthonormé 1:1)")
         
-        # 1. PRÉSENTATION DES 3 FORMES [cite: 55]
-        st.info(r"""
-        **Les 3 écritures de la même fonction $f$ :**
-        * **Forme Développée :** $f(x) = 2x^2 + 4x - 6$  
-        * **Forme Canonique :** $f(x) = 2(x + 1)^2 - 8$  
-        * **Forme Factorisée :** $f(x) = 2(x - 1)(x + 3)$
-        """)
-        
-        # 2. DONNÉES [cite: 56, 57, 58]
+        # 1. DONNÉES
         df_pts = pd.DataFrame([
             {'name': 'S (-1 ; -8)', 'x': -1, 'y': -8},
             {'name': 'R1 (1 ; 0)', 'x': 1, 'y': 0},
             {'name': 'R2 (-3 ; 0)', 'x': -3, 'y': 0},
             {'name': 'C (0 ; -6)', 'x': 0, 'y': -6}
         ])
-        x_p = np.linspace(-5, 5, 400) # Élargi pour l'aspect visuel
+        
+        # On définit un domaine identique pour X et Y pour l'orthonormie
+        # On va de -11 à 11 pour bien voir le sommet à -8
+        limite = 11
+        
+        x_p = np.linspace(-limite, limite, 500)
         y_p = 2 * (x_p - 1) * (x_p + 3)
         df_c = pd.DataFrame({'x': x_p, 'y': y_p})
 
-        # 3. CRÉATION DU GRAPHIQUE
-        # On définit des axes avec un 'tickCount' ou 'step' de 1
+        # 2. CONSTRUCTION DU GRAPHIQUE
+        # Important : on définit 'values' pour forcer le 1, 2, 3...
+        ticks = list(range(-limite, limite + 1))
+
         base = alt.Chart(df_c).encode(
             x=alt.X('x', 
-                scale=alt.Scale(domain=[-6, 6]), 
-                title="Abscisses (x)",
-                axis=alt.Axis(tickMinStep=1, grid=True, gridColor='#333333')
+                scale=alt.Scale(domain=[-limite, limite]), 
+                axis=alt.Axis(values=ticks, title="Abscisses (x)", gridColor='#444444')
             ),
             y=alt.Y('y', 
-                scale=alt.Scale(domain=[-10, 10]), # Zoomé pour mieux voir l'unité
-                title="Ordonnées (y)",
-                axis=alt.Axis(tickMinStep=1, grid=True, gridColor='#333333')
+                scale=alt.Scale(domain=[-limite, limite]), 
+                axis=alt.Axis(values=ticks, title="Ordonnées (y)", gridColor='#444444')
             )
         )
         
+        # La courbe (on ne dessine que ce qui est dans le cadre)
         curve = base.mark_line(color='#ff0000', size=4).transform_filter(
-            (alt.datum.y <= 12) & (alt.datum.y >= -10) # On coupe la courbe pour le zoom
+            (alt.datum.y <= limite) & (alt.datum.y >= -limite)
         )
 
-        # Axes Jaunes [cite: 60, 61]
-        axe_h = alt.Chart(pd.DataFrame({'y': [0]})).mark_rule(color='#ffff00', size=2).encode(y='y')
-        axe_v = alt.Chart(pd.DataFrame({'x': [0]})).mark_rule(color='#ffff00', size=2).encode(x='x')
+        # Les axes jaunes (épais pour la visibilité)
+        axe_h = alt.Chart(pd.DataFrame({'y': [0]})).mark_rule(color='#ffff00', size=3).encode(y='y')
+        axe_v = alt.Chart(pd.DataFrame({'x': [0]})).mark_rule(color='#ffff00', size=3).encode(x='x')
 
-        # Points et Textes Cyan [cite: 62]
-        points = alt.Chart(df_pts).mark_point(size=180, filled=True, color='#00d4ff').encode(x='x', y='y')
-        text = points.mark_text(align='left', dx=15, dy=-15, fontSize=13, fontWeight='bold', color='#00d4ff').encode(text='name')
+        # Points et textes Cyan
+        points = alt.Chart(df_pts).mark_point(size=200, filled=True, color='#00d4ff').encode(x='x', y='y')
+        text = alt.Chart(df_pts).mark_text(
+            align='left', dx=10, dy=-10, fontSize=14, fontWeight='bold', color='#00d4ff'
+        ).encode(x='x', y='y', text='name')
 
-        # 4. CONFIGURATION ET ASPECT "CARRÉ"
-        chart = (curve + axe_h + axe_v + points + text).configure_axis(
+        # 3. CONFIGURATION FINALE
+        # On force la taille à être carrée (ex: 600x600)
+        final_chart = (curve + axe_h + axe_v + points + text).configure_axis(
             labelColor='white',
             titleColor='white',
             domain=False
         ).properties(
-            width=500, # Largeur et hauteur proches pour l'aspect orthonormé
-            height=500
+            width=600,
+            height=600
         )
 
-        st.altair_chart(chart, use_container_width=False, theme=None) # use_container_width=False pour garder le ratio
+        # On centre le graphique avec des colonnes Streamlit
+        _, col_center, _ = st.columns([1, 6, 1])
+        with col_center:
+            st.altair_chart(final_chart, use_container_width=False, theme=None)
 
-        st.success("📏 Le repère est maintenant gradué de 1 en 1.")
-
-
+        st.success("📏 Graduation de 1 en 1 sur les deux axes. Un carreau = 1 unité.")
+        
     # --- ONGLET SIMULATEUR ---
     with t_calc:
         st.write("### 🕹️ Simulateur Interactif")
