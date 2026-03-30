@@ -7,41 +7,81 @@ st.set_page_config(
     page_title="Stranger Maths",
     page_icon="🔦",
     layout="centered",
-    initial_sidebar_state="collapsed" # On cache la sidebar par défaut
+    initial_sidebar_state="collapsed" # Sidebar cachée pour le look "Cards"
 )
 
-# --- 2. STYLE CSS AMÉLIORÉ ---
+# --- 2. STYLE CSS AMÉLIORÉ (CARTES CLIQUABLES) ---
 st.markdown("""
     <style>
+    /* FOND GÉNÉRAL */
     .stApp { background-color: #0e1117; }
     
-    /* Force le texte en BLANC PUR pour la lisibilité */
+    /* TEXTE BLANC PUR pour la lisibilité */
     .stMarkdown, p, span, label, li, .stExpander p { 
         color: #ffffff !important; 
     }
     
-    /* TITRES ROUGES NÉON */
+    /* TITRES ROUGES NÉON CENTRÉS */
     h1, h2, h3 { 
         color: #ff0000 !important; 
         font-family: 'Helvetica', sans-serif; 
         text-shadow: 2px 2px 10px #ff0000; 
         text-align: center;
+        margin-top: 0px;
     }
 
-    /* CARTES DE SÉLECTION (HOME) */
-    .menu-card {
-        background-color: #1e2129;
-        border: 2px solid #ff0000;
-        border-radius: 15px;
-        padding: 20px;
-        text-align: center;
-        transition: 0.3s;
-        cursor: pointer;
+    /* 🎯 --- STYLISATION DES CARTES COMME BOUTONS --- 🎯 */
+    /* On cible les boutons Streamlit spécifiques pour les transformer en cartes */
+    div.stButton > button.css-1x8cf1d, div.stButton > button {
+        background-color: #1e2129 !important;
+        border: 2px solid #ff0000 !important;
+        border-radius: 20px !important;
+        padding: 40px 20px !important; /* Plus grand pour le look carte */
+        text-align: center !important;
+        width: 100% !important;
+        height: 200px !important; /* Hauteur fixe pour les cartes */
+        transition: 0.3s !important;
+        margin-bottom: 20px !important;
+        display: block !important;
+    }
+
+    /* Contenu à l'intérieur du bouton (Titre et icône) */
+    div.stButton > button p {
+        color: #ff0000 !important; /* Titre en rouge néon */
+        font-size: 1.5rem !important;
+        font-weight: bold !important;
+        font-family: 'Helvetica', sans-serif;
+        text-shadow: 1px 1px 5px #ff0000;
+        margin: 0 !important;
+    }
+    
+    /* Icône plus grande au-dessus du texte */
+    div.stButton > button::before {
+        font-size: 3rem !important;
+        display: block;
         margin-bottom: 10px;
     }
-    .menu-card:hover {
-        transform: scale(1.05);
-        box-shadow: 0px 0px 15px #ff0000;
+    
+    /* Spécifique pour l'icône de la carte 1 */
+    key-c1-btn::before { content: "📟"; }
+    /* Spécifique pour l'icône de la carte 2 */
+    key-c2-btn::before { content: "📈"; }
+
+    /* EFFET AU SURVOL (HOVER) */
+    div.stButton > button:hover {
+        transform: scale(1.03) !important;
+        box-shadow: 0px 0px 20px #ff0000 !important;
+        background-color: #2a2e38 !important; /* Un peu plus clair au survol */
+    }
+
+    /* BOUTON RETOUR (plus petit et discret) */
+    .btn-retour div.stButton > button {
+        height: auto !important;
+        padding: 10px 20px !important;
+        border-radius: 10px !important;
+        font-size: 1rem !important;
+        width: auto !important;
+        margin-bottom: 0px !important;
     }
 
     /* FIX EXPANDERS & TABS */
@@ -53,22 +93,10 @@ st.markdown("""
     .stTabs [data-baseweb="tab"] { color: #ffffff !important; }
     .stTabs [aria-selected="true"] { color: #ff0000 !important; font-weight: bold; }
 
-    /* BOUTONS */
-    div.stButton > button {
-        background-color: #0e1117 !important;
-        color: #ff0000 !important;
-        border: 2px solid #ff0000 !important;
-        border-radius: 10px;
-        width: 100%;
-    }
-    div.stButton > button:hover {
-        background-color: #ff0000 !important;
-        color: white !important;
-    }
     </style>
     """, unsafe_allow_html=True)
 
-# Initialisation de la navigation
+# Initialisation de la navigation dans le session_state
 if 'page' not in st.session_state:
     st.session_state.page = 'home'
 
@@ -85,7 +113,7 @@ def aller_a_home():
     st.session_state.page = 'home'
 
 # =================================================================
-# PAGE D'ACCUEIL (MENU PAR CARTES)
+# PAGE D'ACCUEIL (MENU PAR CARTES CLIQUABLES)
 # =================================================================
 if st.session_state.page == 'home':
     # Logo central
@@ -101,14 +129,16 @@ if st.session_state.page == 'home':
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown('<div class="menu-card"><h3>📟</h3><p>Information Chiffrée</p></div>', unsafe_allow_html=True)
-        if st.button("Accéder au Chapitre 1"):
+        # 🎯 LA CARTE EST LE BOUTON 🎯
+        # Le CSS transforme ce bouton en carte avec l'icône 📟
+        if st.button("Information Chiffrée", key="c1-btn"):
             st.session_state.page = 'chap1'
             st.rerun()
 
     with col2:
-        st.markdown('<div class="menu-card"><h3>📈</h3><p>Suites Numériques</p></div>', unsafe_allow_html=True)
-        if st.button("Accéder au Chapitre 2"):
+        # 🎯 LA CARTE EST LE BOUTON 🎯
+        # Le CSS transforme ce bouton en carte avec l'icône 📈
+        if st.button("Suites Numériques", key="c2-btn"):
             st.session_state.page = 'chap2'
             st.rerun()
 
@@ -116,7 +146,11 @@ if st.session_state.page == 'home':
 # CHAPITRE 1 : INFORMATION CHIFFRÉE
 # =================================================================
 elif st.session_state.page == 'chap1':
-    st.button("⬅️ Retour au menu principal", on_click=aller_a_home)
+    # Container pour styliser le bouton retour différemment
+    st.markdown('<div class="btn-retour">', unsafe_allow_html=True)
+    st.button("⬅️ Menu principal", on_click=aller_a_home)
+    st.markdown('</div>', unsafe_allow_html=True)
+    
     st.title("📟 Chapitre 1 : Information Chiffrée")
     
     tab1, tab2, tab3 = st.tabs(["🔢 Coeff. Multiplicateur", "📈 Taux d'évolution", "🔄 Évolutions Successives"])
@@ -150,7 +184,11 @@ elif st.session_state.page == 'chap1':
 # CHAPITRE 2 : SUITES NUMÉRIQUES
 # =================================================================
 elif st.session_state.page == 'chap2':
-    st.button("⬅️ Retour au menu principal", on_click=aller_a_home)
+    # Container pour styliser le bouton retour différemment
+    st.markdown('<div class="btn-retour">', unsafe_allow_html=True)
+    st.button("⬅️ Menu principal", on_click=aller_a_home)
+    st.markdown('</div>', unsafe_allow_html=True)
+
     st.title("📈 Chapitre 2 : Suites Numériques")
     
     t_gen, t_ari, t_geo = st.tabs(["📚 Généralités", "➕ Arithmétiques", "✖️ Géométriques"])
@@ -172,6 +210,7 @@ elif st.session_state.page == 'chap2':
 
         with st.expander("📉 Comment démontrer la Monotonie ?"):
             st.write(r"**Tuyau de Lucas :** Calcule $u_{n+1} - u_n$ et regarde son signe.")
+            # Utilisation du 'r' pour corriger les flèches (r"$\rightarrow$")
             st.success(r"Signe Positif (+) $\rightarrow$ La suite est **Croissante**.")
             st.warning(r"Signe Négatif (-) $\rightarrow$ La suite est **Décroissante**.")
 
