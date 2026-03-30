@@ -386,10 +386,10 @@ elif st.session_state.page == 'chap3':
         import numpy as np
         import altair as alt
 
-        st.write("### 🖼️ Analyse Visuelle (Quadrillage 1x1 Garanti)")
+        st.write("### 🖼️ Représentation Graphique (Repère orthonormé)")
         
         # 1. PRÉSENTATION DES FORMES
-        st.info(r"**Exemple :** $f(x) = 2x^2 + 4x - 6$ | $2(x+1)^2-8$ | $2(x-1)(x+3)$")
+        st.info(r"**Exemple :** $f(x) = 2x^2 + 4x - 6$ = $2(x+1)^2-8$ = $2(x-1)(x+3)$")
         
         # 2. PRÉPARATION DES DONNÉES
         limite = 10
