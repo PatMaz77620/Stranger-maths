@@ -324,3 +324,87 @@ elif st.session_state.page == 'chap2':
     if col_s2.button("Autre défi 🔄"):
         del st.session_state.suite_type
         st.rerun()
+
+# =================================================================
+# CHAPITRE 3 : POLYNÔMES DU 2ND DEGRÉ (STMG - EXEMPLE UNIQUE)
+# =================================================================
+elif st.session_state.page == 'chap3':
+    st.markdown('<div class="btn-retour">', unsafe_allow_html=True)
+    st.button("⬅️ Menu principal", on_click=aller_a_home)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.title("🛸 Chapitre 3 : 2nd Degré")
+    
+    t_cours, t_galerie, t_calc = st.tabs(["📚 Les 3 Formes (Cours)", "🖼️ Galerie de Paraboles", "📈 Simulateur"])
+
+    # --- ONGLET COURS (AVEC EXEMPLE UNIQUE) ---
+    with t_cours:
+        st.write("### 🧬 Les 3 visages d'une même fonction")
+        st.write("Pour comprendre les formes, nous allons utiliser un exemple unique :")
+        st.latex(r"f(x) = 2x^2 + 4x - 6 \quad \text{(Forme Développée)}")
+
+        with st.expander("1. Forme Développée : f(x) = ax² + bx + c"):
+            st.write("**Notre exemple :** $f(x) = 2x^2 + 4x - 6$")
+            st.info("**Interprétation :** Le nombre **c = -6** est l'ordonnée à l'origine (là où la courbe coupe l'axe vertical).")
+            st.latex(r"f(0) = -6")
+            
+        with st.expander("2. Forme Canonique : f(x) = a(x - α)² + β"):
+            st.write("**Notre exemple :** $f(x) = 2(x - (-1))^2 + (-8)$")
+            st.success(r"""
+            **Le Sommet $S(\alpha \ ; \ \beta)$ :** - $\alpha = -1$ est l'abscisse du sommet.  
+            - $\beta = -8$ est la **valeur minimale** de la fonction.  
+            - Ce minimum est atteint pour $x = -1$.
+            """)
+            st.latex(r"S = (-1 \ ; \ -8)")
+            
+        with st.expander("3. Forme Factorisée : f(x) = a(x - x₁)(x - x₂)"):
+            st.write("**Notre exemple :** $f(x) = 2(x - 1)(x - (-3))$")
+            st.warning("**Interprétation :** Les nombres **x₁ = 1** et **x₂ = -3** sont les racines (là où la courbe coupe l'axe horizontal).")
+
+    # --- ONGLET GALERIE (VISUALISATION DE L'EXEMPLE) ---
+    with t_galerie:
+        st.write("### 🖼️ Visualisation de notre exemple unique")
+        st.latex(r"f(x) = 2(x - 1)(x + 3) \quad \text{ou} \quad 2(x + 1)^2 - 8")
+        
+        # Calcul de la courbe précise pour l'exemple unique
+        x_galerie = [x / 10 for x in range(-50, 31)] # Plage de -5 à 3 pour bien voir les racines
+        y_galerie = [2 * (x - 1) * (x + 3) for x in x_galerie]
+        
+        st.line_chart(dict(zip(x_galerie, y_galerie)))
+        st.info("💡 **Analyse :** On voit bien que le minimum est -8 (en y) pour x = -1. Et la courbe coupe l'axe horizontal en x=1 et x=-3.")
+
+    # --- ONGLET SIMULATEUR ---
+    with t_calc:
+        st.write("### 🕹️ Simulateur Interactif")
+        c1, c2, c3 = st.columns(3)
+        pa = c1.number_input("Coeff a (forme)", value=1.0, step=0.5)
+        p_alpha = c2.number_input("Alpha (position x)", value=0.0)
+        p_beta = c3.number_input("Beta (Max/Min y)", value=0.0)
+
+        # Calcul de la courbe
+        x_range = [x / 10 for x in range(int((p_alpha-10)*10), int((p_alpha+10)*10))]
+        y_vals = [pa * (x - p_alpha)**2 + p_beta for x in x_range]
+        st.line_chart(dict(zip(x_range, y_vals)))
+
+        # Affichage dynamique du tableau de variation
+        st.divider()
+        if pa > 0:
+            st.write(f"✅ **Sens de variation :** La fonction décroit puis croît. Le **minimum** est {p_beta} (atteint pour x = {p_alpha}).")
+        else:
+            st.write(f"❌ **Sens de variation :** La fonction croît puis décroit. Le **maximum** est {p_beta} (atteint pour x = {p_alpha}).")
+
+    # --- DÉFI ---
+    st.divider()
+    st.write("### ❓ Défi Sommet")
+    if 'q3_alpha' not in st.session_state:
+        st.session_state.q3_alpha = random.randint(-5, 5)
+        st.session_state.q3_beta = random.randint(-5, 5)
+
+    st.write(f"Soit la fonction $f(x) = 2(x - ({st.session_state.q3_alpha}))^2 + ({st.session_state.q3_beta})$")
+    ans_beta = st.number_input("Quelle est la valeur de l'extremum (Beta) ?", value=0)
+    
+    if st.button("Vérifier"):
+        if ans_beta == st.session_state.q3_beta:
+            st.balloons(); st.success(f"Bravo ! L'extremum est bien {st.session_state.q3_beta}.")
+        else:
+            st.error(f"Faux ! L'extremum (Beta) est le nombre tout seul à la fin : {st.session_state.q3_beta}")
