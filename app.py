@@ -381,7 +381,7 @@ elif st.session_state.page == 'chap3':
             """)
             st.latex(r"f(1) = 0 \quad \text{et} \quad f(-3) = 0")
 
-# --- ONGLET GALERIE (VERSION FINALE CONTRASTE CYAN/ROUGE) ---
+# --- ONGLET GALERIE (VERSION RÉALITÉ AUGMENTÉE - CONTRASTE TOTAL) ---
     with t_galerie:
         import pandas as pd
         import numpy as np
@@ -389,7 +389,7 @@ elif st.session_state.page == 'chap3':
 
         st.write("### 🖼️ Analyse Visuelle Complète")
         
-        # 1. PRÉSENTATION DES 3 FORMES
+        # 1. PRÉSENTATION DES 3 FORMES [cite: 122]
         st.info(r"""
         **Les 3 écritures de la même fonction $f$ :**
         * **Forme Développée :** $f(x) = 2x^2 + 4x - 6$  
@@ -397,68 +397,50 @@ elif st.session_state.page == 'chap3':
         * **Forme Factorisée :** $f(x) = 2(x - 1)(x + 3)$
         """)
         
-        # 2. PRÉPARATION DES DONNÉES
-        # Utilisation du CYAN (#00d4ff) pour détacher du rouge
+        # 2. DONNÉES [cite: 123, 124, 125]
         df_points = pd.DataFrame([
             {'name': 'S (-1 ; -8)', 'x': -1, 'y': -8},
             {'name': 'R1 (1 ; 0)', 'x': 1, 'y': 0},
             {'name': 'R2 (-3 ; 0)', 'x': -3, 'y': 0},
             {'name': 'C (0 ; -6)', 'x': 0, 'y': -6}
         ])
-        
         x_plot = np.linspace(-5, 3, 200)
         y_plot = 2 * (x_plot - 1) * (x_plot + 3)
         df_courbe = pd.DataFrame({'x': x_plot, 'y': y_plot})
 
-        # --- PARTIE GRAPHIQUE ULTRA-VISIBLE ---
+        # 3. COMPOSANTS DU GRAPHIQUE 
         
-        # 1. La Courbe rouge
-        curve = alt.Chart(df_courbe).mark_line(color='#ff0000', size=4).encode(
-            x=alt.X('x', title='Abscisses (x)', scale=alt.Scale(domain=[-5, 3])),
-            y=alt.Y('y', title='Ordonnées (y)', scale=alt.Scale(domain=[-10, 25]))
+        # Courbe de base
+        base = alt.Chart(df_courbe).encode(
+            x=alt.X('x', scale=alt.Scale(domain=[-5, 3]), title="Abscisses"),
+            y=alt.Y('y', scale=alt.Scale(domain=[-10, 25]), title="Ordonnées")
         )
         
-        # 2. LES AXES (On les force avec mark_rule très épais)
-        # L'axe horizontal (y=0)
-        horiz_axis = alt.Chart(pd.DataFrame({'y': [0]})).mark_rule(
-            color='#ffffff', 
-            size=3,        # Épaisseur augmentée
-            opacity=1      # Opacité totale
-        ).encode(y='y')
-        
-        # L'axe vertical (x=0)
-        vert_axis = alt.Chart(pd.DataFrame({'x': [0]})).mark_rule(
-            color='#ffffff', 
-            size=3,        # Épaisseur augmentée
-            opacity=1      # Opacité totale
-        ).encode(x='x')
-        
-        # 3. Les points cyan
-        points = alt.Chart(df_points).mark_point(size=180, filled=True, color='#00d4ff').encode(
-            x='x', y='y'
-        )
+        curve = base.mark_line(color='#ff0000', size=4)
 
-        # 4. Le texte cyan
-        text = alt.Chart(df_points).mark_text(
-            align='left', dx=15, dy=-15, fontSize=14, fontWeight='bold', color='#00d4ff'
-        ).encode(x='x', y='y', text='name')
+        # AXES FORCÉS (Lignes blanches pleines)
+        # On les définit comme des graphiques indépendants pour plus de force
+        rule_h = alt.Chart(pd.DataFrame({'y': [0]})).mark_rule(color='white', size=3, opacity=1).encode(y='y')
+        rule_v = alt.Chart(pd.DataFrame({'x': [0]})).mark_rule(color='white', size=3, opacity=1).encode(x='x')
 
-        # ASSEMBLAGE ET FORÇAGE DES GRADUATIONS
-        chart = (curve + horiz_axis + vert_axis + points + text).configure_axis(
-            domain=True,
-            domainColor='white',
-            domainWidth=3,      # Ligne de bordure des axes
+        # Points et Textes Cyan [cite: 129]
+        points = alt.Chart(df_points).mark_point(size=200, filled=True, color='#00d4ff').encode(x='x', y='y')
+        text = points.mark_text(align='left', dx=15, dy=-15, fontSize=15, fontWeight='bold', color='#00d4ff').encode(text='name')
+
+        # 4. ASSEMBLAGE ET CONFIGURATION AXES [cite: 130, 131]
+        # L'ordre compte : on met les règles (axes) EN DERNIER pour qu'elles soient par-dessus la grille
+        final_chart = (curve + points + text + rule_h + rule_v).configure_axis(
             grid=True,
             gridColor='#444444',
-            labelColor='white', # Chiffres des graduations en blanc
-            tickColor='white',  # Petits traits en blanc
-            labelFontSize=14,
-            titleColor='white'
-        ).properties(height=500)
-        
-        st.altair_chart(chart, use_container_width=True)
+            labelColor='white',
+            titleColor='white',
+            tickColor='white',
+            domain=False # On cache le domaine par défaut d'Altair car on a nos propres règles blanches
+        ).properties(height=500, width='container')
 
-             
+        # CRUCIAL : theme=None empêche Streamlit de modifier les couleurs
+        st.altair_chart(final_chart, use_container_width=True, theme=None)
+
     # --- ONGLET SIMULATEUR ---
     with t_calc:
         st.write("### 🕹️ Simulateur Interactif")
