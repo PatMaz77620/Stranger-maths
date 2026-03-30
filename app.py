@@ -1,4 +1,7 @@
 import streamlit as st
+import pandas as pd
+import numpy as np
+import altair as alt
 from PIL import Image
 import random
 
@@ -391,39 +394,41 @@ elif st.session_state.page == 'chap3':
         * **Forme Canonique :** $f(x) = 2(x + 1)^2 - 8$  
         * **Forme Factorisée :** $f(x) = 2(x - 1)(x + 3)$
         """)
+
+        # 2. PRÉPARATION DES POINTS CLÉS (Format DataFrame pour Altair)
+        df_points = pd.DataFrame([
+            {'name': 'Sommet S', 'x': -1, 'y': -8},
+            {'name': 'Racine R1', 'x': 1, 'y': 0},
+            {'name': 'Racine R2', 'x': -3, 'y': 0},
+            {'name': 'Ordonnée C', 'x': 0, 'y': -6}
+        ])
         
-        # 2. CALCUL DES POINTS CLÉS
-        points_cles = {
-            'Sommet S': (-1, -8),
-            'Racine R1': (1, 0),
-            'Racine R2': (-3, 0),
-            'Ordonnée C': (0, -6)
-        }
-        
-        # 3. GÉNÉRATION DES DONNÉES DE LA COURBE (Plus de points pour la lisser)
-        import numpy as np # Assure-toi d'avoir importé numpy tout en haut de ton code
-        x_plot = np.linspace(-5, 3, 200) # De -5 à 3, avec 200 points
+        # 3. GÉNÉRATION DE LA COURBE
+        x_plot = np.linspace(-5, 3, 200)
         y_plot = 2 * (x_plot - 1) * (x_plot + 3)
+        df_courbe = pd.DataFrame({'x': x_plot, 'y': y_plot})
         
-        # 4. CRÉATION DU GRAPHIQUE INTERACTIF (Avec axes et points clés)
-        # On utilise st.altair_chart pour plus de contrôle sur les axes
-        import altair as alt # Assure-toi d'avoir importé altair tout en haut de ton code
-        
-        # Fond de la courbe
-        curve_data = alt.Chart(dict(x=x_plot, y=y_plot)).mark_line(color='#ff0000').encode(
-            x=alt.X('x', title='Axe des Abscisses (x)'),
+        # 4. CRÉATION DU GRAPHIQUE
+        # La ligne rouge (la parabole)
+        curve = alt.Chart(df_courbe).mark_line(color='#ff0000', size=3).encode(
+            x=alt.X('x', title='Axe des Abscisses (x)', scale=alt.Scale(domain=[-5, 3])),
             y=alt.Y('y', title='Axe des Ordonnées (y)')
         )
         
-        # Points singuliers
-        points_data = alt.Chart(points_cles).mark_circle(size=100, color='#ffffff').encode(
-            x='x', y='y',
-            tooltip=['name', 'x', 'y'] # Affiche le nom du point au survol
+        # Les points blancs (les points singuliers)
+        points = alt.Chart(df_points).mark_circle(size=120, color='#ffffff', border=True).encode(
+            x='x',
+            y='y',
+            tooltip=['name', 'x', 'y']
+        )
+
+        # Les étiquettes (noms des points affichés à côté)
+        text = points.mark_text(align='left', dx=10, dy=-10, color='white').encode(
+            text='name'
         )
         
-        # Combinaison des deux
-        final_chart = curve_data + points_data
-        st.altair_chart(final_chart, use_container_width=True)
+        # On superpose tout : Courbe + Points + Noms
+        st.altair_chart(curve + points + text, use_container_width=True)
         
         # 5. LÉGENDE PÉDAGOGIQUE
         st.success(r"""
