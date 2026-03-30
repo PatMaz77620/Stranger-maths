@@ -465,7 +465,7 @@ elif st.session_state.page == 'chap3':
         * **Le Sommet $S$ :** Coordonnées $(-1 \ ; \ -8)$.
         * **Les Racines $R1$ et $R2$ :** Intersection avec l'axe horizontal.
         * **L'ordonnée à l'origine $C$ :** Intersection avec l'axe vertical à $-6$.
-        """)
+        """) 
         
     # --- ONGLET SIMULATEUR ---
     with t_calc:
