@@ -143,10 +143,9 @@ if st.session_state.page == 'home':
             st.rerun()
 
 # =================================================================
-# CHAPITRE 1 : INFORMATION CHIFFRÉE
+# CHAPITRE 1 : INFORMATION CHIFFRÉE (AVEC COURS)
 # =================================================================
 elif st.session_state.page == 'chap1':
-    # Container pour styliser le bouton retour différemment
     st.markdown('<div class="btn-retour">', unsafe_allow_html=True)
     st.button("⬅️ Menu principal", on_click=aller_a_home)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -156,29 +155,65 @@ elif st.session_state.page == 'chap1':
     tab1, tab2, tab3 = st.tabs(["🔢 Coeff. Multiplicateur", "📈 Taux d'évolution", "🔄 Évolutions Successives"])
 
     with tab1:
-        st.info("💡 $CM = 1 + t/100$ (hausse) ou $1 - t/100$ (baisse)")
-        t_in = st.number_input("Taux (%)", value=20.0, step=0.1, key="c1t")
-        st.success(f"Le CM est de **{formater_fr(1 + t_in / 100)}**")
+        st.markdown("### 🎯 Le multiplicateur magique")
+        st.info(r"""
+        **Concept :** Pour appliquer une évolution, on multiplie par le **CM**.  
+        * **Hausse de t% :** $CM = 1 + \frac{t}{100}$  
+        * **Baisse de t% :** $CM = 1 - \frac{t}{100}$
+        """)
+        t_in = st.number_input("Entrez le taux en % (ex: 20 ou -15)", value=20.0, step=0.1, key="c1t")
+        res_cm = 1 + t_in / 100
+        st.success(f"Le Coefficient Multiplicateur (CM) est de **{formater_fr(res_cm)}**")
 
     with tab2:
+        st.markdown("### 📊 Calculer une variation")
+        st.info(r"""
+        **Concept :** Mesurer l'écart entre le départ ($V_D$) et l'arrivée ($V_A$).  
+        * **Formule :** $t = \frac{V_A - V_D}{V_D}$  
+        * Multiplier le résultat par 100 pour avoir le pourcentage.
+        """)
         ca, cb = st.columns(2)
-        v_d = ca.number_input("Départ (VD)", value=100.0, key="c1vd")
-        v_a = cb.number_input("Arrivée (VA)", value=125.0, key="c1va")
+        v_d = ca.number_input("Valeur de Départ (VD)", value=100.0, key="c1vd")
+        v_a = cb.number_input("Valeur d'Arrivée (VA)", value=125.0, key="c1va")
         if v_d != 0:
-            st.info(f"Taux : **{formater_fr(((v_a - v_d) / v_d) * 100)} %**")
+            taux_calc = ((v_a - v_d) / v_d) * 100
+            st.success(f"Le taux d'évolution est de **{formater_fr(taux_calc)} %**")
+
+    with tab3:
+        st.markdown("### 🔄 Enchaîner les évolutions")
+        st.warning("⚠️ Attention : On ne s'additionne JAMAIS les pourcentages, on multiplie les CM !")
+        st.info(r"**Formule :** $CM_{global} = CM_1 \times CM_2 \times ...$")
+        
+        st.write("Simulateur : deux évolutions successives")
+        col_ev1, col_ev2 = st.columns(2)
+        ev1 = col_ev1.number_input("Taux 1 (%)", value=10.0, key="ev1")
+        ev2 = col_ev2.number_input("Taux 2 (%)", value=-10.0, key="ev2")
+        
+        cm_global = (1 + ev1/100) * (1 + ev2/100)
+        taux_global = (cm_global - 1) * 100
+        st.success(f"Le CM global est **{formater_fr(cm_global, 4)}**, soit une évolution totale de **{formater_fr(taux_global)} %**")
 
     # DÉFI 1
     st.divider()
     if 'vd1' not in st.session_state:
-        st.session_state.vd1, st.session_state.tx1 = 100, 20
-    st.write(f"### ❓ Défi : Hausse de {st.session_state.tx1}% sur {st.session_state.vd1}")
-    rep1 = st.number_input("Réponse ?", value=0.0, key="r1")
-    if st.button("Vérifier"):
+        st.session_state.vd1 = random.randint(50, 200)
+        st.session_state.tx1 = random.choice([5, 10, 15, 20, 25, 50])
+        
+    st.write(f"### ❓ Défi : Une hausse de {st.session_state.tx1}% sur un prix de {st.session_state.vd1}€")
+    rep1 = st.number_input("Quel est le nouveau prix ?", value=0.0, key="r1")
+    
+    c_res1, c_res2 = st.columns(2)
+    if c_res1.button("Vérifier"):
         corr = st.session_state.vd1 * (1 + st.session_state.tx1 / 100)
         if abs(rep1 - corr) < 0.1:
-            st.balloons(); st.success("Bravo !")
+            st.balloons(); st.success(f"Bravo ! C'était bien {formater_fr(corr)} €")
         else:
-            st.error(f"Faux, c'était {formater_fr(corr)}")
+            st.error(f"Faux ! Le calcul était {st.session_state.vd1} × {formater_fr(1+st.session_state.tx1/100)} = {formater_fr(corr)}")
+    
+    if c_res2.button("Nouveau défi 🔄", key="reset_c1"):
+        del st.session_state.vd1
+        st.rerun()
+
 # =================================================================
 # CHAPITRE 2 : SUITES NUMÉRIQUES (AVEC COURS)
 # =================================================================
