@@ -380,16 +380,29 @@ elif st.session_state.page == 'chap3':
             Graphiquement, ce sont les points où la courbe coupe l'axe des abscisses (horizontal).
             """)
             st.latex(r"f(1) = 0 \quad \text{et} \quad f(-3) = 0")
-
-# --- ONGLET GALERIE (FORÇAGE QUADRILLAGE 1x1) ---
+# --- ONGLET GALERIE (QUADRILLAGE MANUEL 1x1) ---
     with t_galerie:
         import pandas as pd
         import numpy as np
         import altair as alt
 
-        st.write("### 🖼️ Analyse Visuelle (Quadrillage 1x1)")
+        st.write("### 🖼️ Analyse Visuelle (Quadrillage 1x1 Garanti)")
         
-        # 1. DONNÉES
+        # 1. PRÉSENTATION DES FORMES
+        st.info(r"**Exemple :** $f(x) = 2x^2 + 4x - 6$ | $2(x+1)^2-8$ | $2(x-1)(x+3)$")
+        
+        # 2. PRÉPARATION DES DONNÉES
+        limite = 10
+        # On crée une liste de coordonnées pour chaque ligne de la grille
+        grid_lines = []
+        for i in range(-limite, limite + 1):
+            # Lignes verticales
+            grid_lines.append(pd.DataFrame({'x': [i, i], 'y': [-limite, limite], 'group': f'v{i}'}))
+            # Lignes horizontales
+            grid_lines.append(pd.DataFrame({'x': [-limite, limite], 'y': [i, i], 'group': f'h{i}'}))
+        df_grid = pd.concat(grid_lines)
+
+        # Points singuliers
         df_pts = pd.DataFrame([
             {'name': 'S (-1 ; -8)', 'x': -1, 'y': -8},
             {'name': 'R1 (1 ; 0)', 'x': 1, 'y': 0},
@@ -397,72 +410,47 @@ elif st.session_state.page == 'chap3':
             {'name': 'C (0 ; -6)', 'x': 0, 'y': -6}
         ])
         
-        limite = 10
-        # Liste exhaustive des positions pour la grille
-        ticks = list(range(-limite, limite + 1))
-        
         x_p = np.linspace(-limite, limite, 400)
         y_p = 2 * (x_p - 1) * (x_p + 3)
         df_c = pd.DataFrame({'x': x_p, 'y': y_p})
 
-        # 2. CONSTRUCTION DU GRAPHIQUE
-        base = alt.Chart(df_c).encode(
-            x=alt.X('x', 
-                scale=alt.Scale(domain=[-limite, limite]), 
-                axis=alt.Axis(
-                    values=ticks,           # On impose les valeurs
-                    tickCount=limite*2,     # On force le nombre de graduations
-                    grid=True, 
-                    gridColor='#444444',
-                    labelOverlap=False,     # Interdiction de cacher des labels
-                    labelFlush=False
-                ),
-                title="Abscisses (x)"
-            ),
-            y=alt.Y('y', 
-                scale=alt.Scale(domain=[-limite, limite]), 
-                axis=alt.Axis(
-                    values=ticks, 
-                    tickCount=limite*2,
-                    grid=True, 
-                    gridColor='#444444',
-                    labelOverlap=False,
-                    labelFlush=False
-                ),
-                title="Ordonnées (y)"
-            )
-        )
+        # 3. CONSTRUCTION DU GRAPHIQUE COUCHE PAR COUCHE
         
-        curve = base.mark_line(color='#ff0000', size=4).transform_filter(
-            (alt.datum.y <= limite) & (alt.datum.y >= -limite)
+        # COUCHE 1 : La grille manuelle (grise, fine)
+        # On utilise mark_line avec un encodage 'detail' pour séparer les lignes
+        manual_grid = alt.Chart(df_grid).mark_line(color='#333333', size=1).encode(
+            x=alt.X('x', scale=alt.Scale(domain=[-limite, limite]), title="Abscisses"),
+            y=alt.Y('y', scale=alt.Scale(domain=[-limite, limite]), title="Ordonnées"),
+            detail='group'
         )
 
-        # AXES JAUNES
+        # COUCHE 2 : Les axes JAUNES (épais)
         axe_h = alt.Chart(pd.DataFrame({'y': [0]})).mark_rule(color='#ffff00', size=3).encode(y='y')
         axe_v = alt.Chart(pd.DataFrame({'x': [0]})).mark_rule(color='#ffff00', size=3).encode(x='x')
 
-        # Points et textes Cyan
-        points = alt.Chart(df_pts).mark_point(size=200, filled=True, color='#00d4ff').encode(x='x', y='y')
-        text = alt.Chart(df_pts).mark_text(
-            align='left', dx=10, dy=-10, fontSize=12, fontWeight='bold', color='#00d4ff'
-        ).encode(x='x', y='y', text='name')
+        # COUCHE 3 : La courbe ROUGE
+        curve = alt.Chart(df_c).mark_line(color='#ff0000', size=4).encode(
+            x='x', y='y'
+        ).transform_filter((alt.datum.y <= limite) & (alt.datum.y >= -limite))
 
-        # 3. CONFIGURATION ET TAILLE
-        final_chart = (curve + axe_h + axe_v + points + text).configure_axis(
+        # COUCHE 4 : Points et textes CYAN
+        points = alt.Chart(df_pts).mark_point(size=200, filled=True, color='#00d4ff').encode(x='x', y='y')
+        text = points.mark_text(align='left', dx=12, dy=-12, fontSize=14, fontWeight='bold', color='#00d4ff').encode(text='name')
+
+        # 4. ASSEMBLAGE ET CONFIGURATION
+        final_chart = (manual_grid + axe_h + axe_v + curve + points + text).configure_axis(
             labelColor='white',
             titleColor='white',
+            grid=False, # On désactive la grille automatique d'Altair qui bugge
             domain=False,
-            labelFontSize=9  # On réduit à 9 pour laisser la place à chaque chiffre
-        ).properties(
-            width=600,
-            height=600
-        )
+            labelFontSize=10,
+            values=list(range(-limite, limite + 1)) # On force quand même les chiffres
+        ).properties(width=600, height=600)
 
-        _, col_center, _ = st.columns([1, 10, 1])
-        with col_center:
+        # Affichage centré
+        _, col_c, _ = st.columns([1, 10, 1])
+        with col_c:
             st.altair_chart(final_chart, use_container_width=False, theme=None)
-
-        st.success("✅ Chaque ligne du quadrillage (1 par 1) est désormais forcée.")
 
         
     # --- ONGLET SIMULATEUR ---
