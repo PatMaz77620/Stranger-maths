@@ -363,7 +363,7 @@ elif st.session_state.page == 'chap3':
             st.latex(r"S = (-1 \ ; \ -8)")
             
         with st.expander("3. Forme Factorisée : f(x) = a(x - x₁)(x - x₂)"):
-            st.write("**Notre exemple :** $f(x) = 2(x - 1)(x - (-3))$")
+            st.write("**Notre exemple :** $f(x) = 2(x - 1)(x + 3)$")
             st.warning("**Interprétation :** Les nombres **x₁ = 1** et **x₂ = -3** sont les racines (là où la courbe coupe l'axe horizontal).")
 
     # --- ONGLET GALERIE (VISUALISATION DE L'EXEMPLE) ---
