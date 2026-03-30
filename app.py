@@ -454,7 +454,7 @@ elif st.session_state.page == 'chap3':
 
 # --- SECTION TABLEAUX GRAPHIQUES OPTIMISÉS ---
         st.divider()
-        st.write("### 📋 Synthèse de l'étude : $f(x) = 2x^2 + 4x - 6$")
+        st.write("### 📋 Tableaux de variations et Tableau de signes de f : $f(x) = 2x^2 + 4x - 6$")
 
         import matplotlib.pyplot as plt
 
