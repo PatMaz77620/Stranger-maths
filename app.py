@@ -1,64 +1,57 @@
 import streamlit as st
 from PIL import Image
 import random
-import os
 
 # --- 1. CONFIGURATION DE LA PAGE ---
 st.set_page_config(
     page_title="Stranger Maths",
     page_icon="🔦",
     layout="centered",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed" # On cache la sidebar par défaut
 )
 
-# --- 2. STYLE CSS (CORRECTION FINALE DU MENU) ---
+# --- 2. STYLE CSS AMÉLIORÉ ---
 st.markdown("""
-
     <style>
     .stApp { background-color: #0e1117; }
     
-    /* --- MASQUER LE BOUTON DE FERMETURE SIDEBAR --- */
-    [data-testid="sidebar-collapse-button"] {
-        display: none !important;
+    /* Force le texte en BLANC PUR pour la lisibilité */
+    .stMarkdown, p, span, label, li, .stExpander p { 
+        color: #ffffff !important; 
+    }
+    
+    /* TITRES ROUGES NÉON */
+    h1, h2, h3 { 
+        color: #ff0000 !important; 
+        font-family: 'Helvetica', sans-serif; 
+        text-shadow: 2px 2px 10px #ff0000; 
+        text-align: center;
     }
 
-    /* --- SIDEBAR FIXE --- */
-    section[data-testid="stSidebar"] { 
-        background-color: #12151d !important; 
-        border-right: 2px solid #ff0000; 
+    /* CARTES DE SÉLECTION (HOME) */
+    .menu-card {
+        background-color: #1e2129;
+        border: 2px solid #ff0000;
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        transition: 0.3s;
+        cursor: pointer;
+        margin-bottom: 10px;
+    }
+    .menu-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0px 0px 15px #ff0000;
     }
 
- 
-    /* 3. 🎯 FIX ULTIME DU MENU DÉROULANT (LA PARTIE BLANCHE) */
-
-    /* On force le conteneur du menu fermé en noir/rouge */
-    div[data-baseweb="select"] > div {
-        background-color: #1e2129 !important;
-        color: white !important;
-        border: 1px solid #ff0000 !important;
-    }
-
-    /* ICI LE FIX POUR LA PARTIE DÉROULANTE (POPOVER) */
-    /* On cible globalement toutes les listes de sélection du site */
-    [data-baseweb="popover"] div, [role="listbox"] {
-        background-color: #1e2129 !important; /* Fond sombre */
-    }
-
-    [data-baseweb="popover"] li, [role="option"] {
-        color: white !important; /* Texte blanc pour chaque ligne */
-        background-color: #1e2129 !important;
-    }
-
-    /* Effet quand on passe la souris sur une ligne de la liste */
-    [data-baseweb="popover"] li:hover, [role="option"]:hover {
-        background-color: #ff0000 !important; /* Devient rouge */
+    /* FIX EXPANDERS & TABS */
+    .streamlit-expanderHeader { 
+        background-color: #1e2129 !important; 
+        border: 1px solid #ff0000 !important; 
         color: white !important;
     }
-
-    /* --- EXPANDERS & TABS --- */
-    .streamlit-expanderHeader { background-color: #1e2129 !important; border: 1px solid #ff0000 !important; }
-    button[data-baseweb="tab"] p { color: #ffffff !important; }
-    button[aria-selected="true"] p { color: #ff0000 !important; font-weight: bold; }
+    .stTabs [data-baseweb="tab"] { color: #ffffff !important; }
+    .stTabs [aria-selected="true"] { color: #ff0000 !important; font-weight: bold; }
 
     /* BOUTONS */
     div.stButton > button {
@@ -66,34 +59,66 @@ st.markdown("""
         color: #ff0000 !important;
         border: 2px solid #ff0000 !important;
         border-radius: 10px;
+        width: 100%;
     }
-    div.stButton > button:hover { background-color: #ff0000 !important; color: white !important; }
+    div.stButton > button:hover {
+        background-color: #ff0000 !important;
+        color: white !important;
+    }
     </style>
     """, unsafe_allow_html=True)
+
+# Initialisation de la navigation
+if 'page' not in st.session_state:
+    st.session_state.page = 'home'
 
 def formater_fr(valeur, decimales=2):
     if valeur is None: return "0"
     s = f"{valeur:.{decimales}f}".replace('.', ',').rstrip('0').rstrip(',')
     return s if s != "" and s != "0," else "0"
 
-
-# --- 3. SIDEBAR & LOGO ---
+# --- 3. GESTION DU LOGO ---
 chemin_logo = "Stranger_Maths_Logo.png"
-try:
-    img = Image.open(chemin_logo)
-    logo = img.resize((220, int(220 * img.size[1] / img.size[0])), Image.LANCZOS)
-    st.sidebar.image(logo)
-except:
-    st.sidebar.title("🔦 STRANGER MATHS")
 
-st.sidebar.title("🎮 Chapitres")
-chapitre = st.sidebar.selectbox("Navigation :", ["Information Chiffrée", "Suites Numériques"])
+# --- FONCTION RETOUR ---
+def aller_a_home():
+    st.session_state.page = 'home'
+
+# =================================================================
+# PAGE D'ACCUEIL (MENU PAR CARTES)
+# =================================================================
+if st.session_state.page == 'home':
+    # Logo central
+    try:
+        img = Image.open(chemin_logo)
+        st.image(img, use_container_width=True)
+    except:
+        st.title("🔦 STRANGER MATHS")
+
+    st.write("### 🎮 Choisissez votre mission :")
+    st.write("")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown('<div class="menu-card"><h3>📟</h3><p>Information Chiffrée</p></div>', unsafe_allow_html=True)
+        if st.button("Accéder au Chapitre 1"):
+            st.session_state.page = 'chap1'
+            st.rerun()
+
+    with col2:
+        st.markdown('<div class="menu-card"><h3>📈</h3><p>Suites Numériques</p></div>', unsafe_allow_html=True)
+        if st.button("Accéder au Chapitre 2"):
+            st.session_state.page = 'chap2'
+            st.rerun()
 
 # =================================================================
 # CHAPITRE 1 : INFORMATION CHIFFRÉE
 # =================================================================
-if chapitre == "Information Chiffrée":
+elif st.session_state.page == 'chap1':
+    st.button("⬅️ Retour au menu principal", on_click=aller_a_home)
     st.title("📟 Chapitre 1 : Information Chiffrée")
+    
     tab1, tab2, tab3 = st.tabs(["🔢 Coeff. Multiplicateur", "📈 Taux d'évolution", "🔄 Évolutions Successives"])
 
     with tab1:
@@ -124,40 +149,31 @@ if chapitre == "Information Chiffrée":
 # =================================================================
 # CHAPITRE 2 : SUITES NUMÉRIQUES
 # =================================================================
-else:
+elif st.session_state.page == 'chap2':
+    st.button("⬅️ Retour au menu principal", on_click=aller_a_home)
     st.title("📈 Chapitre 2 : Suites Numériques")
+    
     t_gen, t_ari, t_geo = st.tabs(["📚 Généralités", "➕ Arithmétiques", "✖️ Géométriques"])
 
     with t_gen:
         st.subheader("📚 Guide de survie : Généralités")
-
-        # --- BLOC 1 : RECONNAISSANCE ---
         with st.expander("🤔 Comment différencier Explicite et Récurrence ?"):
             st.write("**Tuyau de Dustin :** Regarde ce qu'il y a après le signe égal.")
-            st.write("- Si tu vois un **n** seul : c'est **Explicite**. Tu calcules ce que tu veux tout de suite.")
-            st.latex(r"u_n = 5n - 2 \rightarrow u_{10} = 5(10)-2 = 48")
-            st.write("- Si tu vois un **u_n** : c'est **Récurrence**. Tu es bloqué, il te faut le terme d'avant.")
+            st.write("- Si tu vois un **n** seul : c'est **Explicite**.")
+            st.latex(r"u_n = 5n - 2 \rightarrow u_{10} = 48")
+            st.write("- Si tu vois un **u_n** : c'est **Récurrence**.")
             st.latex(r"u_{n+1} = u_n + 10")
 
-        # --- BLOC 2 : DÉMONSTRATION DU TYPE ---
         with st.expander("🛠️ Comment démontrer le type de suite ?"):
             st.write("### ➕ Arithmétique ?")
-            st.info(
-                r"Méthode : Calcule la différence $u_{n+1} - u_n$. Si le résultat est un nombre fixe (ex: 5), c'est la raison $r$.")
+            st.info(r"Méthode : Calcule $u_{n+1} - u_n$. Si c'est un nombre fixe $r$, c'est arithmétique.")
             st.write("### ✖️ Géométrique ?")
-            st.info(
-                r"Méthode : Calcule le quotient $u_{n+1} / u_n$. Si le résultat est un nombre fixe (ex: 1,02), c'est la raison $q$.")
+            st.info(r"Méthode : Calcule $u_{n+1} / u_n$. Si c'est un nombre fixe $q$, c'est géométrique.")
 
-        # --- BLOC 3 : MONOTONIE ---
         with st.expander("📉 Comment démontrer la Monotonie ?"):
             st.write(r"**Tuyau de Lucas :** Calcule $u_{n+1} - u_n$ et regarde son signe.")
-            # Utilisation du 'r' pour corriger les flèches
             st.success(r"Signe Positif (+) $\rightarrow$ La suite est **Croissante**.")
             st.warning(r"Signe Négatif (-) $\rightarrow$ La suite est **Décroissante**.")
-            st.divider()
-            st.write("⚠️ **Cas particulier : Ni l'un ni l'autre**")
-            st.write("Si le signe change tout le temps (ex: suite alternée), la suite n'est **pas monotone**.")
-            st.latex(r"u_n = (-1)^n \rightarrow \{1; -1; 1; -1...\}")
 
     with t_ari:
         u0_a = st.number_input("u0", value=10.0, key="u0a_input")
@@ -169,18 +185,14 @@ else:
         q_g = st.number_input("Raison q", value=1.03, step=0.01, key="qg_input")
         st.area_chart([u0_g * (q_g ** i) for i in range(11)])
 
-    # --- NOUVEAU SYSTÈME DE DÉFI POUR LES SUITES ---
     st.divider()
     st.write("### ❓ Défi des Suites")
 
-    # Initialisation du défi si non présent
     if 'suite_type' not in st.session_state:
         st.session_state.suite_type = random.choice(["Arithmétique", "Géométrique"])
         st.session_state.s_u0 = random.randint(2, 10)
-        st.session_state.s_raison = random.randint(2,
-                                                   5) if st.session_state.suite_type == "Arithmétique" else random.choice(
-            [2, 3])
-        st.session_state.s_n = random.randint(2, 4)  # On demande u2, u3 ou u4
+        st.session_state.s_raison = random.randint(2, 5) if st.session_state.suite_type == "Arithmétique" else random.choice([2, 3])
+        st.session_state.s_n = random.randint(2, 4)
 
     st.write(f"Soit une suite **{st.session_state.suite_type}**.")
     st.write(f"Premier terme **u0 = {st.session_state.s_u0}**.")
@@ -192,17 +204,15 @@ else:
         st.write(f"Raison **q = {st.session_state.s_raison}**.")
         corr_suite = st.session_state.s_u0 * (st.session_state.s_raison ** st.session_state.s_n)
 
-    rep_suite = st.number_input(f"Calcule la valeur de u{st.session_state.s_n} :", value=0.0, key="rep_suite")
+    rep_suite = st.number_input(f"Calcule u{st.session_state.s_n} :", value=0.0, key="rep_suite")
 
     col_s1, col_s2 = st.columns(2)
     if col_s1.button("Vérifier"):
         if abs(rep_suite - corr_suite) < 0.01:
-            st.balloons()
-            st.success(f"Bravo ! u{st.session_state.s_n} était bien égal à {corr_suite}")
+            st.balloons(); st.success(f"Bravo ! C'était {corr_suite}")
         else:
             st.error(f"Faux ! Le résultat était {corr_suite}")
 
-    if col_s2.button("Autre défi 🔄", key="reset_suite"):
-        # On supprime les variables pour forcer la création d'un nouveau défi au prochain passage
+    if col_s2.button("Autre défi 🔄"):
         del st.session_state.suite_type
         st.rerun()
