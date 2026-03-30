@@ -381,8 +381,7 @@ elif st.session_state.page == 'chap3':
             """)
             st.latex(r"f(1) = 0 \quad \text{et} \quad f(-3) = 0")
 
-
-    # --- ONGLET GALERIE (VERSION QUADRILLAGE PARFAIT 1:1) ---
+# --- ONGLET GALERIE (FORÇAGE QUADRILLAGE 1x1) ---
     with t_galerie:
         import pandas as pd
         import numpy as np
@@ -398,8 +397,8 @@ elif st.session_state.page == 'chap3':
             {'name': 'C (0 ; -6)', 'x': 0, 'y': -6}
         ])
         
-        # Domaine de -10 à 10 pour un beau carré
         limite = 10
+        # Liste exhaustive des positions pour la grille
         ticks = list(range(-limite, limite + 1))
         
         x_p = np.linspace(-limite, limite, 400)
@@ -411,40 +410,41 @@ elif st.session_state.page == 'chap3':
             x=alt.X('x', 
                 scale=alt.Scale(domain=[-limite, limite]), 
                 axis=alt.Axis(
-                    values=ticks,           # Force les nombres affichés
-                    tickMinStep=1,          # Force le pas minimum
+                    values=ticks,           # On impose les valeurs
+                    tickCount=limite*2,     # On force le nombre de graduations
                     grid=True, 
                     gridColor='#444444',
-                    labelOverlap=False      # Empêche de cacher des labels
+                    labelOverlap=False,     # Interdiction de cacher des labels
+                    labelFlush=False
                 ),
                 title="Abscisses (x)"
             ),
             y=alt.Y('y', 
                 scale=alt.Scale(domain=[-limite, limite]), 
                 axis=alt.Axis(
-                    values=ticks,           # Force les nombres affichés
-                    tickMinStep=1, 
+                    values=ticks, 
+                    tickCount=limite*2,
                     grid=True, 
                     gridColor='#444444',
-                    labelOverlap=False
+                    labelOverlap=False,
+                    labelFlush=False
                 ),
                 title="Ordonnées (y)"
             )
         )
         
-        # Courbe rouge (limitée au cadre)
         curve = base.mark_line(color='#ff0000', size=4).transform_filter(
             (alt.datum.y <= limite) & (alt.datum.y >= -limite)
         )
 
-        # AXES JAUNES (La croix centrale)
+        # AXES JAUNES
         axe_h = alt.Chart(pd.DataFrame({'y': [0]})).mark_rule(color='#ffff00', size=3).encode(y='y')
         axe_v = alt.Chart(pd.DataFrame({'x': [0]})).mark_rule(color='#ffff00', size=3).encode(x='x')
 
         # Points et textes Cyan
         points = alt.Chart(df_pts).mark_point(size=200, filled=True, color='#00d4ff').encode(x='x', y='y')
         text = alt.Chart(df_pts).mark_text(
-            align='left', dx=10, dy=-10, fontSize=13, fontWeight='bold', color='#00d4ff'
+            align='left', dx=10, dy=-10, fontSize=12, fontWeight='bold', color='#00d4ff'
         ).encode(x='x', y='y', text='name')
 
         # 3. CONFIGURATION ET TAILLE
@@ -452,18 +452,17 @@ elif st.session_state.page == 'chap3':
             labelColor='white',
             titleColor='white',
             domain=False,
-            labelFontSize=10  # Taille réduite pour que tous les chiffres rentrent
+            labelFontSize=9  # On réduit à 9 pour laisser la place à chaque chiffre
         ).properties(
             width=600,
             height=600
         )
 
-        # Centrage
-        _, col_center, _ = st.columns([1, 8, 1])
+        _, col_center, _ = st.columns([1, 10, 1])
         with col_center:
             st.altair_chart(final_chart, use_container_width=False, theme=None)
 
-        st.success("✅ Le quadrillage affiche désormais chaque unité (1, 2, 3...).")
+        st.success("✅ Chaque ligne du quadrillage (1 par 1) est désormais forcée.")
 
         
     # --- ONGLET SIMULATEUR ---
