@@ -154,8 +154,8 @@ elif st.session_state.page == 'chap0':
     st.markdown('</div>', unsafe_allow_html=True)
     st.title("🌀 Fonctions : Généralités")
     st.write("---")
-
-    tab1, tab2, tab3 = st.tabs([
+    
+    tab1, tab2, tab3 = st.tabs([
         "🚪 Portail (Images/Antécédents)", 
         "🗺️ Territoire (Domaine)", 
         "📍 Lecture de Carte"
