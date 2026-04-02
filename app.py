@@ -96,6 +96,9 @@ st.markdown("""
 
     </style>
     """, unsafe_allow_html=True)
+
+
+
 # --- 3. GESTION DU LOGO ---
 chemin_logo = "Stranger_Maths_Logo.png"
 
