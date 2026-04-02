@@ -16,68 +16,61 @@ st.markdown("""
     /* FOND GÉNÉRAL */
     .stApp { background-color: #0e1117; }
     
-    /* TEXTE BLANC PUR */
-    .stMarkdown, p, span, label, li, .stExpander p { 
-        color: #ffffff !important; 
-    }
-    
-    /* TITRES ROUGES NÉON */
-    h1, h2, h3 { 
-        color: #ff0000 !important; 
-        font-family: 'Helvetica', sans-serif; 
-        text-shadow: 2px 2px 10px #ff0000; 
-        text-align: center;
+    /* 🎯 CIBLAGE PRIORITAIRE DES COLONNES DE BOUTONS */
+    /* On force le conteneur du bouton à prendre 100% de la colonne */
+    [data-testid="stColumn"] div[data-testid="stVerticalBlock"] > div {
+        width: 100% !important;
     }
 
-    /* 🎯 STYLE UNIQUE POUR LES CARTES (BOUTONS) */
+    /* LE BOUTON LUI-MÊME */
     div.stButton > button {
         width: 100% !important;
-        height: 150px !important; /* Hauteur fixe pour uniformiser */
+        height: 160px !important; /* Hauteur fixe identique pour tous */
         border-radius: 15px !important;
-        border: 2px solid #ff0000 !important; /* Bordure rouge par défaut */
+        border: 2px solid #ff0000 !important;
         background-color: #161b22 !important;
-        color: #ff0000 !important; /* Texte rouge */
-        font-size: 1.2rem !important;
+        color: #ff0000 !important;
+        font-size: 1.3rem !important;
         font-weight: bold !important;
-        transition: all 0.3s ease !important;
         display: flex !important;
-        flex-direction: column !important; /* Icône au dessus du texte */
+        flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
+        gap: 10px !important;
+        transition: all 0.3s ease !important;
         box-shadow: 0px 4px 15px rgba(255, 0, 0, 0.2) !important;
-        white-space: normal !important; /* Permet le retour à la ligne du texte */
+        padding: 10px !important;
     }
 
-    /* EFFET AU SURVOL (HOVER) */
+    /* Empêcher le texte de déborder ou de changer la taille */
+    div.stButton > button p {
+        margin: 0 !important;
+        line-height: 1.2 !important;
+        text-align: center !important;
+    }
+
+    /* EFFET SURVOL */
     div.stButton > button:hover {
-        transform: scale(1.03) !important;
+        transform: scale(1.02) !important;
         background-color: #1e2129 !important;
         box-shadow: 0px 0px 25px #ff0000 !important;
-        color: #ffffff !important; /* Le texte devient blanc au survol */
+        color: #ffffff !important;
     }
 
-    /* GESTION DES ICÔNES VIA LES KEYS */
-    /* On utilise l'attribut data-testid pour cibler les boutons par leur clé */
-    div[data-testid="stBaseButton-secondary"] > button::before {
-        font-size: 2.5rem !important;
-        margin-bottom: 5px;
+    /* TAILLE DES ICÔNES (Si insérées dans le texte) */
+    .stButton button span {
+        font-size: 1.5rem !important;
     }
     
-    /* Ciblage par les clés spécifiques (key="...") */
-    button[kind="secondary"]:has(div[data-testid="stMarkdownContainer"] p:contains("Généralités"))::before { content: "🌀"; font-size: 2.5rem; }
-    button[kind="secondary"]:has(div[data-testid="stMarkdownContainer"] p:contains("Information"))::before { content: "📟"; font-size: 2.5rem; }
-    button[kind="secondary"]:has(div[data-testid="stMarkdownContainer"] p:contains("Suites"))::before { content: "📈"; font-size: 2.5rem; }
-    button[kind="secondary"]:has(div[data-testid="stMarkdownContainer"] p:contains("2nd Degré"))::before { content: "🛸"; font-size: 2.5rem; }
-
-    /* BOUTON RETOUR (plus petit) */
+    /* BOUTON RETOUR (On crée une exception pour lui) */
     .btn-retour div.stButton > button {
         height: auto !important;
         width: auto !important;
-        padding: 10px 20px !important;
-        font-size: 1rem !important;
+        min-width: 150px !important;
+        padding: 5px 15px !important;
+        font-size: 0.9rem !important;
         border: 1px solid #444 !important;
     }
-    .btn-retour div.stButton > button::before { content: "" !important; display: none !important; }
 
     /* TABS */
     .stTabs [data-baseweb="tab"] { color: #ffffff !important; }
@@ -85,6 +78,8 @@ st.markdown("""
 
     </style>
     """, unsafe_allow_html=True)
+
+
 
 # Initialisation de la navigation dans le session_state
 if 'page' not in st.session_state:
