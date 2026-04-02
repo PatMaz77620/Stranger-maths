@@ -10,112 +10,84 @@ st.set_page_config(
     initial_sidebar_state="collapsed" # Sidebar cachée pour le look "Cards"
 )
 
-# --- 2. STYLE CSS AMÉLIORÉ (CARTES CLIQUABLES) ---
+# --- 2. STYLE CSS UNIFIÉ (CARTES IDENTIQUES & LOOK NÉON) ---
 st.markdown("""
     <style>
     /* FOND GÉNÉRAL */
     .stApp { background-color: #0e1117; }
     
-    /* TEXTE BLANC PUR pour la lisibilité */
+    /* TEXTE BLANC PUR */
     .stMarkdown, p, span, label, li, .stExpander p { 
         color: #ffffff !important; 
     }
     
-    /* TITRES ROUGES NÉON CENTRÉS */
+    /* TITRES ROUGES NÉON */
     h1, h2, h3 { 
         color: #ff0000 !important; 
         font-family: 'Helvetica', sans-serif; 
         text-shadow: 2px 2px 10px #ff0000; 
         text-align: center;
-        margin-top: 0px;
     }
 
-    /* 🎯 --- STYLISATION DES CARTES COMME BOUTONS --- 🎯 */
-    /* Force tous les boutons de cartes à avoir la même largeur et une hauteur fixe */
+    /* 🎯 STYLE UNIQUE POUR LES CARTES (BOUTONS) */
     div.stButton > button {
         width: 100% !important;
-        height: 120px !important; /* Ajuste cette valeur selon tes goûts */
+        height: 150px !important; /* Hauteur fixe pour uniformiser */
         border-radius: 15px !important;
-        border: 2px solid #444 !important;
+        border: 2px solid #ff0000 !important; /* Bordure rouge par défaut */
         background-color: #161b22 !important;
-        color: white !important;
-        font-size: 18px !important;
+        color: #ff0000 !important; /* Texte rouge */
+        font-size: 1.2rem !important;
         font-weight: bold !important;
         transition: all 0.3s ease !important;
         display: flex !important;
+        flex-direction: column !important; /* Icône au dessus du texte */
         align-items: center !important;
         justify-content: center !important;
-        box-shadow: 0px 4px 10px rgba(0,0,0,0.5) !important;
+        box-shadow: 0px 4px 15px rgba(255, 0, 0, 0.2) !important;
+        white-space: normal !important; /* Permet le retour à la ligne du texte */
     }
-
-    /* Effet de survol (Néon) */
-    div.stButton > button:hover {
-        border-color: #ff0000 !important;
-        box-shadow: 0px 0px 20px #ff0000 !important;
-        transform: scale(1.02) !important;
-        color: #ff0000 !important;
-    }
-
-
-    /* Contenu à l'intérieur du bouton (Titre et icône) */
-    div.stButton > button p {
-        color: #ff0000 !important; /* Titre en rouge néon */
-        font-size: 1.5rem !important;
-        font-weight: bold !important;
-        font-family: 'Helvetica', sans-serif;
-        text-shadow: 1px 1px 5px #ff0000;
-        margin: 0 !important;
-    }
-    
-    /* Icône plus grande au-dessus du texte */
-    div.stButton > button::before {
-        font-size: 3rem !important;
-        display: block;
-        margin-bottom: 10px;
-    }
-    
-    /* Spécifique pour l'icône de la carte 1 */
-    key-c1-btn::before { content: "📟"; }
-    /* Spécifique pour l'icône de la carte 2 */
-    key-c2-btn::before { content: "📈"; }
 
     /* EFFET AU SURVOL (HOVER) */
     div.stButton > button:hover {
         transform: scale(1.03) !important;
-        box-shadow: 0px 0px 20px #ff0000 !important;
-        background-color: #2a2e38 !important; /* Un peu plus clair au survol */
+        background-color: #1e2129 !important;
+        box-shadow: 0px 0px 25px #ff0000 !important;
+        color: #ffffff !important; /* Le texte devient blanc au survol */
     }
 
-    /* BOUTON RETOUR (plus petit et discret) */
+    /* GESTION DES ICÔNES VIA LES KEYS */
+    /* On utilise l'attribut data-testid pour cibler les boutons par leur clé */
+    div[data-testid="stBaseButton-secondary"] > button::before {
+        font-size: 2.5rem !important;
+        margin-bottom: 5px;
+    }
+    
+    /* Ciblage par les clés spécifiques (key="...") */
+    button[kind="secondary"]:has(div[data-testid="stMarkdownContainer"] p:contains("Généralités"))::before { content: "🌀"; font-size: 2.5rem; }
+    button[kind="secondary"]:has(div[data-testid="stMarkdownContainer"] p:contains("Information"))::before { content: "📟"; font-size: 2.5rem; }
+    button[kind="secondary"]:has(div[data-testid="stMarkdownContainer"] p:contains("Suites"))::before { content: "📈"; font-size: 2.5rem; }
+    button[kind="secondary"]:has(div[data-testid="stMarkdownContainer"] p:contains("2nd Degré"))::before { content: "🛸"; font-size: 2.5rem; }
+
+    /* BOUTON RETOUR (plus petit) */
     .btn-retour div.stButton > button {
         height: auto !important;
-        padding: 10px 20px !important;
-        border-radius: 10px !important;
-        font-size: 1rem !important;
         width: auto !important;
-        margin-bottom: 0px !important;
+        padding: 10px 20px !important;
+        font-size: 1rem !important;
+        border: 1px solid #444 !important;
     }
+    .btn-retour div.stButton > button::before { content: "" !important; display: none !important; }
 
-    /* FIX EXPANDERS & TABS */
-    .streamlit-expanderHeader { 
-        background-color: #1e2129 !important; 
-        border: 1px solid #ff0000 !important; 
-        color: white !important;
-    }
+    /* TABS */
     .stTabs [data-baseweb="tab"] { color: #ffffff !important; }
-    .stTabs [aria-selected="true"] { color: #ff0000 !important; font-weight: bold; }
+    .stTabs [aria-selected="true"] { color: #ff0000 !important; border-bottom-color: #ff0000 !important; }
 
     </style>
     """, unsafe_allow_html=True)
 
-# Initialisation de la navigation dans le session_state
-if 'page' not in st.session_state:
-    st.session_state.page = 'home'
 
-def formater_fr(valeur, decimales=2):
-    if valeur is None: return "0"
-    s = f"{valeur:.{decimales}f}".replace('.', ',').rstrip('0').rstrip(',')
-    return s if s != "" and s != "0," else "0"
+
 
 # --- 3. GESTION DU LOGO ---
 chemin_logo = "Stranger_Maths_Logo.png"
