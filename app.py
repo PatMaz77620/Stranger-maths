@@ -15,62 +15,77 @@ st.set_page_config(
 if 'page' not in st.session_state:
     st.session_state.page = 'home'
 
-# --- 2. STYLE CSS VERSION ATOMIQUE ---
+# --- 2. STYLE CSS VERSION ATOMIQUE CORRIGÉE ---
 st.markdown("""
     <style>
     /* FOND GÉNÉRAL */
     .stApp { background-color: #0e1117; }
     
-    /* FORCE TOUS LES CONTENEURS À 100% */
-    [data-testid="column"], [data-testid="stVerticalBlock"], [data-testid="stVerticalBlockBorderWrapper"] {
-        width: 100% !important;
-        flex: 1 1 0% !important;
+    /* TEXTE BLANC GÉNÉRAL */
+    .stMarkdown, p, span, label, li { color: #ffffff !important; }
+
+    /* TITRES ROUGES NÉON */
+    h1, h2, h3 { 
+        color: #ff0000 !important; 
+        text-shadow: 2px 2px 10px #ff0000; 
+        text-align: center;
     }
 
-    /* LE BOUTON : ON FIXE LES DIMENSIONS PRÉCISES */
+    /* 🎯 UNIFORMISATION TOTALE DES BOUTONS */
+    /* On cible le conteneur du bouton pour qu'il prenne toute la largeur de la colonne */
+    div[data-testid="stButton"] {
+        width: 100% !important;
+    }
+
     button[kind="secondary"] {
         width: 100% !important;
-        min-width: 100% !important;
         height: 160px !important;
         border-radius: 15px !important;
         border: 2px solid #ff0000 !important;
         background-color: #161b22 !important;
         box-shadow: 0px 4px 15px rgba(255, 0, 0, 0.2) !important;
         transition: all 0.3s ease !important;
-        margin-bottom: 20px !important;
-        padding: 10px !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
+        margin: 0 !important;
     }
 
-    /* TEXTE BLANC PUR DANS LES BOUTONS */
-    button[kind="secondary"] p, button[kind="secondary"] span {
+    /* ⚪ FORCE LE TEXTE EN BLANC PUR (ÉLIMINE LE GRIS) */
+    /* On cible spécifiquement le conteneur de texte interne de Streamlit */
+    button[kind="secondary"] div[data-testid="stMarkdownContainer"] p {
         color: #ffffff !important;
         -webkit-text-fill-color: #ffffff !important;
-        font-size: 1.2rem !important;
+        font-size: 1.25rem !important;
         font-weight: bold !important;
         text-align: center !important;
-        margin: 0 !important;
-        white-space: pre-wrap !important; /* Pour respecter les \n */
+        line-height: 1.2 !important;
     }
 
-    /* SURVOL NÉON */
+    /* 🔴 SURVOL NÉON */
     button[kind="secondary"]:hover {
         transform: scale(1.02) !important;
+        background-color: #1e2129 !important;
         box-shadow: 0px 0px 25px #ff0000 !important;
     }
-    button[kind="secondary"]:hover p {
+    
+    button[kind="secondary"]:hover div[data-testid="stMarkdownContainer"] p {
         color: #ff0000 !important;
         -webkit-text-fill-color: #ff0000 !important;
     }
 
     /* BOUTON RETOUR (LUI SEUL RESTE PETIT) */
+    .btn-retour div[data-testid="stButton"] {
+        width: auto !important;
+    }
     .btn-retour button {
         height: auto !important;
         width: auto !important;
         padding: 5px 20px !important;
+    }
+    .btn-retour button div[data-testid="stMarkdownContainer"] p {
+        font-size: 1rem !important;
     }
     </style>
     """, unsafe_allow_html=True)
