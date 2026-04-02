@@ -10,77 +10,92 @@ st.set_page_config(
     initial_sidebar_state="collapsed" # Sidebar cachée pour le look "Cards"
 )
 
-
-# --- 2. STYLE CSS UNIFIÉ (FORCE BRUTE POUR UNIFORMISATION) ---
+# --- 2. STYLE CSS UNIFIÉ (VERSION ULTRA-PRIORITAIRE) ---
 st.markdown("""
     <style>
+    /* FOND GÉNÉRAL */
     .stApp { background-color: #0e1117; }
     
-    /* Conteneur de la grille de cartes */
-    .main-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        padding: 10px;
+    /* TEXTE BLANC GÉNÉRAL */
+    .stMarkdown, p, span, label, li { color: #ffffff !important; }
+
+    /* TITRES ROUGES NÉON */
+    h1, h2, h3 { 
+        color: #ff0000 !important; 
+        text-shadow: 2px 2px 10px #ff0000; 
+        text-align: center;
     }
 
-    /* Style des boutons transformés en cartes */
-    div.stButton > button {
+    /* 🎯 UNIFORMISATION DES COLONNES */
+    [data-testid="stColumn"] {
+        display: flex;
+        align-items: stretch;
+    }
+    [data-testid="stColumn"] > div {
+        width: 100% !important;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* 🎯 LE BOUTON (CARTE) */
+    /* On cible le bouton par son type pour écraser le style Streamlit */
+    button[kind="secondary"] {
         width: 100% !important;
         height: 160px !important;
         border-radius: 15px !important;
         border: 2px solid #ff0000 !important;
         background-color: #161b22 !important;
+        transition: all 0.3s ease-button !important;
+        box-shadow: 0px 4px 15px rgba(255, 0, 0, 0.2) !important;
+        margin: 0 !important;
+        padding: 10px !important;
+    }
+
+    /* ⚪ FORCE LE TEXTE EN BLANC PUR (ÉLIMINE LE GRIS) */
+    /* On cible TOUS les descendants possibles du bouton */
+    button[kind="secondary"] p, 
+    button[kind="secondary"] span, 
+    button[kind="secondary"] div {
         color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important; /* Pour Chrome/Safari */
         font-size: 1.2rem !important;
         font-weight: bold !important;
         text-align: center !important;
-        transition: all 0.3s ease !important;
-        box-shadow: 0px 4px 15px rgba(255, 0, 0, 0.2) !important;
-        margin: 0 !important;
-        display: block !important;
+        line-height: 1.3 !important;
     }
 
-    /* Forcer le texte en blanc pur à l'intérieur */
-    div.stButton > button p {
-        color: #ffffff !important;
-        -webkit-text-fill-color: #ffffff !important;
-        margin: 0 !important;
-    }
-
-    div.stButton > button:hover {
+    /* 🔴 EFFET AU SURVOL */
+    button[kind="secondary"]:hover {
         transform: scale(1.02) !important;
         background-color: #1e2129 !important;
         box-shadow: 0px 0px 25px #ff0000 !important;
         border-color: #ff0000 !important;
     }
     
-    div.stButton > button:hover p {
+    button[kind="secondary"]:hover p, 
+    button[kind="secondary"]:hover span {
         color: #ff0000 !important;
         -webkit-text-fill-color: #ff0000 !important;
     }
 
-    /* Bouton retour (exception) */
-    .btn-retour div.stButton > button {
+    /* EXCEPTION POUR LE BOUTON RETOUR */
+    /* On utilise la classe parente .btn-retour pour réduire la taille */
+    .btn-retour button {
         height: auto !important;
         width: auto !important;
         min-width: 100px !important;
         padding: 5px 15px !important;
+    }
+    .btn-retour button p {
         font-size: 0.9rem !important;
     }
+
+    /* TABS */
+    .stTabs [data-baseweb="tab"] { color: #ffffff !important; }
+    .stTabs [aria-selected="true"] { color: #ff0000 !important; border-bottom-color: #ff0000 !important; }
+
     </style>
-""", unsafe_allow_html=True)
-
-# Initialisation de la navigation dans le session_state
-if 'page' not in st.session_state:
-    st.session_state.page = 'home'
-
-def formater_fr(valeur, decimales=2):
-    if valeur is None: return "0"
-    s = f"{valeur:.{decimales}f}".replace('.', ',').rstrip('0').rstrip(',')
-    return s if s != "" and s != "0," else "0"
-
-
+    """, unsafe_allow_html=True)
 # --- 3. GESTION DU LOGO ---
 chemin_logo = "Stranger_Maths_Logo.png"
 
