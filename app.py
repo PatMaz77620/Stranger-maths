@@ -15,7 +15,7 @@ st.set_page_config(
 if 'page' not in st.session_state:
     st.session_state.page = 'home'
 
-# --- 2. STYLE CSS VERSION ATOMIQUE CORRIGÉE ---
+# --- 2. STYLE CSS VERSION GRILLE FORCÉE ---
 st.markdown("""
     <style>
     /* FOND GÉNÉRAL */
@@ -31,9 +31,23 @@ st.markdown("""
         text-align: center;
     }
 
-    /* 🎯 UNIFORMISATION TOTALE DES BOUTONS */
-    /* On cible le conteneur du bouton pour qu'il prenne toute la largeur de la colonne */
-    div[data-testid="stButton"] {
+    /* 🎯 --- LA GRILLE MAGIQUE --- 🎯 */
+    /* On force le conteneur des colonnes à devenir une grille stricte */
+    [data-testid="stHorizontalBlock"] {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important; /* Deux colonnes strictement égales */
+        gap: 15px !important;
+    }
+
+    /* On annule les comportements par défaut des colonnes Streamlit qui cassent tout */
+    [data-testid="column"] {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: none !important;
+    }
+
+    /* 🎯 LE BOUTON (CARTE) */
+    div[data-testid="stButton"], div[data-testid="stButton"] button {
         width: 100% !important;
     }
 
@@ -49,21 +63,18 @@ st.markdown("""
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
-        margin: 0 !important;
     }
 
-    /* ⚪ FORCE LE TEXTE EN BLANC PUR (ÉLIMINE LE GRIS) */
-    /* On cible spécifiquement le conteneur de texte interne de Streamlit */
+    /* ⚪ FORCE LE TEXTE EN BLANC PUR */
     button[kind="secondary"] div[data-testid="stMarkdownContainer"] p {
         color: #ffffff !important;
         -webkit-text-fill-color: #ffffff !important;
         font-size: 1.25rem !important;
         font-weight: bold !important;
         text-align: center !important;
-        line-height: 1.2 !important;
     }
 
-    /* 🔴 SURVOL NÉON */
+    /* 🔴 SURVOL */
     button[kind="secondary"]:hover {
         transform: scale(1.02) !important;
         background-color: #1e2129 !important;
@@ -75,21 +86,18 @@ st.markdown("""
         -webkit-text-fill-color: #ff0000 !important;
     }
 
-    /* BOUTON RETOUR (LUI SEUL RESTE PETIT) */
-    .btn-retour div[data-testid="stButton"] {
-        width: auto !important;
+    /* BOUTON RETOUR (On désactive la grille pour lui) */
+    .btn-retour {
+        display: block !important;
+        width: fit-content !important;
     }
     .btn-retour button {
         height: auto !important;
         width: auto !important;
         padding: 5px 20px !important;
     }
-    .btn-retour button div[data-testid="stMarkdownContainer"] p {
-        font-size: 1rem !important;
-    }
     </style>
     """, unsafe_allow_html=True)
-
 # --- FONCTIONS UTILES ---
 def formater_fr(valeur, decimales=2):
     if valeur is None: return "0"
@@ -113,30 +121,26 @@ if st.session_state.page == 'home':
     except:
         st.title("🔦 STRANGER MATHS")
 
-    st.write("### 🎮 Choisissez votre mission :")
+st.write("### 🎮 Choisissez votre mission :")
     st.write("")
 
-    # On crée deux colonnes SANS GAP pour éviter les marges fantômes
-    col_gauche, col_droite = st.columns(2, gap="small")
+    # ON MET TOUT DANS UNE SEULE LIGNE DE 2 COLONNES
+    col1, col2 = st.columns(2)
     
-    with col_gauche:
-        if st.button("🌀 Fonctions :\nGénéralités", key="btn_c0"):
-            st.session_state.page = 'chap0'
-            st.rerun()
-        
-        if st.button("📈 Suites\nNumériques", key="btn_c2"):
-            st.session_state.page = 'chap2'
-            st.rerun()
+    with col1:
+        st.button("🌀 Fonctions :\nGénéralités", key="btn_c0")
+        st.button("📈 Suites\nNumériques", key="btn_c2")
 
-    with col_droite:
-        if st.button("📟 Information\nChiffrée", key="btn_c1"):
-            st.session_state.page = 'chap1'
-            st.rerun()
-            
-        if st.button("🛸 Second\nDegré", key="btn_c3"):
-            st.session_state.page = 'chap3'
-            st.rerun()
-            
+    with col2:
+        st.button("📟 Information\nChiffrée", key="btn_c1")
+        st.button("🛸 Second\nDegré", key="btn_c3")
+    
+    # Clics
+    if st.session_state.btn_c0: st.session_state.page = 'chap0'; st.rerun()
+    if st.session_state.btn_c1: st.session_state.page = 'chap1'; st.rerun()
+    if st.session_state.btn_c2: st.session_state.page = 'chap2'; st.rerun()
+    if st.session_state.btn_c3: st.session_state.page = 'chap3'; st.rerun()
+        
 # =================================================================
 # LES CHAPITRES (0, 1, 2, 3)
 # =================================================================
