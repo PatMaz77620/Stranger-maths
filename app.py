@@ -10,7 +10,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed" # Sidebar cachée pour le look "Cards"
 )
 
-# --- 2. STYLE CSS UNIFIÉ (CARTES IDENTIQUES & LOOK NÉON) ---
+# --- 2. STYLE CSS UNIFIÉ (FORCE BRUTE POUR UNIFORMISATION) ---
 st.markdown("""
     <style>
     /* FOND GÉNÉRAL */
@@ -28,10 +28,16 @@ st.markdown("""
         text-align: center;
     }
 
+    /* 🎯 FORCE L'UNIFORMISATION DES COLONNES (INDISPENSABLE) */
+    /* On force les boîtes contenant les boutons à prendre toute la largeur */
+    [data-testid="stColumn"] > div {
+        width: 100% !important;
+    }
+
     /* 🎯 CARTES (BOUTONS) */
     div.stButton > button {
         width: 100% !important;
-        height: 160px !important;
+        height: 160px !important; /* Hauteur fixe identique pour tous */
         border-radius: 15px !important;
         border: 2px solid #ff0000 !important;
         background-color: #161b22 !important;
@@ -41,17 +47,20 @@ st.markdown("""
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
+        padding: 10px !important;
     }
 
-    /* ⚪ FORCE LE TEXTE ET L'ICÔNE EN BLANC DANS LE BOUTON */
+    /* ⚪ FORCE LE TEXTE EN BLANC PUR (ÉLIMINE LE GRIS) */
     div.stButton > button div[data-testid="stMarkdownContainer"] p,
     div.stButton > button span,
     div.stButton > button p {
         color: #ffffff !important;
-        font-size: 1.2rem !important;
+        -webkit-text-fill-color: #ffffff !important;
+        font-size: 1.25rem !important;
         font-weight: bold !important;
-        text-shadow: none !important;
-        -webkit-text-fill-color: #ffffff !important; /* Force pour certains navigateurs */
+        text-align: center !important;
+        margin: 0 !important;
+        line-height: 1.2 !important;
     }
 
     /* 🔴 EFFET AU SURVOL */
@@ -61,14 +70,14 @@ st.markdown("""
         box-shadow: 0px 0px 25px #ff0000 !important;
     }
     
-    /* Change la couleur du texte en ROUGE uniquement au survol */
+    /* Le texte passe en rouge au survol */
     div.stButton > button:hover p,
     div.stButton > button:hover span {
         color: #ff0000 !important;
         -webkit-text-fill-color: #ff0000 !important;
     }
 
-    /* BOUTON RETOUR (On garde l'exception) */
+    /* BOUTON RETOUR (On garde l'exception pour qu'il ne soit pas énorme) */
     .btn-retour div.stButton > button {
         height: auto !important;
         width: auto !important;
@@ -83,10 +92,8 @@ st.markdown("""
     .stTabs [data-baseweb="tab"] { color: #ffffff !important; }
     .stTabs [aria-selected="true"] { color: #ff0000 !important; border-bottom-color: #ff0000 !important; }
 
-
     </style>
     """, unsafe_allow_html=True)
-
 
 
 # Initialisation de la navigation dans le session_state
