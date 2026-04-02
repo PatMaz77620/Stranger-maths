@@ -10,91 +10,66 @@ st.set_page_config(
     initial_sidebar_state="collapsed" # Sidebar cachée pour le look "Cards"
 )
 
+
 # --- 2. STYLE CSS UNIFIÉ (FORCE BRUTE POUR UNIFORMISATION) ---
 st.markdown("""
     <style>
-    /* FOND GÉNÉRAL */
     .stApp { background-color: #0e1117; }
     
-    /* TEXTE BLANC GÉNÉRAL */
-    .stMarkdown, p, span, label, li { 
-        color: #ffffff !important; 
+    /* Conteneur de la grille de cartes */
+    .main-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        padding: 10px;
     }
 
-    /* TITRES ROUGES NÉON */
-    h1, h2, h3 { 
-        color: #ff0000 !important; 
-        text-shadow: 2px 2px 10px #ff0000; 
-        text-align: center;
-    }
-
-    /* 🎯 FORCE L'UNIFORMISATION DES COLONNES (INDISPENSABLE) */
-    /* On force les boîtes contenant les boutons à prendre toute la largeur */
-    [data-testid="stColumn"] > div {
-        width: 100% !important;
-    }
-
-    /* 🎯 CARTES (BOUTONS) */
+    /* Style des boutons transformés en cartes */
     div.stButton > button {
         width: 100% !important;
-        height: 160px !important; /* Hauteur fixe identique pour tous */
+        height: 160px !important;
         border-radius: 15px !important;
         border: 2px solid #ff0000 !important;
         background-color: #161b22 !important;
+        color: #ffffff !important;
+        font-size: 1.2rem !important;
+        font-weight: bold !important;
+        text-align: center !important;
         transition: all 0.3s ease !important;
         box-shadow: 0px 4px 15px rgba(255, 0, 0, 0.2) !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-        padding: 10px !important;
+        margin: 0 !important;
+        display: block !important;
     }
 
-    /* ⚪ FORCE LE TEXTE EN BLANC PUR (ÉLIMINE LE GRIS) */
-    div.stButton > button div[data-testid="stMarkdownContainer"] p,
-    div.stButton > button span,
+    /* Forcer le texte en blanc pur à l'intérieur */
     div.stButton > button p {
         color: #ffffff !important;
         -webkit-text-fill-color: #ffffff !important;
-        font-size: 1.25rem !important;
-        font-weight: bold !important;
-        text-align: center !important;
         margin: 0 !important;
-        line-height: 1.2 !important;
     }
 
-    /* 🔴 EFFET AU SURVOL */
     div.stButton > button:hover {
         transform: scale(1.02) !important;
         background-color: #1e2129 !important;
         box-shadow: 0px 0px 25px #ff0000 !important;
+        border-color: #ff0000 !important;
     }
     
-    /* Le texte passe en rouge au survol */
-    div.stButton > button:hover p,
-    div.stButton > button:hover span {
+    div.stButton > button:hover p {
         color: #ff0000 !important;
         -webkit-text-fill-color: #ff0000 !important;
     }
 
-    /* BOUTON RETOUR (On garde l'exception pour qu'il ne soit pas énorme) */
+    /* Bouton retour (exception) */
     .btn-retour div.stButton > button {
         height: auto !important;
         width: auto !important;
-        min-width: 150px !important;
+        min-width: 100px !important;
         padding: 5px 15px !important;
-    }
-    .btn-retour div.stButton > button p {
         font-size: 0.9rem !important;
     }
-
-    /* TABS */
-    .stTabs [data-baseweb="tab"] { color: #ffffff !important; }
-    .stTabs [aria-selected="true"] { color: #ff0000 !important; border-bottom-color: #ff0000 !important; }
-
     </style>
-    """, unsafe_allow_html=True)
-
+""", unsafe_allow_html=True)
 
 # Initialisation de la navigation dans le session_state
 if 'page' not in st.session_state:
@@ -104,7 +79,6 @@ def formater_fr(valeur, decimales=2):
     if valeur is None: return "0"
     s = f"{valeur:.{decimales}f}".replace('.', ',').rstrip('0').rstrip(',')
     return s if s != "" and s != "0," else "0"
-
 
 
 # --- 3. GESTION DU LOGO ---
@@ -118,7 +92,6 @@ def aller_a_home():
 # PAGE D'ACCUEIL (MENU PAR CARTES CLIQUABLES 2x2)
 # =================================================================
 if st.session_state.page == 'home':
-    # Logo central
     try:
         img = Image.open(chemin_logo)
         st.image(img, use_container_width=True)
@@ -128,27 +101,23 @@ if st.session_state.page == 'home':
     st.write("### 🎮 Choisissez votre mission :")
     st.write("")
 
-    # LIGNE 1
-    row1_col1, row1_col2 = st.columns(2)
-    with row1_col1:
-        if st.button("🌀 Fonctions : Généralités", key="c0-btn"):
+    # On utilise des colonnes avec un espacement (gap) nul
+    c1, c2 = st.columns(2, gap="small")
+    with c1:
+        if st.button("🌀 Fonctions :\nGénéralités", key="c0-btn"):
             st.session_state.page = 'chap0'
             st.rerun()
-    with row1_col2:
-        if st.button("📟 Information Chiffrée", key="c1-btn"):
-            st.session_state.page = 'chap1'
-            st.rerun()
-
-    st.write("") # Espacement entre les lignes
-
-    # LIGNE 2
-    row2_col1, row2_col2 = st.columns(2)
-    with row2_col1:
-        if st.button("📈 Suites Numériques", key="c2-btn"):
+        st.write("") # Petit espace vertical
+        if st.button("📈 Suites\nNumériques", key="c2-btn"):
             st.session_state.page = 'chap2'
             st.rerun()
-    with row2_col2:
-        if st.button("🛸 2nd Degré", key="c3-btn"):
+
+    with c2:
+        if st.button("📟 Information\nChiffrée", key="c1-btn"):
+            st.session_state.page = 'chap1'
+            st.rerun()
+        st.write("") # Petit espace vertical
+        if st.button("🛸 Second\nDegré", key="c3-btn"):
             st.session_state.page = 'chap3'
             st.rerun()
             
