@@ -121,7 +121,7 @@ if st.session_state.page == 'home':
     except:
         st.title("🔦 STRANGER MATHS")
 
-st.write("### 🎮 Choisissez votre mission :")
+    st.write("### 🎮 Choisissez votre mission :")
     st.write("")
 
     # ON MET TOUT DANS UNE SEULE LIGNE DE 2 COLONNES
