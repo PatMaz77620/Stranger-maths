@@ -104,8 +104,12 @@ chemin_logo = "Stranger_Maths_Logo.png"
 # PAGE D'ACCUEIL
 # =================================================================
 if st.session_state.page == 'home':
-    # ... ton logo ...
-
+    try:
+        img = Image.open(chemin_logo)
+        st.image(img, use_container_width=True)
+    except:
+        st.title("🔦 STRANGER MATHS")
+        
     st.write("### 🎮 Choisissez votre mission :")
     
     # Ligne 1
