@@ -16,60 +16,67 @@ st.markdown("""
     /* FOND GÉNÉRAL */
     .stApp { background-color: #0e1117; }
     
-    /* 🎯 CIBLAGE PRIORITAIRE DES COLONNES DE BOUTONS */
-    /* On force le conteneur du bouton à prendre 100% de la colonne */
-    [data-testid="stColumn"] div[data-testid="stVerticalBlock"] > div {
-        width: 100% !important;
+    /* TEXTE BLANC GÉNÉRAL */
+    .stMarkdown, p, span, label, li { 
+        color: #ffffff !important; 
     }
 
-    /* LE BOUTON LUI-MÊME */
+    /* TITRES ROUGES NÉON */
+    h1, h2, h3 { 
+        color: #ff0000 !important; 
+        text-shadow: 2px 2px 10px #ff0000; 
+        text-align: center;
+    }
+
+    /* 🎯 CARTES (BOUTONS) */
     div.stButton > button {
         width: 100% !important;
-        height: 160px !important; /* Hauteur fixe identique pour tous */
+        height: 160px !important;
         border-radius: 15px !important;
         border: 2px solid #ff0000 !important;
         background-color: #161b22 !important;
-        color: #ff0000 !important;
-        font-size: 1.3rem !important;
-        font-weight: bold !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0px 4px 15px rgba(255, 0, 0, 0.2) !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 10px !important;
-        transition: all 0.3s ease !important;
-        box-shadow: 0px 4px 15px rgba(255, 0, 0, 0.2) !important;
-        padding: 10px !important;
     }
 
-    /* Empêcher le texte de déborder ou de changer la taille */
+    /* ⚪ FORCE LE TEXTE ET L'ICÔNE EN BLANC DANS LE BOUTON */
+    div.stButton > button div[data-testid="stMarkdownContainer"] p,
+    div.stButton > button span,
     div.stButton > button p {
-        margin: 0 !important;
-        line-height: 1.2 !important;
-        text-align: center !important;
+        color: #ffffff !important;
+        font-size: 1.2rem !important;
+        font-weight: bold !important;
+        text-shadow: none !important;
+        -webkit-text-fill-color: #ffffff !important; /* Force pour certains navigateurs */
     }
 
-    /* EFFET SURVOL */
+    /* 🔴 EFFET AU SURVOL */
     div.stButton > button:hover {
         transform: scale(1.02) !important;
         background-color: #1e2129 !important;
         box-shadow: 0px 0px 25px #ff0000 !important;
-        color: #ffffff !important;
-    }
-
-    /* TAILLE DES ICÔNES (Si insérées dans le texte) */
-    .stButton button span {
-        font-size: 1.5rem !important;
     }
     
-    /* BOUTON RETOUR (On crée une exception pour lui) */
+    /* Change la couleur du texte en ROUGE uniquement au survol */
+    div.stButton > button:hover p,
+    div.stButton > button:hover span {
+        color: #ff0000 !important;
+        -webkit-text-fill-color: #ff0000 !important;
+    }
+
+    /* BOUTON RETOUR (On garde l'exception) */
     .btn-retour div.stButton > button {
         height: auto !important;
         width: auto !important;
         min-width: 150px !important;
         padding: 5px 15px !important;
+    }
+    .btn-retour div.stButton > button p {
         font-size: 0.9rem !important;
-        border: 1px solid #444 !important;
     }
 
     /* TABS */
