@@ -113,7 +113,7 @@ def aller_a_home():
     st.session_state.page = 'home'
 
 # =================================================================
-# PAGE D'ACCUEIL (MENU PAR CARTES CLIQUABLES)
+# PAGE D'ACCUEIL (MENU PAR CARTES CLIQUABLES 2x2)
 # =================================================================
 if st.session_state.page == 'home':
     # Logo central
@@ -126,24 +126,27 @@ if st.session_state.page == 'home':
     st.write("### 🎮 Choisissez votre mission :")
     st.write("")
 
-    # On crée 3 colonnes pour nos 3 chapitres
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        # La carte 1 : Information Chiffrée (icône 📟 gérée par CSS via key)
-        if st.button("Information Chiffrée", key="c1-btn"):
+    # LIGNE 1
+    row1_col1, row1_col2 = st.columns(2)
+    with row1_col1:
+        if st.button("🌀 Fonctions : Généralités", key="c0-btn"):
+            st.session_state.page = 'chap0'
+            st.rerun()
+    with row1_col2:
+        if st.button("📟 Information Chiffrée", key="c1-btn"):
             st.session_state.page = 'chap1'
             st.rerun()
 
-    with col2:
-        # La carte 2 : Suites Numériques (icône 📈 gérée par CSS via key)
-        if st.button("Suites Numériques", key="c2-btn"):
+    st.write("") # Espacement entre les lignes
+
+    # LIGNE 2
+    row2_col1, row2_col2 = st.columns(2)
+    with row2_col1:
+        if st.button("📈 Suites Numériques", key="c2-btn"):
             st.session_state.page = 'chap2'
             st.rerun()
-
-    with col3:
-        # La carte 3 : 2nd Degré (icône 🛸 gérée par CSS via key)
-        if st.button("2nd Degré", key="c3-btn"):
+    with row2_col2:
+        if st.button("🛸 2nd Degré", key="c3-btn"):
             st.session_state.page = 'chap3'
             st.rerun()
             
@@ -538,3 +541,89 @@ elif st.session_state.page == 'chap3':
             st.balloons(); st.success(f"Bravo ! L'extremum est bien {st.session_state.q3_beta}.")
         else:
             st.error(f"Faux ! L'extremum (Beta) est le nombre tout seul à la fin : {st.session_state.q3_beta}")
+
+
+# =================================================================
+# CHAPITRE 0 : FONCTIONS (GÉNÉRALITÉS)
+# =================================================================
+if st.session_state.page == 'chap0':
+    if st.button("⬅️ Retour au QG"):
+        st.session_state.page = 'home'
+        st.rerun()
+
+    st.title("🌀 Fonctions : Généralités")
+    st.write("---")
+
+    tab1, tab2, tab3 = st.tabs([
+        "🚪 Portail (Images/Antécédents)", 
+        "🗺️ Territoire (Domaine)", 
+        "📍 Lecture de Carte"
+    ])
+
+    # --- SOUS-CHAPITRE 1 : IMAGES ET ANTÉCÉDENTS ---
+    with tab1:
+        st.subheader("⚙️ La Machine à Transformer")
+        st.info("Une fonction est un processus. On entre un nombre **x** (antécédent), on applique une règle, et il ressort un nombre **f(x)** (image).")
+        
+        col_calc, col_viz = st.columns([1, 1])
+        
+        with col_calc:
+            st.write("**Exemple : $f(x) = 2x^2 - 3$**")
+            input_x = st.number_input("Choisissez un antécédent (x) :", value=3.0)
+            result_f = 2*(input_x**2) - 3
+            st.success(f"L'image de **{input_x}** est **{result_f}**")
+            st.latex(r"f(" + str(input_x) + r") = " + str(result_f))
+
+        with col_viz:
+            st.markdown("""
+            **Mémo technique :**
+            - **x** est l'ANTÉCÉDENT (il vient AVANT).
+            - **f(x)** est l'IMAGE (c'est le RÉSULTAT).
+            *Un antécédent n'a qu'une seule image, mais une image peut avoir plusieurs antécédents !*
+            """)
+
+    # --- SOUS-CHAPITRE 2 : DOMAINE DE DÉFINITION ---
+    with tab2:
+        st.subheader("🚧 Le Territoire de la fonction")
+        st.write("Certaines fonctions ont des 'zones interdites' (valeurs de x pour lesquelles le calcul est impossible).")
+        
+        c1, c2 = st.columns(2)
+        with c1:
+            st.error("🚫 **La Division par Zéro**")
+            st.latex(r"g(x) = \frac{5}{x - 4}")
+            st.write("Ici, $x$ ne peut pas être égal à **4** (le dénominateur serait nul).")
+            st.write("**Domaine :** $\mathbb{R} \setminus \{4\}$")
+            
+        with c2:
+            st.error("🚫 **La Racine Négative**")
+            st.latex(r"h(x) = \sqrt{x + 2}")
+            st.write("Sous une racine, le résultat doit être $\geq 0$.")
+            st.write("**Domaine :** $[-2 \ ; \ +\infty[$")
+
+    # --- SOUS-CHAPITRE 3 : LECTURE GRAPHIQUE ---
+    with tab3:
+        st.subheader("📍 Analyse de la Carte")
+        st.write("Lire un graphique, c'est comme décoder une carte de l'Upside Down.")
+        
+        import numpy as np
+        import pandas as pd
+        import altair as alt
+
+        # Génération d'une courbe exemple (courbe sinueuse)
+        x_vals = np.linspace(-4, 4, 100)
+        y_vals = 0.5 * x_vals**3 - 2 * x_vals
+        df_map = pd.DataFrame({'x': x_vals, 'y': y_vals})
+        
+        chart_map = alt.Chart(df_map).mark_line(color='#00d4ff', size=3).encode(
+            x=alt.X('x', title='Axe des Antécédents (x)'),
+            y=alt.Y('y', title='Axe des Images (f(x))')
+        ).properties(height=300)
+        
+        st.altair_chart(chart_map, use_container_width=True)
+        
+        st.markdown("""
+        - **Lecture d'image :** On entre par l'axe horizontal, on tape la courbe, on lit sur l'axe vertical.
+        - **Lecture d'antécédent :** On entre par l'axe vertical, on cherche les points de la courbe, on descend lire sur l'axe horizontal.
+        """)
+
+
