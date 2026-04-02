@@ -86,6 +86,14 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
+# Initialisation de la navigation dans le session_state
+if 'page' not in st.session_state:
+    st.session_state.page = 'home'
+
+def formater_fr(valeur, decimales=2):
+    if valeur is None: return "0"
+    s = f"{valeur:.{decimales}f}".replace('.', ',').rstrip('0').rstrip(',')
+    return s if s != "" and s != "0," else "0"
 
 
 
