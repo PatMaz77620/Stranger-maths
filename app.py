@@ -15,71 +15,58 @@ st.set_page_config(
 if 'page' not in st.session_state:
     st.session_state.page = 'home'
 
-# --- 2. STYLE CSS UNIFIÉ (VERSION "FULL WIDTH" GARANTIE) ---
+# --- 2. STYLE CSS VERSION ATOMIQUE ---
 st.markdown("""
     <style>
-    /* FOND ET TEXTE GÉNÉRAL */
+    /* FOND GÉNÉRAL */
     .stApp { background-color: #0e1117; }
-    .stMarkdown, p, span, label, li { color: #ffffff !important; }
-    h1, h2, h3 { color: #ff0000 !important; text-shadow: 2px 2px 10px #ff0000; text-align: center; }
-
-    /* 🎯 --- LA FORCE BRUTE POUR L'UNIFORMISATION --- 🎯 */
-    /* On force TOUS les conteneurs de colonnes à laisser leurs enfants prendre 100% */
-    [data-testid="column"] {
+    
+    /* FORCE TOUS LES CONTENEURS À 100% */
+    [data-testid="column"], [data-testid="stVerticalBlock"], [data-testid="stVerticalBlockBorderWrapper"] {
         width: 100% !important;
         flex: 1 1 0% !important;
-        min-width: 0 !important;
-    }
-    
-    [data-testid="column"] > div {
-        width: 100% !important;
     }
 
-    /* On force le bouton Streamlit à ignorer la largeur de son texte */
-    div.stButton, div.stButton > button {
-        width: 100% !important;
-        display: block !important;
-    }
-
-    /* 🏎️ LE LOOK DES CARTES */
+    /* LE BOUTON : ON FIXE LES DIMENSIONS PRÉCISES */
     button[kind="secondary"] {
+        width: 100% !important;
+        min-width: 100% !important;
         height: 160px !important;
         border-radius: 15px !important;
         border: 2px solid #ff0000 !important;
         background-color: #161b22 !important;
         box-shadow: 0px 4px 15px rgba(255, 0, 0, 0.2) !important;
         transition: all 0.3s ease !important;
-        margin-bottom: 10px !important;
+        margin-bottom: 20px !important;
+        padding: 10px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
 
-    /* ⚪ TEXTE BLANC ET CENTRÉ DANS LE BOUTON */
-    button[kind="secondary"] p, 
-    button[kind="secondary"] span {
+    /* TEXTE BLANC PUR DANS LES BOUTONS */
+    button[kind="secondary"] p, button[kind="secondary"] span {
         color: #ffffff !important;
         -webkit-text-fill-color: #ffffff !important;
         font-size: 1.2rem !important;
         font-weight: bold !important;
         text-align: center !important;
-        display: block !important;
-        width: 100% !important;
+        margin: 0 !important;
+        white-space: pre-wrap !important; /* Pour respecter les \n */
     }
 
-    /* 🔴 SURVOL */
+    /* SURVOL NÉON */
     button[kind="secondary"]:hover {
         transform: scale(1.02) !important;
         box-shadow: 0px 0px 25px #ff0000 !important;
-        border-color: #ff0000 !important;
     }
     button[kind="secondary"]:hover p {
         color: #ff0000 !important;
         -webkit-text-fill-color: #ff0000 !important;
     }
 
-    /* BOUTON RETOUR (On le protège de l'étirement) */
-    .btn-retour {
-        display: inline-block !important;
-        width: auto !important;
-    }
+    /* BOUTON RETOUR (LUI SEUL RESTE PETIT) */
     .btn-retour button {
         height: auto !important;
         width: auto !important;
@@ -104,27 +91,38 @@ chemin_logo = "Stranger_Maths_Logo.png"
 # PAGE D'ACCUEIL
 # =================================================================
 if st.session_state.page == 'home':
+    # Logo
     try:
         img = Image.open(chemin_logo)
         st.image(img, use_container_width=True)
     except:
         st.title("🔦 STRANGER MATHS")
-        
-    st.write("### 🎮 Choisissez votre mission :")
-    
-    # Ligne 1
-    c1, c2 = st.columns(2)
-    with c1:
-        st.button("🌀 Fonctions :\nGénéralités", key="c0-btn")
-    with c2:
-        st.button("📟 Information\nChiffrée", key="c1-btn")
 
-    # Ligne 2
-    c3, c4 = st.columns(2)
-    with c3:
-        st.button("📈 Suites\nNumériques", key="c2-btn")
-    with c4:
-        st.button("🛸 Second\nDegré", key="c3-btn")
+    st.write("### 🎮 Choisissez votre mission :")
+    st.write("")
+
+    # On crée deux colonnes SANS GAP pour éviter les marges fantômes
+    col_gauche, col_droite = st.columns(2, gap="small")
+    
+    with col_gauche:
+        if st.button("🌀 Fonctions :\nGénéralités", key="btn_c0"):
+            st.session_state.page = 'chap0'
+            st.rerun()
+        
+        if st.button("📈 Suites\nNumériques", key="btn_c2"):
+            st.session_state.page = 'chap2'
+            st.rerun()
+
+    with col_droite:
+        if st.button("📟 Information\nChiffrée", key="btn_c1"):
+            st.session_state.page = 'chap1'
+            st.rerun()
+            
+        if st.button("🛸 Second\nDegré", key="btn_c3"):
+            st.session_state.page = 'chap3'
+            st.rerun()
+            
+
     
     # Gestion des clics (plus propre)
     if st.session_state["c0-btn"]: st.session_state.page = 'chap0'; st.rerun()
