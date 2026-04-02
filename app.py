@@ -383,7 +383,8 @@ elif st.session_state.page == 'chap3':
             Graphiquement, ce sont les points où la courbe coupe l'axe des abscisses (horizontal).
             """)
             st.latex(r"f(1) = 0 \quad \text{et} \quad f(-3) = 0")
-# --- ONGLET GALERIE (QUADRILLAGE MANUEL 1x1) ---
+
+    # --- ONGLET GALERIE (QUADRILLAGE MANUEL 1x1 & COULEURS SYNCHRO) ---
     with t_galerie:
         import pandas as pd
         import numpy as np
@@ -391,21 +392,18 @@ elif st.session_state.page == 'chap3':
 
         st.write("### 🖼️ Représentation Graphique (Repère orthonormé)")
         
-        # 1. PRÉSENTATION DES FORMES
-        st.info(r"**Exemple :** $f(x) = 2x^2 + 4x - 6$ = $2(x+1)^2-8$ = $2(x-1)(x+3)$")
+        # 1. PRÉSENTATION DES FORMES (Plus lisible)
+        st.info(r"**Exemple :** $f(x) = 2x^2 + 4x - 6$ | Forme canonique : $2(x+1)^2-8$ | Forme factorisée : $2(x-1)(x+3)$")
         
         # 2. PRÉPARATION DES DONNÉES
         limite = 10
-        # On crée une liste de coordonnées pour chaque ligne de la grille
         grid_lines = []
         for i in range(-limite, limite + 1):
-            # Lignes verticales
             grid_lines.append(pd.DataFrame({'x': [i, i], 'y': [-limite, limite], 'group': f'v{i}'}))
-            # Lignes horizontales
             grid_lines.append(pd.DataFrame({'x': [-limite, limite], 'y': [i, i], 'group': f'h{i}'}))
         df_grid = pd.concat(grid_lines)
 
-        # Points singuliers
+        # Points singuliers en CYAN pour se détacher du rouge
         df_pts = pd.DataFrame([
             {'name': 'S (-1 ; -8)', 'x': -1, 'y': -8},
             {'name': 'R1 (1 ; 0)', 'x': 1, 'y': 0},
@@ -419,35 +417,46 @@ elif st.session_state.page == 'chap3':
 
         # 3. CONSTRUCTION DU GRAPHIQUE COUCHE PAR COUCHE
         
-        # COUCHE 1 : La grille manuelle (grise, fine)
-        # On utilise mark_line avec un encodage 'detail' pour séparer les lignes
+        # COUCHE 1 : Grille manuelle discrète
         manual_grid = alt.Chart(df_grid).mark_line(color='#333333', size=1).encode(
-            x=alt.X('x', scale=alt.Scale(domain=[-limite, limite]), title="Abscisses"),
-            y=alt.Y('y', scale=alt.Scale(domain=[-limite, limite]), title="Ordonnées"),
+            x=alt.X('x', scale=alt.Scale(domain=[-limite, limite]), title="Abscisses (x)"),
+            y=alt.Y('y', scale=alt.Scale(domain=[-limite, limite]), title="Ordonnées (y)"),
             detail='group'
         )
 
-        # COUCHE 2 : Les axes JAUNES (épais)
-        axe_h = alt.Chart(pd.DataFrame({'y': [0]})).mark_rule(color='#ffff00', size=3).encode(y='y')
-        axe_v = alt.Chart(pd.DataFrame({'x': [0]})).mark_rule(color='#ffff00', size=3).encode(x='x')
+        # COUCHE 2 : Axes JAUNES éclatants (comme dans le chapitre généralités)
+        axe_h = alt.Chart(pd.DataFrame({'y': [0]})).mark_rule(color='#ffff00', size=3, opacity=0.8).encode(y='y')
+        axe_v = alt.Chart(pd.DataFrame({'x': [0]})).mark_rule(color='#ffff00', size=3, opacity=0.8).encode(x='x')
 
-        # COUCHE 3 : La courbe ROUGE
+        # COUCHE 3 : La Courbe ROUGE (le sujet principal)
         curve = alt.Chart(df_c).mark_line(color='#ff0000', size=4).encode(
             x='x', y='y'
         ).transform_filter((alt.datum.y <= limite) & (alt.datum.y >= -limite))
 
-        # COUCHE 4 : Points et textes CYAN
-        points = alt.Chart(df_pts).mark_point(size=200, filled=True, color='#00d4ff').encode(x='x', y='y')
-        text = points.mark_text(align='left', dx=12, dy=-12, fontSize=14, fontWeight='bold', color='#00d4ff').encode(text='name')
+        # COUCHE 4 : Points et textes CYAN (les indices)
+        points = alt.Chart(df_pts).mark_point(size=220, filled=True, color='#00d4ff', stroke='white').encode(
+            x='x', 
+            y='y',
+            tooltip=['name', 'x', 'y']
+        )
+        
+        text = alt.Chart(df_pts).mark_text(
+            align='left', 
+            dx=12, 
+            dy=-12, 
+            fontSize=14, 
+            fontWeight='bold', 
+            color='#00d4ff'
+        ).encode(x='x', y='y', text='name')
 
         # 4. ASSEMBLAGE ET CONFIGURATION
         final_chart = (manual_grid + axe_h + axe_v + curve + points + text).configure_axis(
             labelColor='white',
             titleColor='white',
-            grid=False, # On désactive la grille automatique d'Altair qui bugge
+            grid=False,
             domain=False,
-            labelFontSize=10,
-            values=list(range(-limite, limite + 1)) # On force quand même les chiffres
+            labelFontSize=11,
+            values=list(range(-limite, limite + 1))
         ).properties(width=600, height=600)
 
         # Affichage centré
