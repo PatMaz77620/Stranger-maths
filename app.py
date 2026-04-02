@@ -122,14 +122,6 @@ if st.session_state.page == 'home':
             st.session_state.page = 'chap3'
             st.rerun()
             
-
-    
-    # Gestion des clics (plus propre)
-    if st.session_state["c0-btn"]: st.session_state.page = 'chap0'; st.rerun()
-    if st.session_state["c1-btn"]: st.session_state.page = 'chap1'; st.rerun()
-    if st.session_state["c2-btn"]: st.session_state.page = 'chap2'; st.rerun()
-    if st.session_state["c3-btn"]: st.session_state.page = 'chap3'; st.rerun()
-
 # =================================================================
 # LES CHAPITRES (0, 1, 2, 3)
 # =================================================================
