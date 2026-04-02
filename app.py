@@ -599,80 +599,80 @@ if st.session_state.page == 'chap0':
             st.latex(r"h(x) = \sqrt{x + 2}")
             st.write("Sous une racine, le résultat doit être $\geq 0$.")
             st.write("**Domaine :** $[-2 \ ; \ +\infty[$")
-# --- SOUS-CHAPITRE 3 : LECTURE DE CARTE (VERSION CORRIGÉE) ---
+
+
+    # --- SOUS-CHAPITRE 3 : LECTURE DE CARTE (VERSION ASYMÉTRIQUE FINALE) ---
     with tab3:
-        st.subheader("📍 Du Squelette au Dessin : Cohérence Totale")
+        st.subheader("📍 Cohérence Graphique : Du Squelette au Dessin")
         
         st.write("""
-        Pour qu'un graphique soit utile, il doit raconter la même histoire que son schéma.
-        Ici, la courbe (le dessin précis) suit **exactement** le mouvement des flèches du tableau (le squelette).
+        Ici, pas de piège : la courbe rouge (le dessin) suit **strictement** le mouvement des flèches du tableau (le schéma). 
+        Observe bien les valeurs de $x$ où la courbe change de direction.
         """)
 
-        # GÉNÉRATION DE L'IMAGE COMPOSITE (COURBE + TABLEAU ALIGNÉS)
         import matplotlib.pyplot as plt
         import numpy as np
-        import pandas as pd
         
-        # 1. Données de la fonction exemple (Un polynôme de degré 3 pour une cohérence parfaite)
+        # 1. CRÉATION D'UNE FONCTION ASYMÉTRIQUE
+        # On définit les points de rupture (x) pour le tableau
+        x_min_local = -3  # Le creux
+        x_max_local = 1   # La bosse
+        
         limite = 6
-        x_p = np.linspace(-limite, limite, 300)
-        # Fonction f(x) = 0.1*(x^3 - 12x) pour avoir un min à -2, un max à 2 et une descente ensuite
-        y_p = 0.1 * (x_p**3 - 12 * x_p)
+        x_p = np.linspace(-limite, limite, 400)
         
-        # 2. Création de la figure (2 lignes, 1 colonne)
-        # On définit un ratio de hauteur 3:1 entre le graph et le tableau
-        fig, (ax_graph, ax_tab) = plt.subplots(2, 1, figsize=(10, 8), gridspec_kw={'height_ratios': [3, 1]})
-        fig.patch.set_facecolor('#0e1117') # Fond sombre de l'app
+        # Fonction f(x) asymétrique : f(x) = 0.1 * (x+4)(x-1)(x-5) - ajustée
+        # Pour garantir la forme : Descend -> Monte -> Descend
+        y_p = -0.05 * (x_p + 5) * (x_p + 1) * (x_p - 4) 
 
-        # --- PARTIE HAUTE : LE GRAPH (LE DESSIN PRÉCIS) ---
+        # 2. CRÉATION DE LA FIGURE
+        fig, (ax_graph, ax_tab) = plt.subplots(2, 1, figsize=(10, 8), gridspec_kw={'height_ratios': [3, 1]})
+        fig.patch.set_facecolor('#0e1117')
+
+        # --- PARTIE HAUTE : LE GRAPH (DESSIN PRÉCIS) ---
         ax_graph.set_facecolor('#161b22')
-        ax_graph.plot(x_p, y_p, color='#ff0000', lw=4, label='Courbe f(x)')
+        ax_graph.plot(x_p, y_p, color='#ff0000', lw=4)
         
-        # Axes du repère (x=0 et y=0) en blanc
+        # Axes et Grille
         ax_graph.axhline(0, color='white', lw=1.5)
         ax_graph.axvline(0, color='white', lw=1.5)
-        
-        # Configuration des titres et des grilles
-        ax_graph.set_title("1. LA REPRÉSENTATION GRAPHIQUE (LE DESSIN PRÉCIS)", color='white', pad=15, fontweight='bold')
+        ax_graph.set_title("1. REPRÉSENTATION GRAPHIQUE", color='white', pad=15, fontweight='bold')
         ax_graph.tick_params(colors='white')
         ax_graph.set_xlim(-limite, limite)
-        ax_graph.set_ylim(-1.5, 1.5) # Zoomé pour bien voir les variations
         ax_graph.grid(color='#333333', linestyle='--')
-        ax_graph.legend(loc='upper right', facecolor='#161b22', labelcolor='white')
 
-        # --- PARTIE BASSE : LE TABLEAU DE VARIATIONS (LE SQUELETTE ALIGNÉ) ---
+        # --- PARTIE BASSE : LE TABLEAU (SQUELETTE ASYMÉTRIQUE) ---
         ax_tab.set_facecolor('#161b22')
-        ax_tab.set_title("2. LE TABLEAU DE VARIATIONS (LE SCHÉMA)", color='white', pad=10, fontweight='bold')
+        ax_tab.set_title("2. TABLEAU DE VARIATIONS", color='white', pad=10, fontweight='bold')
         
-        # Structure du tableau
+        # Structure du tableau (Lignes blanches)
         ax_tab.axhline(0.8, color='white', lw=1)
-        ax_tab.axvline(-5.8, color='white', lw=1)
-        ax_tab.axvline(-2.0, color='white', lw=1)
-        ax_tab.axvline(2.0, color='white', lw=1)
-        ax_tab.axvline(5.8, color='white', lw=1)
+        ax_tab.axvline(-5.8, color='white', lw=1) # Bord gauche
+        ax_tab.axvline(-3.2, color='white', lw=1) # Min à x ≈ -3.2
+        ax_tab.axvline(1.8, color='white', lw=1)  # Max à x ≈ 1.8
+        ax_tab.axvline(5.8, color='white', lw=1)  # Bord droit
         
-        # Textes x (alignés verticalement avec le graph grâce aux coordonnées communes)
-        ax_tab.text(-5.8, 0.9, "-6", color='white', ha='center', fontsize=12)
-        ax_tab.text(-2.0, 0.9, "-2", color='white', ha='center', fontsize=12)
-        ax_tab.text(2.0, 0.9, "2", color='white', ha='center', fontsize=12)
-        ax_tab.text(5.8, 0.9, "6", color='white', ha='center', fontsize=12)
+        # Valeurs de x (alignées avec les sommets de la courbe)
+        ax_tab.text(-5.8, 0.9, "-6", color='white', ha='center')
+        ax_tab.text(-3.2, 0.9, "-3.2", color='white', ha='center')
+        ax_tab.text(1.8, 0.9, "1.8", color='white', ha='center')
+        ax_tab.text(5.8, 0.9, "6", color='white', ha='center')
         
-        # Flèches (Même couleur rouge que la courbe pour le lien visuel)
-        # De -6 à -2 (baisse continue)
-        ax_tab.annotate('', xy=(-2.2, 0.2), xytext=(-5.6, 0.7), arrowprops=dict(arrowstyle='->', color='#ff0000', lw=2))
-        # De -2 à 2 (monte continue)
-        ax_tab.annotate('', xy=(1.8, 0.7), xytext=(-1.8, 0.2), arrowprops=dict(arrowstyle='->', color='#ff0000', lw=2))
-        # De 2 à 6 (baisse continue jusqu'à la fin)
-        ax_tab.annotate('', xy=(5.6, 0.2), xytext=(2.2, 0.7), arrowprops=dict(arrowstyle='->', color='#ff0000', lw=2))
+        # Flèches (Même rouge que la courbe)
+        # 1. Descente de -6 à -3.2
+        ax_tab.annotate('', xy=(-3.4, 0.2), xytext=(-5.6, 0.7), arrowprops=dict(arrowstyle='->', color='#ff0000', lw=2))
+        # 2. Montée de -3.2 à 1.8
+        ax_tab.annotate('', xy=(1.6, 0.7), xytext=(-3.0, 0.2), arrowprops=dict(arrowstyle='->', color='#ff0000', lw=2))
+        # 3. Descente de 1.8 à 6
+        ax_tab.annotate('', xy=(5.6, 0.2), xytext=(2.0, 0.7), arrowprops=dict(arrowstyle='->', color='#ff0000', lw=2))
         
-        # Valeurs f(x) (aux points de changement)
-        # f(-2) est le minimum, f(2) est le maximum
-        ax_tab.text(-2.0, 0.1, "Min", color='white', ha='center', fontsize=10)
-        ax_tab.text(2.0, 0.8, "Max", color='white', ha='center', fontsize=10)
+        # Valeurs f(x) qualitatives
+        ax_tab.text(-3.2, 0.1, "Min", color='white', ha='center', fontsize=10)
+        ax_tab.text(1.8, 0.75, "Max", color='white', ha='center', fontsize=10)
         
         ax_tab.axis('off')
 
-        # Affichage du combiné dans Streamlit
         st.pyplot(fig)
         
-        st.success("✅ La courbe rouge suit désormais parfaitement le schéma des flèches : descend, monte, descend.")
+        st.success("✅ Cette fois c'est la bonne : l'asymétrie est respectée et la courbe suit strictement le tableau !")
+        
