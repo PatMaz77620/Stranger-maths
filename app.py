@@ -600,30 +600,68 @@ if st.session_state.page == 'chap0':
             st.write("Sous une racine, le résultat doit être $\geq 0$.")
             st.write("**Domaine :** $[-2 \ ; \ +\infty[$")
 
-    # --- SOUS-CHAPITRE 3 : LECTURE GRAPHIQUE ---
+    # --- SOUS-CHAPITRE 3 : LECTURE DE CARTE ---
     with tab3:
-        st.subheader("📍 Analyse de la Carte")
-        st.write("Lire un graphique, c'est comme décoder une carte de l'Upside Down.")
+        st.subheader("📍 Lecture de Carte : Du Squelette au Dessin")
         
-        import numpy as np
-        import pandas as pd
-        import altair as alt
-
-        # Génération d'une courbe exemple (courbe sinueuse)
-        x_vals = np.linspace(-4, 4, 100)
-        y_vals = 0.5 * x_vals**3 - 2 * x_vals
-        df_map = pd.DataFrame({'x': x_vals, 'y': y_vals})
-        
-        chart_map = alt.Chart(df_map).mark_line(color='#00d4ff', size=3).encode(
-            x=alt.X('x', title='Axe des Antécédents (x)'),
-            y=alt.Y('y', title='Axe des Images (f(x))')
-        ).properties(height=300)
-        
-        st.altair_chart(chart_map, use_container_width=True)
-        
-        st.markdown("""
-        - **Lecture d'image :** On entre par l'axe horizontal, on tape la courbe, on lit sur l'axe vertical.
-        - **Lecture d'antécédent :** On entre par l'axe vertical, on cherche les points de la courbe, on descend lire sur l'axe horizontal.
+        st.write("""
+        Un graphique, c'est comme une carte précise de l'Upside Down. 
+        Le **Tableau de Variations**, c'est le schéma rapide, le squelette. 
+        La **Représentation Graphique**, c'est le dessin détaillé.
+        Les deux racontent la même histoire !
         """)
 
+        # GÉNÉRATION DE L'IMAGE COMPOSITE (COURBE + TABLEAU ALIGNÉS)
+        import matplotlib.pyplot as plt
+        import numpy as np
+        
+        # 1. Données de la fonction exemple (une belle sinusoïde amortie)
+        x_p = np.linspace(-6, 6, 200)
+        y_p = np.sin(x_p) * (1 - abs(x_p)/8)
+        
+        # 2. Création de la figure (2 lignes, 1 colonne)
+        fig, (ax_graph, ax_tab) = plt.subplots(2, 1, figsize=(10, 8), gridspec_kw={'height_ratios': [3, 1]})
+        fig.patch.set_facecolor('#0e1117') # Fond sombre de l'app
 
+        # --- PARTIE HAUTE : LE GRAPH (DESSIN PRÉCIS) ---
+        ax_graph.set_facecolor('#161b22')
+        ax_graph.plot(x_p, y_p, color='#ff0000', lw=4, label='Courbe f(x)')
+        # Axes
+        ax_graph.axhline(0, color='white', lw=1.5)
+        ax_graph.axvline(0, color='white', lw=1.5)
+        ax_graph.set_title("1. LA REPRÉSENTATION GRAPHIQUE (LE DESSIN)", color='white', pad=15, fontweight='bold')
+        ax_graph.tick_params(colors='white')
+        ax_graph.grid(color='#333333', linestyle='--')
+        ax_graph.legend(loc='upper right', facecolor='#161b22', labelcolor='white')
+
+        # --- PARTIE BASSE : LE TABLEAU (SQUELETTE ALIGNÉ) ---
+        ax_tab.set_facecolor('#161b22')
+        ax_tab.set_title("2. LE TABLEAU DE VARIATIONS (LE SCHÉMA)", color='white', pad=10, fontweight='bold')
+        # Structure du tableau
+        ax_tab.axhline(0.8, color='white', lw=1)
+        ax_tab.axvline(-5.5, color='white', lw=1)
+        ax_tab.axvline(-1.5, color='white', lw=1)
+        ax_tab.axvline(1.5, color='white', lw=1)
+        ax_tab.axvline(5.5, color='white', lw=1)
+        # Textes x (alignés verticalement avec le graph)
+        ax_tab.text(-5.5, 0.9, "-6", color='white', ha='center')
+        ax_tab.text(-1.5, 0.9, "-1.5", color='white', ha='center')
+        ax_tab.text(1.5, 0.9, "1.5", color='white', ha='center')
+        ax_tab.text(5.5, 0.9, "6", color='white', ha='center')
+        # Flèches (Même couleur rouge que la courbe)
+        # De -6 à -1.5 (baisse)
+        ax_tab.annotate('', xy=(-1.7, 0.2), xytext=(-5.3, 0.7), arrowprops=dict(arrowstyle='->', color='#ff0000', lw=2))
+        # De -1.5 à 1.5 (monte)
+        ax_tab.annotate('', xy=(1.3, 0.7), xytext=(-1.3, 0.2), arrowprops=dict(arrowstyle='->', color='#ff0000', lw=2))
+        # De 1.5 à 6 (baisse)
+        ax_tab.annotate('', xy=(5.3, 0.2), xytext=(1.7, 0.7), arrowprops=dict(arrowstyle='->', color='#ff0000', lw=2))
+        # Valeurs f(x)
+        ax_tab.text(-1.5, 0.1, "-1", color='white', ha='center', fontsize=12)
+        ax_tab.text(1.5, 0.8, "1", color='white', ha='center', fontsize=12)
+        
+        ax_tab.axis('off')
+
+        # Affichage
+        st.pyplot(fig)
+        
+        st.success("💡 Regarde bien : quand la courbe (rouge) descend, la flèche du tableau descend. Quand elle monte, la flèche monte. L'alignement vertical est parfait !")
