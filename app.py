@@ -31,19 +31,31 @@ st.markdown("""
     }
 
     /* 🎯 --- STYLISATION DES CARTES COMME BOUTONS --- 🎯 */
-    /* On cible les boutons Streamlit spécifiques pour les transformer en cartes */
-    div.stButton > button.css-1x8cf1d, div.stButton > button {
-        background-color: #1e2129 !important;
-        border: 2px solid #ff0000 !important;
-        border-radius: 20px !important;
-        padding: 40px 20px !important; /* Plus grand pour le look carte */
-        text-align: center !important;
+    /* Force tous les boutons de cartes à avoir la même largeur et une hauteur fixe */
+    div.stButton > button {
         width: 100% !important;
-        height: 200px !important; /* Hauteur fixe pour les cartes */
-        transition: 0.3s !important;
-        margin-bottom: 20px !important;
-        display: block !important;
+        height: 120px !important; /* Ajuste cette valeur selon tes goûts */
+        border-radius: 15px !important;
+        border: 2px solid #444 !important;
+        background-color: #161b22 !important;
+        color: white !important;
+        font-size: 18px !important;
+        font-weight: bold !important;
+        transition: all 0.3s ease !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0px 4px 10px rgba(0,0,0,0.5) !important;
     }
+
+    /* Effet de survol (Néon) */
+    div.stButton > button:hover {
+        border-color: #ff0000 !important;
+        box-shadow: 0px 0px 20px #ff0000 !important;
+        transform: scale(1.02) !important;
+        color: #ff0000 !important;
+    }
+
 
     /* Contenu à l'intérieur du bouton (Titre et icône) */
     div.stButton > button p {
