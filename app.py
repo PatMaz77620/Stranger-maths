@@ -83,6 +83,12 @@ st.markdown("""
     .stTabs [data-baseweb="tab"] { color: #ffffff !important; }
     .stTabs [aria-selected="true"] { color: #ff0000 !important; border-bottom-color: #ff0000 !important; }
 
+    /* EFFET GRAIN DE FILM / UPSIDE DOWN */
+    .stApp {
+        background-color: #0e1117;
+        background-image: radial-gradient(circle at center, #161b22 0%, #0e1117 100%);
+    }
+
     </style>
     """, unsafe_allow_html=True)
 
