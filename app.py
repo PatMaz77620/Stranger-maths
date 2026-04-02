@@ -153,7 +153,7 @@ elif st.session_state.page == 'chap0':
     st.button("⬅️ Retour", on_click=aller_a_home)
     st.markdown('</div>', unsafe_allow_html=True)
     st.title("🌀 Fonctions : Généralités")
-    st.write("---")
+    st.write("---")
 
     tab1, tab2, tab3 = st.tabs([
         "🚪 Portail (Images/Antécédents)", 
