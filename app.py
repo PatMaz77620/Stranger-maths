@@ -130,9 +130,7 @@ if st.session_state.page == 'home':
     with col1:
         st.button("🌀 Fonctions :\nGénéralités", key="btn_c0")
         st.button("📈 Suites\nNumériques", key="btn_c2")
-        if st.button("📊 Stats :\nProbabilités", key="btn_c4"):
-        st.session_state.page = 'chap4'
-        st.rerun()
+        st.button("📊 Stats :\nProbabilités", key="btn_c4")
 
     with col2:
         st.button("📟 Information\nChiffrée", key="btn_c1")
@@ -143,7 +141,8 @@ if st.session_state.page == 'home':
     if st.session_state.btn_c1: st.session_state.page = 'chap1'; st.rerun()
     if st.session_state.btn_c2: st.session_state.page = 'chap2'; st.rerun()
     if st.session_state.btn_c3: st.session_state.page = 'chap3'; st.rerun()
-        
+    if st.session_state.btn_c4: st.session_state.page = 'chap4'; st.rerun()
+
 # =================================================================
 # LES CHAPITRES (0, 1, 2, 3)
 # =================================================================
