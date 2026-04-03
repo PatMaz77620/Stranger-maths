@@ -97,6 +97,7 @@ def formater_fr(valeur, decimales=2):
     return s if s != "" and s != "0," else "0"
 
 def aller_a_home():
+    st.session_state.clear()
     st.session_state.page = 'home'
 
 chemin_logo = "Stranger_Maths_Logo.png"
