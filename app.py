@@ -17,29 +17,37 @@ st.set_page_config(
 if 'page' not in st.session_state:
     st.session_state.page = 'home'
 
-# --- 2. STYLE CSS VERSION GRILLE FORCÉE ---
+
+# --- 2. STYLE CSS COMPLET ET ISOLÉ ---
 st.markdown("""
     <style>
+    /* 1. FOND ET TEXTE GÉNÉRAL */
     .stApp { background-color: #0e1117; }
     .stMarkdown, p, span, label, li { color: #ffffff !important; }
+    
+    /* 2. TITRES NÉON ROUGE */
     h1, h2, h3 { 
         color: #ff0000 !important; 
         text-shadow: 2px 2px 10px #ff0000; 
         text-align: center;
     }
 
-    [data-testid="stHorizontalBlock"] {
+    /* 3. 🎯 LA GRILLE (UNIQUEMENT POUR L'ACCUEIL) */
+    /* On utilise .grille-accueil pour ne pas casser les colonnes des chapitres */
+    .grille-accueil [data-testid="stHorizontalBlock"] {
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
         gap: 15px !important;
+        width: 100% !important;
     }
 
-    [data-testid="column"] {
+    .grille-accueil [data-testid="column"] {
         width: 100% !important;
         max-width: 100% !important;
         flex: none !important;
     }
 
+    /* 4. LES BOUTONS (CARTES) */
     div[data-testid="stButton"], div[data-testid="stButton"] button {
         width: 100% !important;
     }
@@ -58,14 +66,17 @@ st.markdown("""
         justify-content: center !important;
     }
 
+    /* 5. TEXTE DES BOUTONS (BLANC PUR) */
     button[kind="secondary"] div[data-testid="stMarkdownContainer"] p {
         color: #ffffff !important;
         -webkit-text-fill-color: #ffffff !important;
         font-size: 1.1rem !important;
         font-weight: bold !important;
         text-align: center !important;
+        line-height: 1.2 !important;
     }
 
+    /* 6. EFFET AU SURVOL (NÉON) */
     button[kind="secondary"]:hover {
         transform: scale(1.02) !important;
         background-color: #1e2129 !important;
@@ -77,6 +88,18 @@ st.markdown("""
         -webkit-text-fill-color: #ff0000 !important;
     }
 
+    /* 7. CENTRAGE DES TABLEAUX (CHAPITRE 4) */
+    div[data-testid="stTable"] {
+        display: flex;
+        justify-content: center;
+    }
+    div[data-testid="stTable"] table td, 
+    div[data-testid="stTable"] table th {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+
+    /* 8. BOUTON RETOUR (TAILLE NORMALE) */
     .btn-retour {
         display: block !important;
         width: fit-content !important;
@@ -113,11 +136,13 @@ if st.session_state.page == 'home':
         st.title("🔦 STRANGER MATHS")
 
     st.write("### 🎮 Choisissez votre mission :")
-    st.write("")
-
+    
+    # --- DÉBUT DE LA ZONE PROTÉGÉE ---
+    st.markdown('<div class="grille-accueil">', unsafe_allow_html=True)
+    
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("🌀 Fonctions :\nGénéralités", key="btn_c0"):
+        st.button("🌀 Fonctions :\nGénéralités", key="btn_c0"):
             st.session_state.page = 'chap0'
             st.rerun()
         if st.button("📈 Suites\nNumériques", key="btn_c2"):
@@ -126,7 +151,7 @@ if st.session_state.page == 'home':
         if st.button("📊 Stats :\nProbabilités", key="btn_c4"):
             st.session_state.page = 'chap4'
             st.rerun()
-
+        
     with col2:
         if st.button("📟 Information\nChiffrée", key="btn_c1"):
             st.session_state.page = 'chap1'
@@ -134,6 +159,9 @@ if st.session_state.page == 'home':
         if st.button("🛸 Second\nDegré", key="btn_c3"):
             st.session_state.page = 'chap3'
             st.rerun()
+
+    st.markdown('</div>', unsafe_allow_html=True) 
+    # --- FIN DE LA ZONE PROTÉGÉE ---
 
 # =================================================================
 # CHAPITRE 0 : FONCTIONS (GÉNÉRALITÉS)
