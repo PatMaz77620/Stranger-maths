@@ -255,7 +255,7 @@ elif st.session_state.page == 'chap0':
         ax_tab.axis('off')
 
         st.pyplot(fig)
-        st.success("✅ cette fonction est la suivante : $$f(x) = 0,1(4 - x)(x + 1)(x + 5)$$. As-tu trouvé les racines (les valeurs de x qui annulent la fonction) ? Peux-tu en déduire le tableau de signes facilement ?")
+        st.success("✅ cette fonction est la suivante : $$f(x) = 0,1(4 - x)(x + 1)(x + 5)$$. As-tu trouvé les racines de la fonction (les valeurs de $$x$$ qui annulent la fonction) ? Vérifie sur la représentation graphique les valeurs que tu as trouvées par le calcul... Peux-tu en déduire le tableau de signes facilement ?")
 
 # =================================================================
 # CHAPITRE 1 : INFORMATION CHIFFRÉE
