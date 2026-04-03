@@ -450,7 +450,7 @@ elif st.session_state.page == 'chap2':
 # =================================================================
 elif st.session_state.page == 'chap3':
     st.markdown('<div class="btn-retour">', unsafe_allow_html=True)
-    st.button("⬅️ Menu principal", on_click=aller_a_home)
+    st.button("⬅️ Retour au QG", on_click=aller_a_home)
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.title("🛸 Chapitre 3 : Second Degré")
@@ -590,18 +590,129 @@ elif st.session_state.page == 'chap3':
             st.error(f"Faux. La réponse était {st.session_state.q3_val}.")
 
 # =================================================================
-# CHAPITRE 4 : STATISTIQUES
+# CHAPITRE 4 : PROBABILITÉS
 # =================================================================
 elif st.session_state.page == 'chap4':
     st.markdown('<div class="btn-retour">', unsafe_allow_html=True)
     st.button("⬅️ Retour au QG", on_click=aller_a_home)
     st.markdown('</div>', unsafe_allow_html=True)
-    st.title("📊 Statistiques & Arbres")
-    t1, t2 = st.tabs(["📋 Tableau Croisé", "🌳 Arbre de Choix"])
-    with t1:
-        st.markdown("| | Pouvoirs | Pas Pouvoirs | Total |\n|---|---|---|---|\n| Enfant | 2 | 18 | 20 |\n| Adulte | 1 | 29 | 30 |\n| Total | 3 | 47 | 50 |")
-        v1 = st.number_input("Valeur case", value=2)
-        v2 = st.number_input("Valeur total", value=20)
-        if v2 > 0: st.success(f"Fréquence = **{formater_fr((v1/v2)*100)} %**")
-    with t2:
-        st.code("Départ -> [Choix A] -> Résultat 1\n       -> [Choix B] -> Résultat 2")
+
+    st.title("🎲 Chapitre 4 : Probabilités")
+
+    tab_cours, tab_tab, tab_arbre = st.tabs(["📚 Rappels de Cours", "📊 Tableau Croisé", "🌳 Arbre de Choix"])
+
+    # --- 1. RAPPELS DE COURS ---
+    with tab_cours:
+        st.subheader("🧠 Fondamentaux des Probabilités")
+        col_c1, col_c2 = st.columns(2)
+        
+        with col_c1:
+            st.info("""
+            **🔹 Probabilité simple :**
+            $$P(A) = \\frac{\\text{Nombre de cas favorables}}{\\text{Nombre total de cas}}$$
+            """)
+            st.write("Exemple : Tirer un As dans un jeu de 32 cartes $\\rightarrow 4/32 = 0,125$.")
+        
+        with col_c2:
+            st.warning("""
+            **🔹 Événement contraire :**
+            L'événement $\\bar{A}$ (non A) est :
+            $$P(\\bar{A}) = 1 - P(A)$$
+            """)
+            st.write("Si $P(A)=0,3$, alors $P(\\bar{A})=0,7$.")
+
+        st.divider()
+        st.subheader("📡 Probabilités Conditionnelles")
+        st.error("""
+        **La formule clé :** La probabilité de B sachant que A est réalisé :
+        $$P_A(B) = \\frac{P(A \\cap B)}{P(A)}$$
+        *Note : $P(A \\cap B)$ représente 'A et B en même temps'.*
+        """)
+
+    # --- 2. TABLEAU CROISÉ ---
+    with tab_tab:
+        st.subheader("📊 Analyse de données (Tableau à double entrée)")
+        st.write("👉 **Mode d'emploi :** Complétez les cases vides. Le total des lignes et colonnes doit correspondre.")
+        
+        # Exemple interactif
+        data = {
+            "Garçons": [12, 8, 20],
+            "Filles": [15, 5, 20],
+            "Total": [27, 13, 40]
+        }
+        import pandas as pd
+        df_prob = pd.DataFrame(data, index=["Sportifs", "Non Sportifs", "Total"])
+        
+        st.table(df_prob)
+        
+        st.write("#### ❓ Question d'entraînement")
+        st.write("Quelle est la probabilité qu'un élève choisi au hasard soit une **fille sportive** ?")
+        
+        c1, c2 = st.columns(2)
+        val_f_s = c1.number_input("Nombre de filles sportives", value=0)
+        val_tot = c2.number_input("Total des élèves", value=40)
+        
+        if st.button("Vérifier le calcul"):
+            if val_f_s == 15 and val_tot == 40:
+                st.success(f"Bravo ! $P = 15/40 = {15/40}$")
+            else:
+                st.error("Regardez la ligne 'Sportifs' et la colonne 'Filles'.")
+
+    # --- 3. ARBRE DE CHOIX (STYLE GRAPHIQUE NOIR/CYAN/ROUGE) ---
+    with tab_arbre:
+        st.subheader("🌳 Arbre de Probabilités")
+        st.write("Visualisation des chemins possibles :")
+
+        import matplotlib.pyplot as plt
+
+        # Configuration du graphique identique au Ch0/Ch3
+        fig, ax = plt.subplots(figsize=(10, 5))
+        fig.patch.set_facecolor('#0e1117')
+        ax.set_facecolor('#161b22')
+
+        # Construction de l'arbre
+        # Coordonnées des nœuds
+        nodes = {
+            'Départ': (0, 0),
+            'A': (1, 1),
+            'nonA': (1, -1),
+            'B_sachant_A': (2, 1.5),
+            'nonB_sachant_A': (2, 0.5),
+            'B_sachant_nonA': (2, -0.5),
+            'nonB_sachant_nonA': (2, -1.5)
+        }
+
+        # Dessiner les branches (Lignes Rouges)
+        def draw_branch(p1, p2, label):
+            ax.plot([nodes[p1][0], nodes[p2][0]], [nodes[p1][1], nodes[p2][1]], 
+                    color='#ff0000', lw=3, zorder=1)
+            # Label de probabilité au milieu de la branche
+            mid_x = (nodes[p1][0] + nodes[p2][0]) / 2
+            mid_y = (nodes[p1][1] + nodes[p2][1]) / 2
+            ax.text(mid_x, mid_y + 0.1, label, color='white', fontweight='bold', ha='center')
+
+        draw_branch('Départ', 'A', 'P(A)')
+        draw_branch('Départ', 'nonA', 'P(nonA)')
+        draw_branch('A', 'B_sachant_A', 'P_A(B)')
+        draw_branch('A', 'nonB_sachant_A', 'P_A(nonB)')
+        draw_branch('nonA', 'B_sachant_nonA', 'P_nonA(B)')
+        draw_branch('nonA', 'nonB_sachant_nonA', 'P_nonA(nonB)')
+
+        # Dessiner les nœuds (Points Cyan)
+        for name, pos in nodes.items():
+            ax.scatter(pos[0], pos[1], color='#00d4ff', s=200, zorder=2, edgecolors='white')
+            ax.text(pos[0], pos[1]-0.3, name, color='#00d4ff', fontsize=10, ha='center', fontweight='bold')
+
+        # Nettoyage du graphique
+        ax.set_xlim(-0.5, 2.5)
+        ax.set_ylim(-2, 2)
+        ax.axis('off') # On cache les axes pour l'arbre
+
+        st.pyplot(fig)
+
+        st.info("""
+        **📏 Règle d'or de l'arbre :**
+        1. La somme des branches partant d'un même nœud vaut toujours **1**.
+        2. Pour calculer la probabilité d'un chemin complet, on **multiplie** les probabilités.
+        """)
+
