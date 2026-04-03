@@ -632,34 +632,58 @@ elif st.session_state.page == 'chap4':
         *Note : $P(A \\cap B)$ représente 'A et B en même temps'.*
         """)
 
-    # --- 2. TABLEAU CROISÉ ---
+# --- 2. TABLEAU CROISÉ ---
     with tab_tab:
         st.subheader("📊 Analyse de données (Tableau à double entrée)")
-        st.write("👉 **Mode d'emploi :** Complétez les cases vides. Le total des lignes et colonnes doit correspondre.")
         
-        # Exemple interactif
+        st.write("""
+        👉 **Méthode :** Ce tableau est un exemple complet. Dans un exercice, certaines cases seront **vides**. 
+        Vous devrez les retrouver en sachant que la somme des cases d'une ligne (ou d'une colonne) est égale à son **Total**.
+        """)
+        
+        # Données
         data = {
             "Garçons": [12, 8, 20],
             "Filles": [15, 5, 20],
             "Total": [27, 13, 40]
         }
-        import pandas as pd
         df_prob = pd.DataFrame(data, index=["Sportifs", "Non Sportifs", "Total"])
         
+        # Affichage avec CSS pour centrer tout le contenu du tableau
+        st.markdown("""
+        <style>
+            .centered-table div[data-testid="stTable"] table {
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .centered-table td, .centered-table th {
+                text-align: center !important;
+            }
+        </style>
+        <div class="centered-table">
+        """, unsafe_allow_html=True)
         st.table(df_prob)
+        st.markdown("</div>", unsafe_allow_html=True)
         
+        st.divider()
+
         st.write("#### ❓ Question d'entraînement")
-        st.write("Quelle est la probabilité qu'un élève choisi au hasard soit une **fille sportive** ?")
+        st.write("D'après le tableau ci-dessus, quelle est la **fréquence** (en %) de **filles sportives** parmi le total des élèves ?")
+        st.caption("💡 Rappel : Fréquence % = (Valeur de la case / Total général) × 100")
+
+        # Entrée de l'élève
+        ans_pct = st.number_input("Réponse en % (arrondir à 1 chiffre après la virgule) :", value=0.0, step=0.1)
         
-        c1, c2 = st.columns(2)
-        val_f_s = c1.number_input("Nombre de filles sportives", value=0)
-        val_tot = c2.number_input("Total des élèves", value=40)
-        
-        if st.button("Vérifier le calcul"):
-            if val_f_s == 15 and val_tot == 40:
-                st.success(f"Bravo ! $P = 15/40 = {15/40}$")
+        if st.button("Vérifier le pourcentage"):
+            # Calcul réel : (15 / 40) * 100 = 37.5
+            bonne_reponse = 37.5
+            
+            # On utilise abs(reponse - bonne_reponse) < 0.1 pour accepter les petits écarts d'arrondi
+            if abs(ans_pct - bonne_reponse) < 0.1:
+                st.balloons()
+                st.success(f"Bravo ! Le calcul est : (15 / 40) × 100 = **{bonne_reponse}%**")
             else:
-                st.error("Regardez la ligne 'Sportifs' et la colonne 'Filles'.")
+                st.error(f"Pas tout à fait. Cherchez la case 'Filles' + 'Sportifs' (15) et divisez par le Total (40).")
 
     # --- 3. ARBRE DE CHOIX (STYLE GRAPHIQUE NOIR/CYAN/ROUGE) ---
     with tab_arbre:
