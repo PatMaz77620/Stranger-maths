@@ -352,7 +352,7 @@ elif st.session_state.page == 'chap1':
 # =================================================================
 elif st.session_state.page == 'chap2':
     st.markdown('<div class="btn-retour">', unsafe_allow_html=True)
-    st.button("⬅️ Menu principal", on_click=aller_a_home)
+    st.button("⬅️ Retour au QG", on_click=aller_a_home)
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.title("📈 Chapitre 2 : Suites Numériques")
@@ -444,6 +444,7 @@ elif st.session_state.page == 'chap2':
             st.success(f"Félicitations ! $u_{st.session_state.s_n}$ vaut bien {formater_fr(sol_suite)}.")
         else:
             st.error(f"Oups ! Revois ta formule. Le résultat attendu était {formater_fr(sol_suite)}.")
+
 
 
 # =================================================================
