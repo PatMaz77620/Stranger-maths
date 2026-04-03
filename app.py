@@ -479,52 +479,100 @@ elif st.session_state.page == 'chap3':
             st.warning("**Interprétation :** $x_1$ et $x_2$ sont les **racines** (là où la courbe coupe l'axe horizontal).")
             st.latex(r"f(x) = 2(x - 1)(x + 3) \rightarrow x_1 = 1, x_2 = -3")
 
-    # --- ONGLET 2 : GALERIE (GRAPHIQUE ALTAIR) ---
+# --- ONGLET 2 : GALERIE (STYLE UNIFIÉ CH0) ---
     with t_galerie:
-        import pandas as pd
+        import matplotlib.pyplot as plt
         import numpy as np
-        import altair as alt
 
         st.write("### 🖼️ Analyse Graphique : $f(x) = 2x^2 + 4x - 6$")
         
-        # Données de la courbe
-        x_val = np.linspace(-6, 4, 400)
-        y_val = 2*x_val**2 + 4*x_val - 6
-        df_curve = pd.DataFrame({'x': x_val, 'y': y_val})
+        # 1. PRÉPARATION DES DONNÉES
+        limite_x = 6
+        limite_y = 10
+        x_p = np.linspace(-limite_x, limite_x, 400)
+        y_p = 2*x_p**2 + 4*x_p - 6
 
-        # Points Singuliers
-        df_pts = pd.DataFrame([
-            {'n': 'Sommet S(-1,-8)', 'x': -1, 'y': -8},
-            {'n': 'Racine x1=1', 'x': 1, 'y': 0},
-            {'n': 'Racine x2=-3', 'x': -3, 'y': 0}
-        ])
+        # 2. CRÉATION DE LA FIGURE
+        fig, ax = plt.subplots(figsize=(10, 7))
+        fig.patch.set_facecolor('#0e1117') # Fond sombre App
+        ax.set_facecolor('#161b22')        # Fond graphique
 
-        # Graphique
-        base = alt.Chart(df_curve).mark_line(color='#ff0000', size=3).encode(x='x', y='y')
-        points = alt.Chart(df_pts).mark_point(color='#00d4ff', size=100, filled=True).encode(x='x', y='y', tooltip='n')
+        # Grille et Axes (Style blanc discret)
+        ax.grid(color='#333333', linestyle='--', lw=0.5)
+        ax.axhline(0, color='white', lw=1.5)
+        ax.axvline(0, color='white', lw=1.5)
+
+        # La Courbe ROUGE NÉON
+        ax.plot(x_p, y_p, color='#ff0000', lw=4, label='f(x) = 2x² + 4x - 6')
+
+        # Points Singuliers en CYAN
+        # Sommet S(-1, -8) | Racines (1,0) et (-3,0) | Ordonnée origine (0,-6)
+        pts_x = [-1, 1, -3, 0]
+        pts_y = [-8, 0, 0, -6]
+        labels = ['S(-1;-8)', 'x1=1', 'x2=-3', 'c=-6']
+
+        ax.scatter(pts_x, pts_y, color='#00d4ff', s=100, zorder=5, edgecolors='white')
         
-        st.altair_chart(base + points, use_container_width=True)
-        st.caption("💡 Le point bleu en bas est le sommet (le minimum car a > 0).")
+        # Annotations Cyan
+        for i, txt in enumerate(labels):
+            ax.annotate(txt, (pts_x[i], pts_y[i]), xytext=(10, 10), 
+                        textcoords='offset points', color='#00d4ff', fontweight='bold')
 
-    # --- ONGLET 3 : SIMULATEUR ---
+        # Graduations
+        ax.set_xlim(-limite_x, limite_x)
+        ax.set_ylim(-limite_y, limite_y)
+        ax.tick_params(colors='white')
+        
+        st.pyplot(fig)
+        st.success("✅ **Lecture :** La courbe coupe l'axe horizontal aux racines (Cyan) et atteint son minimum au sommet S.")
+
+    # --- ONGLET 3 : SIMULATEUR (STYLE INTERACTIF) ---
     with t_calc:
-        st.subheader("🕹️ Manipulez la Parabole")
-        c1, c2, c3 = st.columns(3)
-        pa = c1.slider("Coefficient a", -5.0, 5.0, 1.0)
-        p_alpha = c2.number_input("Alpha (Sommet x)", value=0.0)
-        p_beta = c3.number_input("Beta (Sommet y)", value=0.0)
+        st.write("### 🕹️ Le Labo des Paraboles")
+        
+        col_p, col_v = st.columns([1, 2])
+        
+        with col_p:
+            st.write("**Paramètres (Forme Canonique) :**")
+            sa = st.slider("Coefficient a (Ouverture)", -4.0, 4.0, 1.0, step=0.5)
+            s_alpha = st.number_input("Alpha (Position x)", value=0.0)
+            s_beta = st.number_input("Beta (Hauteur y)", value=0.0)
+        
+        with col_v:
+            # Création du graphique dynamique
+            x_sim = np.linspace(s_alpha - 10, s_alpha + 10, 400)
+            y_sim = sa * (x_sim - s_alpha)**2 + s_beta
+            
+            fig2, ax2 = plt.subplots()
+            fig2.patch.set_facecolor('#0e1117')
+            ax2.set_facecolor('#161b22')
+            
+            # Axes et Grille
+            ax2.grid(color='#333333', linestyle='--', lw=0.5)
+            ax2.axhline(0, color='white', lw=1)
+            ax2.axvline(0, color='white', lw=1)
+            
+            # Courbe dynamique
+            couleur_courbe = '#ff0000' if sa != 0 else '#ffffff'
+            ax2.plot(x_sim, y_sim, color=couleur_courbe, lw=3)
+            
+            # Point du sommet (Cyan)
+            ax2.scatter([s_alpha], [s_beta], color='#00d4ff', s=100, zorder=5)
+            
+            # Fixer les limites pour que le mouvement soit visible
+            ax2.set_xlim(s_alpha - 10, s_alpha + 10)
+            ax2.set_ylim(s_beta - 10, s_beta + 10)
+            ax2.tick_params(colors='white')
+            
+            st.pyplot(fig2)
 
-        x_sim = np.linspace(p_alpha-10, p_alpha+10, 100)
-        y_sim = pa * (x_sim - p_alpha)**2 + p_beta
-        
-        st.line_chart(pd.DataFrame({'y': y_sim}, index=x_sim))
-        
-        if pa > 0:
-            st.success(f"La parabole est tournée vers le **HAUT** (Minimum : {p_beta})")
-        elif pa < 0:
-            st.error(f"La parabole est tournée vers le **BAS** (Maximum : {p_beta})")
+        # Analyse dynamique sous le graphique
+        if sa > 0:
+            st.info(f"🔼 **a > 0** : Parabole 'souriante'. Minimum en $y = {s_beta}$")
+        elif sa < 0:
+            st.error(f"🔽 **a < 0** : Parabole 'triste'. Maximum en $y = {s_beta}$")
         else:
-            st.warning("Si a = 0, ce n'est plus une parabole mais une droite !")
+            st.warning("📏 **a = 0** : C'est une droite horizontale !")
 
     # --- DÉFI ---
     st.divider()
