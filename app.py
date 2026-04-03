@@ -714,5 +714,6 @@ elif st.session_state.page == 'chap4':
         **📏 Règle d'or de l'arbre :**
         1. La somme des branches partant d'un même nœud vaut toujours **1**.
         2. Pour calculer la probabilité d'un chemin complet, on **multiplie** les probabilités.
+        3. La somme des fleurs de l'arbre (les probabilités à droite) fait 1 ou 100%.
         """)
 
