@@ -142,7 +142,7 @@ if st.session_state.page == 'home':
     
     col1, col2 = st.columns(2)
     with col1:
-        st.button("🌀 Fonctions :\nGénéralités", key="btn_c0"):
+        if st.button("🌀 Fonctions :\nGénéralités", key="btn_c0"):
             st.session_state.page = 'chap0'
             st.rerun()
         if st.button("📈 Suites\nNumériques", key="btn_c2"):
