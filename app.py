@@ -611,7 +611,7 @@ elif st.session_state.page == 'chap4':
             **🔹 Probabilité simple :**
             $$P(A) = \\frac{\\text{Nombre de cas favorables}}{\\text{Nombre total de cas}}$$
             """)
-            st.write("Exemple : Tirer un As dans un jeu de 32 cartes $\\rightarrow 4/32 = 0,125$ ou 12,5%.")
+            st.write("Exemple : Tirer un As dans un jeu de 32 cartes $\\rightarrow 4/32 = 0,125 (ou 12,5%)$.")
         
         with col_c2:
             st.warning("""
