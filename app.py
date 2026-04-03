@@ -621,7 +621,8 @@ elif st.session_state.page == 'chap4':
             """)
             st.write("Si $P(A)=0,3$ ou 30%, alors $P(\\bar{A})=0,7$ ou 70%.")
 
-        st.write("La probabilité te dit ce qui devrait arriver en théorie, et la fréquence te dit ce qui est arrivé en pratique sur un échantillon donné. Mais les formules pour les calculer sont les mêmes !")
+        st.write("")
+        st.write("🤔 La probabilité te dit ce qui devrait arriver en théorie, et la fréquence te dit ce qui est arrivé en pratique sur un échantillon donné. Mais les formules pour les calculer sont les mêmes !")
         
         st.divider()
         st.subheader("📡 Probabilités Conditionnelles")
