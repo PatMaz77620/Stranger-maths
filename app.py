@@ -679,7 +679,7 @@ elif st.session_state.page == 'chap4':
         
         if st.button("Vérifier le pourcentage", key="btn_c4_f"):
             bonne_reponse = 37.5
-            if abs(ans_pct - bonne_reponse) < 0.1:
+            if abs(ans_pct - bonne_reponse) = 0:
                 st.balloons()
                 st.success(f"Bravo ! Le calcul est : (15 / 40) × 100 = **{bonne_reponse}%**")
             else:
