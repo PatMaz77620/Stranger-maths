@@ -255,28 +255,100 @@ if st.session_state.page == 'chap0':
         st.pyplot(fig)
         st.success("✅ Cette fois c'est la bonne : l'asymétrie est respectée et la courbe suit strictement le tableau !")
 
-
 # =================================================================
-# CHAPITRE 1
+# CHAPITRE 1 : INFORMATION CHIFFRÉE
 # =================================================================
 elif st.session_state.page == 'chap1':
     st.markdown('<div class="btn-retour">', unsafe_allow_html=True)
     st.button("⬅️ Retour au QG", on_click=aller_a_home)
     st.markdown('</div>', unsafe_allow_html=True)
+    
     st.title("📟 Information Chiffrée")
-    tab1, tab2, tab3 = st.tabs(["🔢 Coeff. Multiplicateur", "📈 Taux d'évolution", "🔄 Évolutions Successives"])
+    
+    tab1, tab2, tab3 = st.tabs([
+        "🔢 Coeff. Multiplicateur", 
+        "📈 Taux d'évolution", 
+        "🔄 Évolutions Successives"
+    ])
+
     with tab1:
-        t_in = st.number_input("Taux en %", value=20.0, step=0.1)
-        st.success(f"CM = **{formater_fr(1 + t_in / 100)}**")
+        st.subheader("🎯 Le Multiplicateur Magique")
+        st.info("""
+        **Concept :** Pour passer d'une valeur à une autre après une hausse ou une baisse, on utilise le **Coefficient Multiplicateur (CM)**.
+        - **Hausse de t% :** $CM = 1 + \\frac{t}{100}$
+        - **Baisse de t% :** $CM = 1 - \\frac{t}{100}$
+        """)
+        
+        col_input, col_res = st.columns(2)
+        with col_input:
+            t_in = st.number_input("Entrez le taux en % (ex: 20 ou -15)", value=20.0, step=0.1, key="input_c1_t1")
+        with col_res:
+            res_cm = 1 + t_in / 100
+            st.metric("Résultat du CM", formater_fr(res_cm))
+            
+        st.write("👉 *Exemple : Une hausse de 20% revient à multiplier par 1,20.*")
+
     with tab2:
-        v_d = st.number_input("Valeur de Départ", value=100.0)
-        v_a = st.number_input("Valeur d'Arrivée", value=125.0)
-        if v_d != 0: st.success(f"Taux = **{formater_fr(((v_a-v_d)/v_d)*100)} %**")
+        st.subheader("📊 Calculer une Variation")
+        st.warning("""
+        **Formule :** Pour trouver le taux d'évolution ($t$) entre une valeur de départ ($V_D$) et une valeur d'arrivée ($V_A$) :
+        $$t = \\frac{V_A - V_D}{V_D}$$
+        *(Multiplier par 100 pour obtenir le pourcentage)*
+        """)
+        
+        c1, c2 = st.columns(2)
+        v_d = c1.number_input("Valeur de Départ ($V_D$)", value=100.0, key="input_c1_vd")
+        v_a = c2.number_input("Valeur d'Arrivée ($V_A$)", value=125.0, key="input_c1_va")
+        
+        if v_d != 0:
+            taux_calc = ((v_a - v_d) / v_d) * 100
+            st.success(f"Le taux d'évolution est de **{formater_fr(taux_calc)} %**")
+
     with tab3:
-        ev1 = st.number_input("Taux 1 (%)", value=10.0)
-        ev2 = st.number_input("Taux 2 (%)", value=-10.0)
-        cm_g = (1+ev1/100)*(1+ev2/100)
-        st.success(f"Evolution totale : **{formater_fr((cm_g-1)*100)} %**")
+        st.subheader("🔄 Évolutions Successives")
+        st.error("⚠️ **Attention :** On n'additionne JAMAIS les pourcentages entre eux !")
+        st.info("""
+        **Règle :** Pour trouver l'évolution globale, on multiplie les coefficients multiplicateurs entre eux.
+        $$CM_{Global} = CM_1 \\times CM_2$$
+        """)
+        
+        col_ev1, col_ev2 = st.columns(2)
+        with col_ev1:
+            ev1 = st.number_input("Hausse/Baisse 1 (%)", value=10.0, key="input_c1_ev1")
+            cm1 = 1 + ev1/100
+            st.caption(f"CM1 = {formater_fr(cm1)}")
+        with col_ev2:
+            ev2 = st.number_input("Hausse/Baisse 2 (%)", value=-10.0, key="input_c1_ev2")
+            cm2 = 1 + ev2/100
+            st.caption(f"CM2 = {formater_fr(cm2)}")
+        
+        cm_g = cm1 * cm2
+        taux_g = (cm_g - 1) * 100
+        
+        st.divider()
+        st.metric("Taux d'évolution global", f"{formater_fr(taux_g)} %")
+        st.write(f"Calcul : ${formater_fr(cm1)} \\times {formater_fr(cm2)} = {formater_fr(cm_g)}$")
+
+    # --- PETIT DÉFI POUR FINIR ---
+    st.divider()
+    if 'vd_quiz' not in st.session_state:
+        st.session_state.vd_quiz = random.randint(50, 200)
+        st.session_state.tx_quiz = random.choice([5, 10, 20, 25, 50])
+
+    st.write(f"### ❓ Mission Flash :")
+    st.write(f"Un objet coûte **{st.session_state.vd_quiz} €**. Son prix augmente de **{st.session_state.tx_quiz} %**.")
+    rep_eleve = st.number_input("Quel est le nouveau prix ?", value=0.0, key="input_c1_quiz")
+    
+    if st.button("Vérifier la réponse"):
+        correction = st.session_state.vd_quiz * (1 + st.session_state.tx_quiz / 100)
+        if abs(rep_eleve - correction) < 0.1:
+            st.balloons()
+            st.success(f"Bravo ! C'est exactement {formater_fr(correction)} €.")
+        else:
+            st.error(f"Pas tout à fait. Le calcul était : {st.session_state.vd_quiz} × {formater_fr(1+st.session_state.tx_quiz/100)}.")
+
+
+
 
 # =================================================================
 # CHAPITRE 4 : STATISTIQUES
