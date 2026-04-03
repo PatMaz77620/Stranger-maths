@@ -611,7 +611,7 @@ elif st.session_state.page == 'chap4':
             **🔹 Probabilité simple :**
             $$P(A) = \\frac{\\text{Nombre de cas favorables}}{\\text{Nombre total de cas}}$$
             """)
-            st.write("Exemple : Tirer un As dans un jeu de 32 cartes $\\rightarrow 4/32 = 0,125 (ou 12,5%)$.")
+            st.write("Exemple : Tirer un As dans un jeu de 32 cartes $\\rightarrow 4/32 = 0,125$ (ou 12,5%).")
         
         with col_c2:
             st.warning("""
@@ -619,7 +619,7 @@ elif st.session_state.page == 'chap4':
             L'événement $\\bar{A}$ (non A) est :
             $$P(\\bar{A}) = 1 - P(A)$$
             """)
-            st.write("Si $P(A)=0,3$, alors $P(\\bar{A})=0,7$.")
+            st.write("Si $P(A)=0,3$ ou 30%, alors $P(\\bar{A})=0,7$ ou 70%.")
 
         st.divider()
         st.subheader("📡 Probabilités Conditionnelles")
