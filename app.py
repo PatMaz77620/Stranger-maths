@@ -261,7 +261,7 @@ if st.session_state.page == 'chap0':
 # =================================================================
 elif st.session_state.page == 'chap1':
     st.markdown('<div class="btn-retour">', unsafe_allow_html=True)
-    st.button("⬅️ Menu", on_click=aller_a_home)
+    st.button("⬅️ Retour au QG", on_click=aller_a_home)
     st.markdown('</div>', unsafe_allow_html=True)
     st.title("📟 Information Chiffrée")
     tab1, tab2, tab3 = st.tabs(["🔢 Coeff. Multiplicateur", "📈 Taux d'évolution", "🔄 Évolutions Successives"])
@@ -283,7 +283,7 @@ elif st.session_state.page == 'chap1':
 # =================================================================
 elif st.session_state.page == 'chap4':
     st.markdown('<div class="btn-retour">', unsafe_allow_html=True)
-    st.button("⬅️ Menu", on_click=aller_a_home)
+    st.button("⬅️ Retour au QG", on_click=aller_a_home)
     st.markdown('</div>', unsafe_allow_html=True)
     st.title("📊 Statistiques & Arbres")
     t1, t2 = st.tabs(["📋 Tableau Croisé", "🌳 Arbre de Choix"])
