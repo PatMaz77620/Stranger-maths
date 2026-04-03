@@ -648,21 +648,24 @@ elif st.session_state.page == 'chap4':
         }
         df_prob = pd.DataFrame(data, index=["Sportifs", "Non Sportifs", "Total"])
         
-        # Affichage avec CSS pour centrer tout le contenu du tableau
+        # CSS Ultra-Précis pour le centrage des cellules
         st.markdown("""
         <style>
-            .centered-table div[data-testid="stTable"] table {
-                margin-left: auto;
-                margin-right: auto;
+            /* Centre le tableau dans la page */
+            div[data-testid="stTable"] {
+                display: flex;
+                justify-content: center;
             }
-            .centered-table td, .centered-table th {
+            /* Force le centrage du texte dans TOUTES les cellules du tableau */
+            div[data-testid="stTable"] table td, 
+            div[data-testid="stTable"] table th {
                 text-align: center !important;
+                vertical-align: middle !important;
             }
         </style>
-        <div class="centered-table">
         """, unsafe_allow_html=True)
+        
         st.table(df_prob)
-        st.markdown("</div>", unsafe_allow_html=True)
         
         st.divider()
 
@@ -671,13 +674,10 @@ elif st.session_state.page == 'chap4':
         st.caption("💡 Rappel : Fréquence % = (Valeur de la case / Total général) × 100")
 
         # Entrée de l'élève
-        ans_pct = st.number_input("Réponse en % (arrondir à 1 chiffre après la virgule) :", value=0.0, step=0.1)
+        ans_pct = st.number_input("Réponse en % (ex: 37,5) :", value=0.0, step=0.1, key="input_c4_f")
         
-        if st.button("Vérifier le pourcentage"):
-            # Calcul réel : (15 / 40) * 100 = 37.5
+        if st.button("Vérifier le pourcentage", key="btn_c4_f"):
             bonne_reponse = 37.5
-            
-            # On utilise abs(reponse - bonne_reponse) < 0.1 pour accepter les petits écarts d'arrondi
             if abs(ans_pct - bonne_reponse) < 0.1:
                 st.balloons()
                 st.success(f"Bravo ! Le calcul est : (15 / 40) × 100 = **{bonne_reponse}%**")
