@@ -445,7 +445,101 @@ elif st.session_state.page == 'chap2':
         else:
             st.error(f"Oups ! Revois ta formule. Le résultat attendu était {formater_fr(sol_suite)}.")
 
+# =================================================================
+# CHAPITRE 3 : POLYNÔMES DU 2ND DEGRÉ
+# =================================================================
+elif st.session_state.page == 'chap3':
+    st.markdown('<div class="btn-retour">', unsafe_allow_html=True)
+    st.button("⬅️ Menu principal", on_click=aller_a_home)
+    st.markdown('</div>', unsafe_allow_html=True)
 
+    st.title("🛸 Chapitre 3 : Second Degré")
+    
+    t_cours, t_galerie, t_calc = st.tabs(["📚 Les 3 Formes (Cours)", "🖼️ Galerie de Paraboles", "📈 Simulateur"])
+
+    # --- ONGLET 1 : LES FORMES (COURS) ---
+    with t_cours:
+        st.subheader("🧬 Les 3 visages d'une même fonction")
+        st.write("Exemple unique pour tout le cours : $f(x) = 2x^2 + 4x - 6$")
+
+        with st.expander("1. Forme Développée : $f(x) = ax^2 + bx + c$"):
+            st.info("**Interprétation :** Le nombre **c = -6** est l'ordonnée à l'origine (coupe l'axe vertical).")
+            st.latex(r"f(0) = c = -6")
+            
+        with st.expander("2. Forme Canonique : $f(x) = a(x - \\alpha)^2 + \\beta$"):
+            st.success(r"""
+            **🎯 Le Sommet $S(\alpha ; \beta)$ :**
+            - $\alpha = \frac{-b}{2a} = \frac{-4}{2 \times 2} = \mathbf{-1}$
+            - $\beta = f(\alpha) = 2(-1)^2 + 4(-1) - 6 = \mathbf{-8}$
+            """)
+            st.write("👉 *Le sommet de cette parabole est le point $S(-1 ; -8)$.*")
+            
+
+        with st.expander("3. Forme Factorisée : $f(x) = a(x - x_1)(x - x_2)$"):
+            st.warning("**Interprétation :** $x_1$ et $x_2$ sont les **racines** (là où la courbe coupe l'axe horizontal).")
+            st.latex(r"f(x) = 2(x - 1)(x + 3) \rightarrow x_1 = 1, x_2 = -3")
+
+    # --- ONGLET 2 : GALERIE (GRAPHIQUE ALTAIR) ---
+    with t_galerie:
+        import pandas as pd
+        import numpy as np
+        import altair as alt
+
+        st.write("### 🖼️ Analyse Graphique : $f(x) = 2x^2 + 4x - 6$")
+        
+        # Données de la courbe
+        x_val = np.linspace(-6, 4, 400)
+        y_val = 2*x_val**2 + 4*x_val - 6
+        df_curve = pd.DataFrame({'x': x_val, 'y': y_val})
+
+        # Points Singuliers
+        df_pts = pd.DataFrame([
+            {'n': 'Sommet S(-1,-8)', 'x': -1, 'y': -8},
+            {'n': 'Racine x1=1', 'x': 1, 'y': 0},
+            {'n': 'Racine x2=-3', 'x': -3, 'y': 0}
+        ])
+
+        # Graphique
+        base = alt.Chart(df_curve).mark_line(color='#ff0000', size=3).encode(x='x', y='y')
+        points = alt.Chart(df_pts).mark_point(color='#00d4ff', size=100, filled=True).encode(x='x', y='y', tooltip='n')
+        
+        st.altair_chart(base + points, use_container_width=True)
+        st.caption("💡 Le point bleu en bas est le sommet (le minimum car a > 0).")
+
+    # --- ONGLET 3 : SIMULATEUR ---
+    with t_calc:
+        st.subheader("🕹️ Manipulez la Parabole")
+        c1, c2, c3 = st.columns(3)
+        pa = c1.slider("Coefficient a", -5.0, 5.0, 1.0)
+        p_alpha = c2.number_input("Alpha (Sommet x)", value=0.0)
+        p_beta = c3.number_input("Beta (Sommet y)", value=0.0)
+
+        x_sim = np.linspace(p_alpha-10, p_alpha+10, 100)
+        y_sim = pa * (x_sim - p_alpha)**2 + p_beta
+        
+        st.line_chart(pd.DataFrame({'y': y_sim}, index=x_sim))
+        
+        if pa > 0:
+            st.success(f"La parabole est tournée vers le **HAUT** (Minimum : {p_beta})")
+        elif pa < 0:
+            st.error(f"La parabole est tournée vers le **BAS** (Maximum : {p_beta})")
+        else:
+            st.warning("Si a = 0, ce n'est plus une parabole mais une droite !")
+
+    # --- DÉFI ---
+    st.divider()
+    st.write("### ❓ Défi Sommet")
+    if 'q3_val' not in st.session_state:
+        st.session_state.q3_val = random.randint(-5, 5)
+
+    st.write(f"Dans la forme $f(x) = 3(x - 2)^2 + ({st.session_state.q3_val})$, quelle est l'ordonnée du sommet ($\\beta$) ?")
+    ans3 = st.number_input("Votre réponse :", value=0, key="quiz_c3")
+    
+    if st.button("Vérifier"):
+        if ans3 == st.session_state.q3_val:
+            st.balloons(); st.success("Bravo ! C'est le nombre seul à la fin de la forme canonique.")
+        else:
+            st.error(f"Faux. La réponse était {st.session_state.q3_val}.")
 
 # =================================================================
 # CHAPITRE 4 : STATISTIQUES
