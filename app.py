@@ -608,7 +608,7 @@ elif st.session_state.page == 'chap4':
         
         with col_c1:
             st.info("""
-            **🔹 Probabilité simple :**
+            **🔹 Probabilité simple ou marginale :**
             $$P(A) = \\frac{\\text{Nombre de cas favorables}}{\\text{Nombre total de cas}}$$
             """)
             st.write("Exemple : Tirer un As dans un jeu de 32 cartes $\\rightarrow 4/32 = 0,125$ (ou 12,5%).")
@@ -621,6 +621,8 @@ elif st.session_state.page == 'chap4':
             """)
             st.write("Si $P(A)=0,3$ ou 30%, alors $P(\\bar{A})=0,7$ ou 70%.")
 
+        st.write("La probabilité te dit ce qui devrait arriver en théorie, et la fréquence te dit ce qui est arrivé en pratique sur un échantillon donné. Mais les formules pour les calculer sont les mêmes !")
+        
         st.divider()
         st.subheader("📡 Probabilités Conditionnelles")
         st.error("""
