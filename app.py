@@ -347,7 +347,103 @@ elif st.session_state.page == 'chap1':
         else:
             st.error(f"Pas tout à fait. Le calcul était : {st.session_state.vd_quiz} × {formater_fr(1+st.session_state.tx_quiz/100)}.")
 
+# =================================================================
+# CHAPITRE 2 : SUITES NUMÉRIQUES
+# =================================================================
+elif st.session_state.page == 'chap2':
+    st.markdown('<div class="btn-retour">', unsafe_allow_html=True)
+    st.button("⬅️ Menu principal", on_click=aller_a_home)
+    st.markdown('</div>', unsafe_allow_html=True)
 
+    st.title("📈 Chapitre 2 : Suites Numériques")
+    
+    t_gen, t_ari, t_geo = st.tabs(["📚 Généralités", "➕ Arithmétiques", "✖️ Géométriques"])
+
+    # --- ONGLET 1 : GÉNÉRALITÉS ---
+    with t_gen:
+        st.subheader("📚 Guide de survie : Les Bases")
+        
+        with st.expander("🤔 Forme Explicite vs Récurrence"):
+            st.write("#### 1️⃣ Forme Explicite (Le calcul direct)")
+            st.write("On calcule n'importe quel terme directement avec **n**.")
+            st.latex(r"u_n = f(n)")
+            st.info("👉 *Exemple :* $u_n = 3n + 2$. Pour $u_{100}$, on fait $3 \times 100 + 2$. Rapide !")
+            
+            st.divider()
+            
+            st.write("#### 2️⃣ Forme Récurrence (L'escalier)")
+            st.write("On a besoin du terme d'avant pour calculer le suivant. Il y a **toujours 2 lignes**.")
+            st.latex(r"\begin{cases} u_0 = 5 \\ u_{n+1} = u_n + 3 \end{cases}")
+            st.warning("⚠️ *Ici, pour avoir $u_{10}$, il faut d'abord calculer $u_1, u_2, u_3...$ jusqu'à 9. C'est long !*")
+
+        with st.expander("📉 La Monotonie (Sens de variation)"):
+            st.write("Pour savoir si une suite monte ou descend, on calcule :")
+            st.latex(r"u_{n+1} - u_n")
+            st.success("✅ Résultat > 0 : La suite est **Croissante**.")
+            st.error("❌ Résultat < 0 : La suite est **Décroissante**.")
+
+    # --- ONGLET 2 : ARITHMÉTIQUES ---
+    with t_ari:
+        st.subheader("🪜 Suites Arithmétiques (Addition)")
+        st.info("""
+        **Règle :** On passe d'un terme au suivant en **ajoutant** toujours le même nombre $r$ (la raison).
+        - **Récurrence :** $u_{n+1} = u_n + r$
+        - **Explicite :** $u_n = u_0 + n \times r$
+        """)
+        
+        col_p, col_g = st.columns([1, 2])
+        with col_p:
+            u0_a = st.number_input("Premier terme $u_0$", value=10.0, key="ari_u0")
+            r_a = st.number_input("Raison $r$", value=2.0, key="ari_r")
+        
+        with col_g:
+            data_ari = [u0_a + (i * r_a) for i in range(11)]
+            st.line_chart(data_ari)
+            st.caption("Évolution des 10 premiers termes (Progression linéaire)")
+
+    # --- ONGLET 3 : GÉOMÉTRIQUES ---
+    with t_geo:
+        st.subheader("🚀 Suites Géométriques (Multiplication)")
+        st.warning("""
+        **Règle :** On passe d'un terme au suivant en **multipliant** toujours par le même nombre $q$ (la raison).
+        - **Récurrence :** $u_{n+1} = u_n \times q$
+        - **Explicite :** $u_n = u_0 \times q^n$
+        """)
+        
+        col_p2, col_g2 = st.columns([1, 2])
+        with col_p2:
+            u0_g = st.number_input("Premier terme $u_0$", value=1.0, key="geo_u0")
+            q_g = st.number_input("Raison $q$", value=2.0, step=0.1, key="geo_q")
+        
+        with col_g2:
+            data_geo = [u0_g * (q_g ** i) for i in range(11)]
+            st.area_chart(data_geo)
+            st.caption("Évolution des 10 premiers termes (Progression exponentielle)")
+
+    # --- DÉFI DES SUITES ---
+    st.divider()
+    if 'suite_type' not in st.session_state:
+        st.session_state.suite_type = random.choice(["Arithmétique", "Géométrique"])
+        st.session_state.s_u0 = random.randint(2, 10)
+        st.session_state.s_r = random.randint(2, 5)
+        st.session_state.s_n = random.randint(2, 4)
+
+    st.write(f"### ❓ Défi Mission :")
+    if st.session_state.suite_type == "Arithmétique":
+        st.write(f"Soit une suite **Arithmétique** de premier terme $u_0 = {st.session_state.s_u0}$ et de raison $r = {st.session_state.s_r}$.")
+        sol_suite = st.session_state.s_u0 + (st.session_state.s_n * st.session_state.s_r)
+    else:
+        st.write(f"Soit une suite **Géométrique** de premier terme $u_0 = {st.session_state.s_u0}$ et de raison $q = {st.session_state.s_r}$.")
+        sol_suite = st.session_state.s_u0 * (st.session_state.s_r ** st.session_state.s_n)
+
+    rep_suite = st.number_input(f"Calculez la valeur de $u_{st.session_state.s_n}$ :", value=0.0, key="quiz_suite")
+    
+    if st.button("Vérifier le résultat", key="btn_quiz_suite"):
+        if abs(rep_suite - sol_suite) < 0.1:
+            st.balloons()
+            st.success(f"Félicitations ! $u_{st.session_state.s_n}$ vaut bien {formater_fr(sol_suite)}.")
+        else:
+            st.error(f"Oups ! Revois ta formule. Le résultat attendu était {formater_fr(sol_suite)}.")
 
 
 # =================================================================
