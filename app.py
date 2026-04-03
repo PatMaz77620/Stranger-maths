@@ -1,5 +1,8 @@
 import streamlit as st
 from PIL import Image
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
 import random
 
 # --- 1. CONFIGURATION DE LA PAGE ---
@@ -193,8 +196,6 @@ if st.session_state.page == 'chap0':
         Observe bien les valeurs de $x$ où la courbe change de direction.
         """)
 
-        import matplotlib.pyplot as plt
-        import numpy as np
 
         # 1. CRÉATION D'UNE FONCTION ASYMÉTRIQUE
         # On définit les points de rupture (x) pour le tableau
@@ -481,8 +482,6 @@ elif st.session_state.page == 'chap3':
 
 # --- ONGLET 2 : GALERIE (STYLE UNIFIÉ CH0) ---
     with t_galerie:
-        import matplotlib.pyplot as plt
-        import numpy as np
 
         st.write("### 🖼️ Analyse Graphique : $f(x) = 2x^2 + 4x - 6$")
         
@@ -690,7 +689,6 @@ elif st.session_state.page == 'chap4':
         st.subheader("🌳 Arbre de Probabilités")
         st.write("Visualisation des chemins possibles :")
 
-        import matplotlib.pyplot as plt
 
         # Configuration du graphique identique au Ch0/Ch3
         fig, ax = plt.subplots(figsize=(10, 5))
