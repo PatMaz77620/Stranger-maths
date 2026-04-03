@@ -137,10 +137,10 @@ if st.session_state.page == 'home':
 # =================================================================
 # CHAPITRE 0 : FONCTIONS (GÉNÉRALITÉS)
 # =================================================================
-if st.session_state.page == 'chap0':
-    if st.button("⬅️ Retour au QG"):
-        st.session_state.page = 'home'
-        st.rerun()
+elif st.session_state.page == 'chap0':
+    st.markdown('<div class="btn-retour">', unsafe_allow_html=True)
+    st.button("⬅️ Retour au QG", on_click=aller_a_home)
+    st.markdown('</div>', unsafe_allow_html=True)
 
     st.title("🌀 Fonctions : Généralités")
     st.write("---")
