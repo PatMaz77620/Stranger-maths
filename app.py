@@ -103,10 +103,10 @@ if st.session_state.page == 'home':
             if st.button("🌀 Fonctions :\nGénéralités", key="btn_c0"):
                 st.session_state.page = 'chap0'
                 st.rerun()
-            if st.button("📈 Suites\nNumériques\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0", key="btn_c2"):
+            if st.button("📈 Suites\nNumériques\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0", key="btn_c2"):
                 st.session_state.page = 'chap2'
                 st.rerun()
-            if st.button("📊 Stats :\nProbabilités\u00A0\u00A0\u00A0", key="btn_c4"):
+            if st.button("📊 Stats :\nProbabilités\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0", key="btn_c4"):
                 st.session_state.page = 'chap4'
                 st.rerun()
 
@@ -114,7 +114,7 @@ if st.session_state.page == 'home':
             if st.button("📟 Information\nChiffrée\u00A0\u00A0\u00A0", key="btn_c1"):
                 st.session_state.page = 'chap1'
                 st.rerun()
-            if st.button("🛸 Second\nDegré\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0", key="btn_c3"):
+            if st.button("🛸 Second\nDegré\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0", key="btn_c3"):
                 st.session_state.page = 'chap3'
                 st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
