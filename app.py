@@ -17,83 +17,62 @@ st.set_page_config(
 if 'page' not in st.session_state:
     st.session_state.page = 'home'
 
-# --- 2. STYLE CSS CONSOLIDÉ ET STABLE ---
+# --- 2. STYLE CSS ULTIME ET STABLE ---
 st.markdown("""
     <style>
-    /* 1. FOND ET TEXTE GÉNÉRAL */
     .stApp { background-color: #0e1117; }
     .stMarkdown, p, span, label, li { color: #ffffff !important; }
-    
-    /* 2. TITRES NÉON ROUGE */
-    h1, h2, h3 { 
-        color: #ff0000 !important; 
-        text-shadow: 2px 2px 10px #ff0000; 
-        text-align: center;
-    }
+    h1, h2, h3 { color: #ff0000 !important; text-shadow: 2px 2px 10px #ff0000; text-align: center; }
 
-    /* 3. 🎯 LA GRILLE DE L'ACCUEIL (FIXE ET CONSTANTE) */
+    /* 🎯 LA GRILLE : FORCE 2 COLONNES ÉGALES QUOI QU'IL ARRIVE */
     .grille-accueil [data-testid="stHorizontalBlock"] {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: stretch !important;
         gap: 15px !important;
     }
 
-    /* Force les colonnes de l'accueil à ne pas se rétracter */
     .grille-accueil [data-testid="column"] {
-        width: 100% !important;
-        flex: 1 1 auto !important;
+        width: 50% !important; /* Force la moitié de l'écran */
+        flex: 1 1 50% !important;
+        min-width: 0 !important; /* Empêche l'élargissement par le texte */
     }
 
-    /* 4. DESIGN DES BOUTONS (CARTES + RETOUR) */
-    /* On cible tous les boutons secondaires pour éviter le blanc sur blanc */
+    /* 💳 LES CARTES (BOUTONS) */
     button[kind="secondary"] {
         width: 100% !important;
-        background-color: #161b22 !important; /* Fond sombre */
+        background-color: #161b22 !important;
         border: 2px solid #ff0000 !important;
-        color: #ffffff !important; /* Texte blanc */
         border-radius: 15px !important;
         transition: all 0.3s ease !important;
     }
 
-    /* Taille spécifique pour les cartes de l'accueil */
     .grille-accueil button[kind="secondary"] {
         height: 160px !important;
         box-shadow: 0px 4px 15px rgba(255, 0, 0, 0.2) !important;
     }
 
-    /* 5. TEXTE À L'INTÉRIEUR DES BOUTONS */
+    /* ⚪ TEXTE TOUJOURS BLANC (Même hors survol) */
     button[kind="secondary"] p, button[kind="secondary"] span {
         color: #ffffff !important;
         font-weight: bold !important;
         text-align: center !important;
     }
 
-    /* 6. EFFET AU SURVOL (NÉON ROUGE) */
+    /* 🔴 SURVOL NÉON */
     button[kind="secondary"]:hover {
         transform: scale(1.02) !important;
-        background-color: #1e2129 !important;
         box-shadow: 0px 0px 25px #ff0000 !important;
-        border-color: #ff0000 !important;
+        background-color: #1e2129 !important;
     }
-    
-    button[kind="secondary"]:hover p, button[kind="secondary"]:hover span {
-        color: #ff0000 !important;
-    }
+    button[kind="secondary"]:hover p { color: #ff0000 !important; }
 
-    /* 7. BOUTON RETOUR (ON RÉDUIT SA TAILLE) */
-    .btn-retour {
-        margin-bottom: 20px;
-    }
+    /* 🔙 BOUTON RETOUR */
     .btn-retour button {
         width: auto !important;
-        height: auto !important;
         padding: 8px 25px !important;
-        min-width: 120px !important;
     }
-
-    /* 8. CENTRAGE TABLEAUX */
-    div[data-testid="stTable"] table { margin: auto !important; }
-    div[data-testid="stTable"] td, div[data-testid="stTable"] th { text-align: center !important; }
     </style>
     """, unsafe_allow_html=True)
 
