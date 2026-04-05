@@ -17,7 +17,7 @@ st.set_page_config(
 if 'page' not in st.session_state:
     st.session_state.page = 'home'
 
-# --- 2. STYLE CSS VERSION GRILLE FORCÉE ---
+# --- 2. STYLE CSS COMPLET ET ISOLÉ ---
 st.markdown("""
     <style>
     .stApp { background-color: #0e1117; }
@@ -28,23 +28,22 @@ st.markdown("""
         text-align: center;
     }
 
-    [data-testid="stHorizontalBlock"] {
+    /* 🎯 LA GRILLE UNIQUEMENT POUR L'ACCUEIL */
+    .grille-accueil [data-testid="stHorizontalBlock"] {
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
-        gap: 15px !important;
+        gap: 20px !important; /* Espace entre les cartes */
+        width: 100% !important;
     }
 
-    [data-testid="column"] {
+    .grille-accueil [data-testid="column"] {
         width: 100% !important;
         max-width: 100% !important;
         flex: none !important;
     }
 
-    div[data-testid="stButton"], div[data-testid="stButton"] button {
-        width: 100% !important;
-    }
-
-    button[kind="secondary"] {
+    /* CARTES DE L'ACCUEIL */
+    .grille-accueil button[kind="secondary"] {
         width: 100% !important;
         height: 160px !important;
         border-radius: 15px !important;
@@ -52,39 +51,35 @@ st.markdown("""
         background-color: #161b22 !important;
         box-shadow: 0px 4px 15px rgba(255, 0, 0, 0.2) !important;
         transition: all 0.3s ease !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
     }
 
+    /* TEXTE DES BOUTONS */
     button[kind="secondary"] div[data-testid="stMarkdownContainer"] p {
         color: #ffffff !important;
-        -webkit-text-fill-color: #ffffff !important;
         font-size: 1.1rem !important;
         font-weight: bold !important;
         text-align: center !important;
+        line-height: 1.2 !important;
     }
 
+    /* SURVOL NÉON */
     button[kind="secondary"]:hover {
         transform: scale(1.02) !important;
-        background-color: #1e2129 !important;
         box-shadow: 0px 0px 25px #ff0000 !important;
     }
-    
-    button[kind="secondary"]:hover div[data-testid="stMarkdownContainer"] p {
-        color: #ff0000 !important;
-        -webkit-text-fill-color: #ff0000 !important;
+
+    /* CENTRAGE TABLEAUX CHAPITRE 4 */
+    div[data-testid="stTable"] table {
+        margin: auto !important;
+    }
+    div[data-testid="stTable"] td, div[data-testid="stTable"] th {
+        text-align: center !important;
     }
 
-    .btn-retour {
-        display: block !important;
-        width: fit-content !important;
-        margin-bottom: 20px;
-    }
+    /* BOUTON RETOUR NORMAL */
     .btn-retour button {
-        height: auto !important;
         width: auto !important;
+        height: auto !important;
         padding: 5px 20px !important;
     }
     </style>
@@ -105,16 +100,19 @@ chemin_logo = "Stranger_Maths_Logo.png"
 # =================================================================
 # PAGE D'ACCUEIL
 # =================================================================
+
 if st.session_state.page == 'home':
     try:
         img = Image.open(chemin_logo)
         st.image(img, use_container_width=True)
     except:
         st.title("🔦 STRANGER MATHS")
-
+    
     st.write("### 🎮 Choisissez votre mission :")
-    st.write("")
-
+    
+    # ⚡ ON ACTIVE LA GRILLE ICI
+    st.markdown('<div class="grille-accueil">', unsafe_allow_html=True)
+    
     col1, col2 = st.columns(2)
     with col1:
         if st.button("🌀 Fonctions :\nGénéralités", key="btn_c0"):
@@ -126,7 +124,6 @@ if st.session_state.page == 'home':
         if st.button("📊 Stats :\nProbabilités", key="btn_c4"):
             st.session_state.page = 'chap4'
             st.rerun()
-
     with col2:
         if st.button("📟 Information\nChiffrée", key="btn_c1"):
             st.session_state.page = 'chap1'
@@ -134,7 +131,9 @@ if st.session_state.page == 'home':
         if st.button("🛸 Second\nDegré", key="btn_c3"):
             st.session_state.page = 'chap3'
             st.rerun()
-
+            
+    st.markdown('</div>', unsafe_allow_html=True) # ⚡ ON FERME LA ZONE
+    
 # =================================================================
 # CHAPITRE 0 : FONCTIONS (GÉNÉRALITÉS)
 # =================================================================
