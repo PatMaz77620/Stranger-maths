@@ -527,11 +527,146 @@ elif st.session_state.page == 'chap4':
     st.markdown('</div>', unsafe_allow_html=True)
     st.title("🎲 Chapitre 4 : Probabilités")
     tab_cours, tab_tab, tab_arbre = st.tabs(["📚 Rappels", "📊 Tableau", "🌳 Arbre"])
+
+    # --- 1. RAPPELS DE COURS ---
+    with tab_cours:
+        st.subheader("🧠 Fondamentaux des Probabilités")
+        col_c1, col_c2 = st.columns(2)
+        
+        with col_c1:
+            st.info("""
+            **🔹 Probabilité simple ou marginale :**
+            $$P(A) = \\frac{\\text{Nombre de cas favorables}}{\\text{Nombre total de cas}}$$
+            """)
+            st.write("Exemple : Tirer un As dans un jeu de 32 cartes $\\rightarrow 4/32 = 0,125$ (ou 12,5%).")
+        
+        with col_c2:
+            st.warning("""
+            **🔹 Événement contraire :**
+            L'événement $\\bar{A}$ (non A) est :
+            $$P(\\bar{A}) = 1 - P(A)$$
+            """)
+            st.write("Si $P(A)=0,3$ ou 30%, alors $P(\\bar{A})=0,7$ ou 70%.")
+
+        st.write("")
+        st.write("🤔 La probabilité te dit ce qui devrait arriver en théorie (dans le futur), et la fréquence te dit ce qui est arrivé (dans le passé) sur un échantillon donné. Mais les formules pour les calculer sont les mêmes !")
+        
+        st.divider()
+        st.subheader("📡 Probabilités Conditionnelles")
+        st.error("""
+        **La formule clé :** La probabilité de B sachant que A est réalisé :
+        $$P_A(B) = \\frac{P(A \\cap B)}{P(A)}$$
+        *Note : $P(A \\cap B)$ représente 'A et B en même temps'.*
+        """)
+
+    # --- 2. TABLEAU CROISÉ ---
     with tab_tab:
-        df_prob = pd.DataFrame({"Garçons": [12, 8, 20], "Filles": [15, 5, 20], "Total": [27, 13, 40]}, index=["Sport", "Non Sport", "Total"])
+        st.subheader("📊 Analyse de données (Tableau à double entrée)")
+        
+        st.write("""
+        👉 **Méthode :** Ce tableau est un exemple complet. Dans un exercice, certaines cases seront **vides**. 
+        Vous devrez les retrouver en sachant que la somme des cases d'une ligne (ou d'une colonne) est égale à son **Total**.
+        """)
+        
+        # Données
+        data = {
+            "Garçons": [12, 8, 20],
+            "Filles": [15, 5, 20],
+            "Total": [27, 13, 40]
+        }
+        df_prob = pd.DataFrame(data, index=["Sportifs", "Non Sportifs", "Total"])
+        
+        # CSS Ultra-Précis pour le centrage des cellules
+        st.markdown("""
+        <style>
+            /* Centre le tableau dans la page */
+            div[data-testid="stTable"] {
+                display: flex;
+                justify-content: center;
+            }
+            /* Force le centrage du texte dans TOUTES les cellules du tableau */
+            div[data-testid="stTable"] table td, 
+            div[data-testid="stTable"] table th {
+                text-align: center !important;
+                vertical-align: middle !important;
+            }
+        </style>
+        """, unsafe_allow_html=True)
+        
         st.table(df_prob)
+        
+        st.divider()
+
+        st.write("#### ❓ Question d'entraînement")
+        st.write("D'après le tableau ci-dessus, quelle est la **fréquence** (en %) de **filles sportives** parmi le total des élèves ?")
+        st.caption("💡 Rappel : Fréquence % = (Valeur de la case / Total général) × 100")
+
+        # Entrée de l'élève
+        ans_pct = st.number_input("Réponse en % (ex: 37,5) :", value=0.0, step=0.1, key="input_c4_f")
+        
+        if st.button("Vérifier le pourcentage", key="btn_c4_f"):
+            bonne_reponse = 37.5
+            if abs(ans_pct - bonne_reponse) == 0:
+                st.balloons()
+                st.success(f"Bravo ! Le calcul est : (15 / 40) × 100 = **{bonne_reponse}%**")
+            else:
+                st.error(f"Pas tout à fait. Cherchez la case 'Filles' + 'Sportifs' (15) et divisez par le Total (40).")
+
+    # --- 3. ARBRE DE CHOIX (STYLE GRAPHIQUE NOIR/CYAN/ROUGE) ---
     with tab_arbre:
-        fig, ax = plt.subplots(figsize=(10, 5)); fig.patch.set_facecolor('#0e1117'); ax.set_facecolor('#161b22')
-        ax.plot([0, 1], [0, 1], color='#ff0000', lw=3); ax.plot([0, 1], [0, -1], color='#ff0000', lw=3)
-        ax.scatter([0, 1, 1], [0, 1, -1], color='#00d4ff', s=200); ax.axis('off')
+        st.subheader("🌳 Arbre de Probabilités")
+        st.write("Visualisation des chemins possibles :")
+
+
+        # Configuration du graphique identique au Ch0/Ch3
+        fig, ax = plt.subplots(figsize=(10, 5))
+        fig.patch.set_facecolor('#0e1117')
+        ax.set_facecolor('#161b22')
+
+        # Construction de l'arbre
+        # Coordonnées des nœuds
+        nodes = {
+            'Départ': (0, 0),
+            'A': (1, 1),
+            'nonA': (1, -1),
+            'B_sachant_A': (2, 1.5),
+            'nonB_sachant_A': (2, 0.5),
+            'B_sachant_nonA': (2, -0.5),
+            'nonB_sachant_nonA': (2, -1.5)
+        }
+
+        # Dessiner les branches (Lignes Rouges)
+        def draw_branch(p1, p2, label):
+            ax.plot([nodes[p1][0], nodes[p2][0]], [nodes[p1][1], nodes[p2][1]], 
+                    color='#ff0000', lw=3, zorder=1)
+            # Label de probabilité au milieu de la branche
+            mid_x = (nodes[p1][0] + nodes[p2][0]) / 2
+            mid_y = (nodes[p1][1] + nodes[p2][1]) / 2
+            ax.text(mid_x, mid_y + 0.1, label, color='white', fontweight='bold', ha='center')
+
+        draw_branch('Départ', 'A', 'P(A)')
+        draw_branch('Départ', 'nonA', 'P(nonA)')
+        draw_branch('A', 'B_sachant_A', 'P_A(B)')
+        draw_branch('A', 'nonB_sachant_A', 'P_A(nonB)')
+        draw_branch('nonA', 'B_sachant_nonA', 'P_nonA(B)')
+        draw_branch('nonA', 'nonB_sachant_nonA', 'P_nonA(nonB)')
+
+        # Dessiner les nœuds (Points Cyan)
+        for name, pos in nodes.items():
+            ax.scatter(pos[0], pos[1], color='#00d4ff', s=200, zorder=2, edgecolors='white')
+            ax.text(pos[0], pos[1]-0.3, name, color='#00d4ff', fontsize=10, ha='center', fontweight='bold')
+
+        # Nettoyage du graphique
+        ax.set_xlim(-0.5, 2.5)
+        ax.set_ylim(-2, 2)
+        ax.axis('off') # On cache les axes pour l'arbre
+
         st.pyplot(fig)
+
+        st.info("""
+        **📏 Règle d'or de l'arbre :**
+        1. La somme des branches partant d'un même nœud vaut toujours **1**.
+        2. Pour calculer la probabilité d'un chemin complet, on **multiplie** les probabilités.
+        3. La somme des fleurs de l'arbre (les probabilités à droite) fait 1 ou 100%.
+        """)
+        
