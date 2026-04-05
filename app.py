@@ -33,15 +33,18 @@ st.markdown("""
 
     /* Design des boutons (Cartes) */
     button[kind="secondary"] {
-        width: 100% !important;
+        /* On enlève width: 100% pour laisser les espaces pousser les bords */
+        width: max-content !important; 
+        min-width: 300px !important; /* Optionnel : définit une base minimale pour la sécurité */
         background-color: #161b22 !important;
         border: 2px solid #ff0000 !important;
         border-radius: 15px !important;
         transition: all 0.3s ease !important;
         height: 160px !important;
         box-shadow: 0px 4px 15px rgba(255, 0, 0, 0.2) !important;
+        margin: auto !important; /* Centre le bouton dans sa colonne */
+        display: block !important;
     }
-
     button[kind="secondary"] p {
         color: #ffffff !important;
         font-weight: bold !important;
