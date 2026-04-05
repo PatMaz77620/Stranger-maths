@@ -17,71 +17,83 @@ st.set_page_config(
 if 'page' not in st.session_state:
     st.session_state.page = 'home'
 
-# --- 2. STYLE CSS COMPLET ET ISOLÉ ---
+# --- 2. STYLE CSS CONSOLIDÉ ET STABLE ---
 st.markdown("""
     <style>
+    /* 1. FOND ET TEXTE GÉNÉRAL */
     .stApp { background-color: #0e1117; }
     .stMarkdown, p, span, label, li { color: #ffffff !important; }
+    
+    /* 2. TITRES NÉON ROUGE */
     h1, h2, h3 { 
         color: #ff0000 !important; 
         text-shadow: 2px 2px 10px #ff0000; 
         text-align: center;
     }
 
-    /* 🎯 LA GRILLE UNIQUEMENT POUR L'ACCUEIL */
+    /* 3. 🎯 LA GRILLE DE L'ACCUEIL (FIXE ET CONSTANTE) */
     .grille-accueil [data-testid="stHorizontalBlock"] {
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
-        gap: 20px !important; /* Espace entre les cartes */
-        width: 100% !important;
+        gap: 15px !important;
     }
 
+    /* Force les colonnes de l'accueil à ne pas se rétracter */
     .grille-accueil [data-testid="column"] {
         width: 100% !important;
-        max-width: 100% !important;
-        flex: none !important;
+        flex: 1 1 auto !important;
     }
 
-    /* CARTES DE L'ACCUEIL */
-    .grille-accueil button[kind="secondary"] {
+    /* 4. DESIGN DES BOUTONS (CARTES + RETOUR) */
+    /* On cible tous les boutons secondaires pour éviter le blanc sur blanc */
+    button[kind="secondary"] {
         width: 100% !important;
-        height: 160px !important;
-        border-radius: 15px !important;
+        background-color: #161b22 !important; /* Fond sombre */
         border: 2px solid #ff0000 !important;
-        background-color: #161b22 !important;
-        box-shadow: 0px 4px 15px rgba(255, 0, 0, 0.2) !important;
+        color: #ffffff !important; /* Texte blanc */
+        border-radius: 15px !important;
         transition: all 0.3s ease !important;
     }
 
-    /* TEXTE DES BOUTONS */
-    button[kind="secondary"] div[data-testid="stMarkdownContainer"] p {
+    /* Taille spécifique pour les cartes de l'accueil */
+    .grille-accueil button[kind="secondary"] {
+        height: 160px !important;
+        box-shadow: 0px 4px 15px rgba(255, 0, 0, 0.2) !important;
+    }
+
+    /* 5. TEXTE À L'INTÉRIEUR DES BOUTONS */
+    button[kind="secondary"] p, button[kind="secondary"] span {
         color: #ffffff !important;
-        font-size: 1.1rem !important;
         font-weight: bold !important;
         text-align: center !important;
-        line-height: 1.2 !important;
     }
 
-    /* SURVOL NÉON */
+    /* 6. EFFET AU SURVOL (NÉON ROUGE) */
     button[kind="secondary"]:hover {
         transform: scale(1.02) !important;
+        background-color: #1e2129 !important;
         box-shadow: 0px 0px 25px #ff0000 !important;
+        border-color: #ff0000 !important;
+    }
+    
+    button[kind="secondary"]:hover p, button[kind="secondary"]:hover span {
+        color: #ff0000 !important;
     }
 
-    /* CENTRAGE TABLEAUX CHAPITRE 4 */
-    div[data-testid="stTable"] table {
-        margin: auto !important;
+    /* 7. BOUTON RETOUR (ON RÉDUIT SA TAILLE) */
+    .btn-retour {
+        margin-bottom: 20px;
     }
-    div[data-testid="stTable"] td, div[data-testid="stTable"] th {
-        text-align: center !important;
-    }
-
-    /* BOUTON RETOUR NORMAL */
     .btn-retour button {
         width: auto !important;
         height: auto !important;
-        padding: 5px 20px !important;
+        padding: 8px 25px !important;
+        min-width: 120px !important;
     }
+
+    /* 8. CENTRAGE TABLEAUX */
+    div[data-testid="stTable"] table { margin: auto !important; }
+    div[data-testid="stTable"] td, div[data-testid="stTable"] th { text-align: center !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -132,7 +144,7 @@ if st.session_state.page == 'home':
             st.session_state.page = 'chap3'
             st.rerun()
             
-    st.markdown('</div>', unsafe_allow_html=True) # ⚡ ON FERME LA ZONE
+st.markdown('</div>', unsafe_allow_html=True) # ⚡ ON FERME LA ZONE
     
 # =================================================================
 # CHAPITRE 0 : FONCTIONS (GÉNÉRALITÉS)
