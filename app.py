@@ -144,7 +144,7 @@ if st.session_state.page == 'home':
             st.session_state.page = 'chap3'
             st.rerun()
             
-st.markdown('</div>', unsafe_allow_html=True) # ⚡ ON FERME LA ZONE
+    st.markdown('</div>', unsafe_allow_html=True) # ⚡ ON FERME LA ZONE
     
 # =================================================================
 # CHAPITRE 0 : FONCTIONS (GÉNÉRALITÉS)
