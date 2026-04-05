@@ -386,18 +386,137 @@ elif st.session_state.page == 'chap3':
     st.markdown('</div>', unsafe_allow_html=True)
     st.title("🛸 Chapitre 3 : Second Degré")
     t_cours, t_galerie, t_calc = st.tabs(["📚 Les 3 Formes", "🖼️ Galerie", "📈 Simulateur"])
+
+    # --- ONGLET 1 : LES FORMES (COURS) ---
     with t_cours:
-        st.latex(r"ax^2 + bx + c")
+        st.subheader("🧬 Les 3 visages d'une même fonction")
+        st.write("Exemple unique pour tout le cours : $f(x) = 2x^2 + 4x - 6$")
+
+        with st.expander("1. Forme Développée : $f(x) = ax^2 + bx + c$"):
+            st.info("**Interprétation :** Le nombre **c = -6** est l'ordonnée à l'origine (coupe l'axe vertical).")
+            st.latex(r"f(0) = c = -6")
+            
+        with st.expander("2. Forme Canonique : $f(x) = a(x - \\alpha)^2 + \\beta$"):
+            st.success(r"""
+            **🎯 Le Sommet $S(\alpha ; \beta)$ :**
+            - $\alpha = \frac{-b}{2a} = \frac{-4}{2 \times 2} = \mathbf{-1}$
+            - $\beta = f(\alpha) = 2(-1)^2 + 4(-1) - 6 = \mathbf{-8}$
+            """)
+            st.write("👉 *Le sommet de cette parabole est le point $S(-1 ; -8)$.*")
+            
+
+        with st.expander("3. Forme Factorisée : $f(x) = a(x - x_1)(x - x_2)$"):
+            st.warning("**Interprétation :** $x_1$ et $x_2$ sont les **racines** (là où la courbe coupe l'axe horizontal).")
+            st.latex(r"f(x) = 2(x - 1)(x + 3) \rightarrow x_1 = 1, x_2 = -3")
+
+# --- ONGLET 2 : GALERIE (STYLE UNIFIÉ CH0) ---
     with t_galerie:
-        x_p = np.linspace(-6, 6, 400); y_p = 2*x_p**2 + 4*x_p - 6
-        fig, ax = plt.subplots(); fig.patch.set_facecolor('#0e1117'); ax.set_facecolor('#161b22')
-        ax.plot(x_p, y_p, color='#ff0000', lw=4); ax.grid(color='#333333'); ax.tick_params(colors='white')
+
+        st.write("### 🖼️ Analyse Graphique : $f(x) = 2x^2 + 4x - 6$")
+        
+        # 1. PRÉPARATION DES DONNÉES
+        limite_x = 6
+        limite_y = 10
+        x_p = np.linspace(-limite_x, limite_x, 400)
+        y_p = 2*x_p**2 + 4*x_p - 6
+
+        # 2. CRÉATION DE LA FIGURE
+        fig, ax = plt.subplots(figsize=(10, 7))
+        fig.patch.set_facecolor('#0e1117') # Fond sombre App
+        ax.set_facecolor('#161b22')        # Fond graphique
+
+        # Grille et Axes (Style blanc discret)
+        ax.grid(color='#333333', linestyle='--', lw=0.5)
+        ax.axhline(0, color='white', lw=1.5)
+        ax.axvline(0, color='white', lw=1.5)
+
+        # La Courbe ROUGE NÉON
+        ax.plot(x_p, y_p, color='#ff0000', lw=4, label='f(x) = 2x² + 4x - 6')
+
+        # Points Singuliers en CYAN
+        # Sommet S(-1, -8) | Racines (1,0) et (-3,0) | Ordonnée origine (0,-6)
+        pts_x = [-1, 1, -3, 0]
+        pts_y = [-8, 0, 0, -6]
+        labels = ['S(-1;-8)', 'x1=1', 'x2=-3', 'c=-6']
+
+        ax.scatter(pts_x, pts_y, color='#00d4ff', s=100, zorder=5, edgecolors='white')
+        
+        # Annotations Cyan
+        for i, txt in enumerate(labels):
+            ax.annotate(txt, (pts_x[i], pts_y[i]), xytext=(10, 10), 
+                        textcoords='offset points', color='#00d4ff', fontweight='bold')
+
+        # Graduations
+        ax.set_xlim(-limite_x, limite_x)
+        ax.set_ylim(-limite_y, limite_y)
+        ax.tick_params(colors='white')
+        
         st.pyplot(fig)
+        st.success("✅ **Lecture :** La courbe coupe l'axe horizontal aux racines (Cyan) et atteint son minimum au sommet S.")
+
+    # --- ONGLET 3 : SIMULATEUR (STYLE INTERACTIF) ---
     with t_calc:
-        sa = st.slider("a", -4.0, 4.0, 1.0); s_alpha = st.number_input("Alpha", value=0.0)
-        s_beta = st.number_input("Beta", value=0.0)
-        x_sim = np.linspace(s_alpha-10, s_alpha+10, 100); y_sim = sa*(x_sim-s_alpha)**2 + s_beta
-        st.line_chart(pd.DataFrame({'y': y_sim}, index=x_sim))
+        st.write("### 🕹️ Le Labo des Paraboles")
+        
+        col_p, col_v = st.columns([1, 2])
+        
+        with col_p:
+            st.write("**Paramètres (Forme Canonique) :**")
+            sa = st.slider("Coefficient a (Ouverture)", -4.0, 4.0, 1.0, step=0.5)
+            s_alpha = st.number_input("Alpha (Position x)", value=0.0)
+            s_beta = st.number_input("Beta (Hauteur y)", value=0.0)
+        
+        with col_v:
+            # Création du graphique dynamique
+            x_sim = np.linspace(s_alpha - 10, s_alpha + 10, 400)
+            y_sim = sa * (x_sim - s_alpha)**2 + s_beta
+            
+            fig2, ax2 = plt.subplots()
+            fig2.patch.set_facecolor('#0e1117')
+            ax2.set_facecolor('#161b22')
+            
+            # Axes et Grille
+            ax2.grid(color='#333333', linestyle='--', lw=0.5)
+            ax2.axhline(0, color='white', lw=1)
+            ax2.axvline(0, color='white', lw=1)
+            
+            # Courbe dynamique
+            couleur_courbe = '#ff0000' if sa != 0 else '#ffffff'
+            ax2.plot(x_sim, y_sim, color=couleur_courbe, lw=3)
+            
+            # Point du sommet (Cyan)
+            ax2.scatter([s_alpha], [s_beta], color='#00d4ff', s=100, zorder=5)
+            
+            # Fixer les limites pour que le mouvement soit visible
+            ax2.set_xlim(s_alpha - 10, s_alpha + 10)
+            ax2.set_ylim(s_beta - 10, s_beta + 10)
+            ax2.tick_params(colors='white')
+            
+            st.pyplot(fig2)
+
+        # Analyse dynamique sous le graphique
+        if sa > 0:
+            st.info(f"🔼 **a > 0** : Parabole 'souriante'. Minimum en $y = {s_beta}$")
+        elif sa < 0:
+            st.error(f"🔽 **a < 0** : Parabole 'triste'. Maximum en $y = {s_beta}$")
+        else:
+            st.warning("📏 **a = 0** : C'est une droite horizontale !")
+
+    # --- DÉFI ---
+    st.divider()
+    st.write("### ❓ Défi Sommet")
+    if 'q3_val' not in st.session_state:
+        st.session_state.q3_val = random.randint(-5, 5)
+
+    st.write(f"Dans la forme $f(x) = 3(x - 2)^2 + ({st.session_state.q3_val})$, quelle est l'ordonnée du sommet ($\\beta$) ?")
+    ans3 = st.number_input("Votre réponse :", value=0, key="quiz_c3")
+    
+    if st.button("Vérifier"):
+        if ans3 == st.session_state.q3_val:
+            st.balloons(); st.success("Bravo ! C'est le nombre seul à la fin de la forme canonique.")
+        else:
+            st.error(f"Faux. La réponse était {st.session_state.q3_val}.")
+
 
 # =================================================================
 # CHAPITRE 4 : PROBABILITÉS
