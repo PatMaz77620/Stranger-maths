@@ -139,60 +139,110 @@ elif st.session_state.page == 'chap0':
         "📍 Lecture de Carte"
     ])
 
+    # --- SOUS-CHAPITRE 1 : IMAGES ET ANTÉCÉDENTS ---
     with tab1:
         st.subheader("⚙️ La Machine à Transformer")
         st.info("Une fonction est un processus. On entre un nombre **x** (antécédent), on applique une règle, et il ressort un nombre **f(x)** (image).")
         col_calc, col_viz = st.columns([1, 1])
+
         with col_calc:
             st.write("**Exemple : $f(x) = 2x^2 - 3$**")
             input_x = st.number_input("Choisissez un antécédent (x) :", value=3.0)
             result_f = 2*(input_x**2) - 3
             st.success(f"L'image de **{input_x}** est **{result_f}**")
             st.latex(r"f(" + str(input_x) + r") = " + str(result_f))
+
         with col_viz:
             st.markdown("""
             **Mémo technique :**
             - **x** est l'ANTÉCÉDENT (il vient AVANT).
             - **f(x)** est l'IMAGE (c'est le RÉSULTAT).
+            *Un antécédent n'a qu'une seule image, mais une image peut avoir plusieurs antécédents !*
             """)
 
+    # --- SOUS-CHAPITRE 2 : DOMAINE DE DÉFINITION ---
     with tab2:
         st.subheader("🚧 Le Territoire de la fonction")
+        st.write("Certaines fonctions ont des 'zones interdites' (valeurs de x pour lesquelles le calcul est impossible).")
         c1, c2 = st.columns(2)
         with c1:
             st.error("🚫 **La Division par Zéro**")
             st.latex(r"g(x) = \frac{5}{x - 4}")
+            st.write("Ici, $x$ ne peut pas être égal à **4** (le dénominateur serait nul).")
             st.write("**Domaine :** $\mathbb{R} \setminus \{4\}$")
         with c2:
             st.error("🚫 **La Racine Négative**")
             st.latex(r"h(x) = \sqrt{x + 2}")
+            st.write("Sous une racine, le résultat doit être $\geq 0$.")
             st.write("**Domaine :** $[-2 \ ; \ +\infty[$")
 
+    # --- SOUS-CHAPITRE 3 : LECTURE DE CARTE (VERSION ASYMÉTRIQUE FINALE) ---
     with tab3:
-        st.subheader("📍 Cohérence Graphique")
+        st.subheader("📍 Cohérence Graphique : Du Squelette au Dessin")
+        st.write("""
+        Ici, pas de piège : la courbe rouge (le dessin) suit **strictement** le mouvement des flèches du tableau (le schéma). 
+        Observe bien les valeurs de $x$ où la courbe change de direction.
+        """)
+
+
+        # 1. CRÉATION D'UNE FONCTION ASYMÉTRIQUE
+        # On définit les points de rupture (x) pour le tableau
+        x_min_local = -3  # Le creux
+        x_max_local = 1   # La bosse
         limite = 6
         x_p = np.linspace(-limite, limite, 400)
+        # Fonction f(x) asymétrique : f(x) = 0.1 * (x+4)(x-1)(x-5) - ajustée
+        # Pour garantir la forme : Descend -> Monte -> Descend
         y_p = -0.05 * (x_p + 5) * (x_p + 1) * (x_p - 4) 
+
+        # 2. CRÉATION DE LA FIGURE
         fig, (ax_graph, ax_tab) = plt.subplots(2, 1, figsize=(10, 8), gridspec_kw={'height_ratios': [3, 1]})
         fig.patch.set_facecolor('#0e1117')
+
+        # --- PARTIE HAUTE : LE GRAPH (DESSIN PRÉCIS) ---
         ax_graph.set_facecolor('#161b22')
         ax_graph.plot(x_p, y_p, color='#ff0000', lw=4)
-        ax_graph.axhline(0, color='white', lw=1.5); ax_graph.axvline(0, color='white', lw=1.5)
-        ax_graph.tick_params(colors='white'); ax_graph.grid(color='#333333', linestyle='--')
-        ax_tab.set_facecolor('#161b22'); ax_tab.axis('off')
-        
-        # Annotation manuelle asymétrique
+
+        # Axes et Grille
+        ax_graph.axhline(0, color='white', lw=1.5)
+        ax_graph.axvline(0, color='white', lw=1.5)
+        ax_graph.set_title("1. REPRÉSENTATION GRAPHIQUE", color='white', pad=15, fontweight='bold')
+        ax_graph.tick_params(colors='white')
+        ax_graph.set_xlim(-limite, limite)
+        ax_graph.grid(color='#333333', linestyle='--')
+
+        # --- PARTIE BASSE : LE TABLEAU (SQUELETTE ASYMÉTRIQUE) ---
+        ax_tab.set_facecolor('#161b22')
+        ax_tab.set_title("2. TABLEAU DE VARIATIONS", color='white', pad=10, fontweight='bold')
+
+        # Structure du tableau (Lignes blanches)
         ax_tab.axhline(0.8, color='white', lw=1)
+        ax_tab.axvline(-5.8, color='white', lw=1) # Bord gauche
+        ax_tab.axvline(-3.2, color='white', lw=1) # Min à x ≈ -3.2
+        ax_tab.axvline(1.8, color='white', lw=1)  # Max à x ≈ 1.8
+        ax_tab.axvline(5.8, color='white', lw=1)  # Bord droit
+
+        # Valeurs de x (alignées avec les sommets de la courbe)
         ax_tab.text(-5.8, 0.9, "-6", color='white', ha='center')
         ax_tab.text(-3.2, 0.9, "-3.2", color='white', ha='center')
         ax_tab.text(1.8, 0.9, "1.8", color='white', ha='center')
         ax_tab.text(5.8, 0.9, "6", color='white', ha='center')
+        
+        # Flèches (Même rouge que la courbe)
+        # 1. Descente de -6 à -3.2
         ax_tab.annotate('', xy=(-3.4, 0.2), xytext=(-5.6, 0.7), arrowprops=dict(arrowstyle='->', color='#ff0000', lw=2))
+        # 2. Montée de -3.2 à 1.8
         ax_tab.annotate('', xy=(1.6, 0.7), xytext=(-3.0, 0.2), arrowprops=dict(arrowstyle='->', color='#ff0000', lw=2))
+        # 3. Descente de 1.8 à 6
         ax_tab.annotate('', xy=(5.6, 0.2), xytext=(2.0, 0.7), arrowprops=dict(arrowstyle='->', color='#ff0000', lw=2))
+        
+        # Valeurs f(x) qualitatives
+        ax_tab.text(-3.2, 0.1, "Min", color='white', ha='center', fontsize=10)
+        ax_tab.text(1.8, 0.75, "Max", color='white', ha='center', fontsize=10)
+        ax_tab.axis('off')
 
         st.pyplot(fig)
-        st.success("✅ f(x) = 0,1(4 - x)(x + 1)(x + 5)")
+        st.success("✅ la fonction représentée ci-dessus est la suivante : $$f(x) = 0,1(4 - x)(x + 1)(x + 5)$$. As-tu trouvé les racines de la fonction (les valeurs de $$x$$ qui annulent la fonction) ? Vérifie sur la représentation graphique les valeurs que tu as trouvées par le calcul... Peux-tu en déduire le tableau de signes facilement ?")
 
 # =================================================================
 # CHAPITRE 1 : INFORMATION CHIFFRÉE
