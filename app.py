@@ -90,6 +90,37 @@ def aller_a_home():
     st.session_state.clear()
     st.session_state.page = 'home'
 
+def generer_mission_gemini(theme_maths):
+    prompt_systeme = f"""
+    Tu es un expert en pédagogie mathématique pour la section STMG en France.
+    Ta mission est de créer une question de quiz unique pour l'application "Stranger Maths".
+    
+    CONTEXTE : Hawkins, Stranger Things, le Monde à l'Envers.
+    SUJET MATHS : {theme_maths}
+    NIVEAU : Terminale STMG.
+    
+    RÈGLES STRICTES :
+    1. Utilise des prénoms de la série (Eleven, Mike, Dustin, etc.).
+    2. Le calcul doit être exact et réaliste pour le niveau STMG.
+    3. Utilise la virgule comme séparateur décimal.
+    4. Réponds UNIQUEMENT au format JSON brut, sans balises de code markdown, avec cette structure :
+    {{
+        "question": "Texte de la question ici",
+        "options": ["Choix A", "Choix B", "Choix C", "Choix D"],
+        "reponse": "Le texte exact de la bonne option",
+        "explication": "Une explication courte et fun avec une référence à la série"
+    }}
+    """
+    
+    try:
+        response = model.generate_content(prompt_systeme)
+        # Nettoyage de la réponse pour extraire le JSON proprement
+        texte_propre = response.text.strip().replace('```json', '').replace('```', '')
+        return json.loads(texte_propre)
+    except Exception as e:
+        return None
+        
+
 chemin_logo = "Stranger_Maths_Logo.png"
 
 # =================================================================
