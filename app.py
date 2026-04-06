@@ -4,6 +4,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import random
+import google.generativeai as genai
+import json
+
+# Clé Google API Studio
+GENAI_KEY = "AIzaSyA0WK7pNEb12fyVOlUFdjIAsQvMa0VLGVg" 
+genai.configure(api_key=GENAI_KEY)
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 # --- 1. CONFIGURATION DE LA PAGE ---
 st.set_page_config(
