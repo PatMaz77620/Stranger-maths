@@ -7,13 +7,16 @@ import random
 import google.generativeai as genai
 import json
 
-# Clé Google API Studio
+# Configuration sécurisée via Streamlit Secrets
 GENAI_KEY = st.secrets["GEMINI_API_KEY"]
 genai.configure(api_key=GENAI_KEY)
 
-# Force la configuration sur le modèle stable
-# On utilise le modèle détecté dans ta liste
-model = genai.GenerativeModel('gemini-pro')
+# Utilisation du nom complet 'models/...' 
+# C'est souvent la solution quand le nom court renvoie une 404
+try:
+    model = genai.GenerativeModel('models/gemini-1.5-flash')
+except Exception:
+    model = genai.GenerativeModel('gemini-1.5-flash')
 
 # --- 1. CONFIGURATION DE LA PAGE ---
 st.set_page_config(
@@ -22,8 +25,6 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="collapsed"
 )
-
-
 
 # --- 🎯 INITIALISATION DU STATE ---
 if 'page' not in st.session_state:
