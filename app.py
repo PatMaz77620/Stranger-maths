@@ -112,14 +112,19 @@ def generer_mission_gemini(theme_maths):
     }}
     """
     
-    try:
+try:
         response = model.generate_content(prompt_systeme)
-        # Nettoyage de la réponse pour extraire le JSON proprement
-        texte_propre = response.text.strip().replace('```json', '').replace('```', '')
-        return json.loads(texte_propre)
+        texte = response.text
+        # On cherche le premier '{' et le dernier '}' pour isoler le JSON
+        debut = texte.find('{')
+        fin = texte.rfind('}') + 1
+        json_str = texte[debut:fin]
+        return json.loads(json_str)
     except Exception as e:
+        # Affiche l'erreur en console pour debug
+        print(f"Erreur Gemini : {e}")
         return None
-        
+
 
 chemin_logo = "Stranger_Maths_Logo.png"
 
