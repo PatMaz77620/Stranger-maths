@@ -8,7 +8,7 @@ import google.generativeai as genai
 import json
 
 # Clé Google API Studio
-GENAI_KEY = "AIzaSyA0WK7pNEb12fyVOlUFdjIAsQvMa0VLGVg" 
+GENAI_KEY = st.secrets["GEMINI_API_KEY"]
 genai.configure(api_key=GENAI_KEY)
 
 # Force la configuration sur le modèle stable
