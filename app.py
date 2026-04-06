@@ -22,6 +22,14 @@ model = genai.GenerativeModel(
     }
 )
 
+# TEST TEMPORAIRE : Affiche les modèles disponibles dans ton interface
+try:
+    available_models = [m.name for m in genai.list_models()]
+    st.write("Modèles détectés :", available_models)
+except Exception as e:
+    st.write("Impossible de lister les modèles :", e)
+
+
 # --- 1. CONFIGURATION DE LA PAGE ---
 st.set_page_config(
     page_title="Stranger Maths",
@@ -29,6 +37,8 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="collapsed"
 )
+
+
 
 # --- 🎯 INITIALISATION DU STATE ---
 if 'page' not in st.session_state:
