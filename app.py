@@ -113,7 +113,7 @@ def generer_mission_gemini(theme_maths):
     """
     
 try:
-    response = model.generate_content(prompt_systeme)
+    response = model.generate_content(prompt_systeme)    
     texte = response.text
     # On cherche le premier '{' et le dernier '}' pour isoler le JSON
     debut = texte.find('{')
