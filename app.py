@@ -120,7 +120,8 @@ try:
         fin = texte.rfind('}') + 1
         json_str = texte[debut:fin]
         return json.loads(json_str)
-    except Exception as e:
+
+except Exception as e:
         # Affiche l'erreur en console pour debug
         print(f"Erreur Gemini : {e}")
         return None
