@@ -123,7 +123,7 @@ def generer_mission_gemini(theme_maths):
 
     except Exception as e:
         # Affiche l'erreur en console pour debug
-        print(f"Erreur Gemini : {e}")
+        st.error(f"🚨 ERREUR TECHNIQUE : {e}")
         return None
 
 chemin_logo = "Stranger_Maths_Logo.png"
