@@ -13,7 +13,7 @@ genai.configure(api_key=GENAI_KEY)
 
 # Force la configuration sur le modèle stable
 # On utilise le modèle détecté dans ta liste
-model = genai.GenerativeModel('gemini-1.5-flash-latest')
+model = genai.GenerativeModel('gemini-pro')
 
 # --- 1. CONFIGURATION DE LA PAGE ---
 st.set_page_config(
