@@ -10,7 +10,17 @@ import json
 # Clé Google API Studio
 GENAI_KEY = "AIzaSyA0WK7pNEb12fyVOlUFdjIAsQvMa0VLGVg" 
 genai.configure(api_key=GENAI_KEY)
-model = genai.GenerativeModel('gemini-1.5-pro')
+
+# Force la configuration sur le modèle stable
+model = genai.GenerativeModel(
+    model_name='gemini-1.5-flash',
+    generation_config={
+        "temperature": 1,
+        "top_p": 0.95,
+        "top_k": 64,
+        "max_output_tokens": 8192,
+    }
+)
 
 # --- 1. CONFIGURATION DE LA PAGE ---
 st.set_page_config(
