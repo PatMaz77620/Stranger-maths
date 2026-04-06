@@ -369,6 +369,34 @@ elif st.session_state.page == 'chap1':
             st.error(f"Pas tout à fait. Le calcul était : {st.session_state.vd_quiz} × {formater_fr(1+st.session_state.tx_quiz/100)}.")
 
 
+# --- DANS LE CHAPITRE 1 (ou un autre) ---
+st.divider()
+st.subheader("📡 Réception d'une transmission du Monde à l'Envers...")
+
+if st.button("🔦 Lancer une Mission Aléatoire"):
+    with st.spinner("Cryptage de la fréquence..."):
+        quiz = generer_mission_gemini("Taux d'évolution et évolutions successives")
+        if quiz:
+            st.session_state.quiz_dynamique = quiz
+        else:
+            st.error("La connexion avec Eleven a été coupée. Réessaye !")
+
+# Affichage du quiz s'il existe en mémoire
+if 'quiz_dynamique' in st.session_state:
+    q = st.session_state.quiz_dynamique
+    st.info(f"**MISSION :** {q['question']}")
+    
+    choix = st.radio("Ta réponse :", q['options'], key="radio_gemini")
+    
+    if st.button("Valider la mission"):
+        if choix == q['reponse']:
+            st.balloons()
+            st.success(f"🎯 TERMINÉ ! {q['explication']}")
+            # Optionnel : effacer le quiz après réussite pour en générer un nouveau
+            # del st.session_state.quiz_dynamique 
+        else:
+            st.error(f"⚠️ Alerte Demogorgon ! {q['explication']}")
+
 
 # =================================================================
 # CHAPITRE 2 : SUITES NUMÉRIQUES
