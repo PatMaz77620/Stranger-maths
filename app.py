@@ -12,22 +12,8 @@ GENAI_KEY = st.secrets["GEMINI_API_KEY"]
 genai.configure(api_key=GENAI_KEY)
 
 # Force la configuration sur le modèle stable
-model = genai.GenerativeModel(
-    model_name='gemini-1.5-flash',
-    generation_config={
-        "temperature": 1,
-        "top_p": 0.95,
-        "top_k": 64,
-        "max_output_tokens": 8192,
-    }
-)
-
-# TEST TEMPORAIRE : Affiche les modèles disponibles dans ton interface
-try:
-    available_models = [m.name for m in genai.list_models()]
-    st.write("Modèles détectés :", available_models)
-except Exception as e:
-    st.write("Impossible de lister les modèles :", e)
+# On utilise le modèle détecté dans ta liste
+model = genai.GenerativeModel('gemini-2.0-flash')
 
 
 # --- 1. CONFIGURATION DE LA PAGE ---
