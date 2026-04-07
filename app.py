@@ -21,7 +21,7 @@ genai.configure(
 
 # 3. On choisit un modèle présent dans TA liste (le numéro 16 ou 18)
 # Ce sont des "alias" qui pointent toujours vers la version valide
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-flash-latest')
 
 # --- 1. CONFIGURATION DE LA PAGE ---
 st.set_page_config(
