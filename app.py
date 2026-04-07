@@ -152,9 +152,9 @@ def afficher_interface_quiz():
             st.markdown(f"**{q['question']}**")
             st.write("") # Petit espace
 
-            # --- AFFICHAGE DES RÉPONSES ---
+            # --- AFFICHAGE DES RÉPONSES (LISTE DE BOUTONS SIMPLE) ---
             if not st.session_state.repondu:
-                # On affiche la liste des boutons
+                # On affiche simplement les boutons les uns sous les autres
                 for option in q['options']:
                     if st.button(option, key=f"opt_{idx}_{option}", use_container_width=True):
                         st.session_state.dernière_reponse = option
@@ -163,7 +163,7 @@ def afficher_interface_quiz():
                             st.session_state.score += 1
                         st.rerun()
             else:
-                # On affiche le résultat de la réponse choisie
+                # Affichage après la sélection
                 st.write(f"Ton choix : **{st.session_state.dernière_reponse}**")
                 
                 if st.session_state.dernière_reponse == q['reponse']:
@@ -197,7 +197,7 @@ def afficher_interface_quiz():
                 st.session_state.repondu = False
                 st.rerun()
 
-    # CAS B : Écran de lancement (Pas de mission chargée)
+    # CAS B : Écran de lancement
     else:
         themes = {
             "chap0": "Fonctions (Généralités)",
@@ -222,8 +222,6 @@ def afficher_interface_quiz():
                     st.session_state.score = 0
                     st.session_state.repondu = False
                     st.rerun()
-
-
 
 chemin_logo = "Stranger_Maths_Logo.png"
 
