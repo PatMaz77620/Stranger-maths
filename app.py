@@ -18,11 +18,8 @@ genai.configure(
     transport="rest" # On force le protocole REST pour éviter les bugs de tunnel
 )
 
-# On utilise une option de requête pour forcer la version v1
-model = genai.GenerativeModel(
-    model_name='gemini-1.5-flash'
-)
-
+# On change de famille de modèle pour forcer une autre route
+model = genai.GenerativeModel('gemini-1.5-pro-latest')
 
 # --- 1. CONFIGURATION DE LA PAGE ---
 st.set_page_config(
