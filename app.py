@@ -21,7 +21,12 @@ genai.configure(
 
 # 3. On choisit un modèle présent dans TA liste (le numéro 16 ou 18)
 # Ce sont des "alias" qui pointent toujours vers la version valide
-model = genai.GenerativeModel('gemini-flash-latest')
+# Configuration avec mode JSON forcé (plus rapide et plus fiable)
+model = genai.GenerativeModel(
+    model_name='gemini-flash-latest',
+    generation_config={"response_mime_type": "application/json"}
+)
+
 
 # --- 1. CONFIGURATION DE LA PAGE ---
 st.set_page_config(
