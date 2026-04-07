@@ -6,20 +6,24 @@ import numpy as np
 import random
 import json
 
+import os
 import google.generativeai as genai
-from google.generativeai.types import RequestOptions
 
-st.write(f"Version de la bibliothèque : {genai.__version__}")
+# 1. On force la désactivation des protocoles qui perdent l'API
+os.environ["GOOGLE_API_USE_MTLS"] = "never"
+os.environ["GRPC_DNS_RESOLVER"] = "native"
 
-
-# Configuration avec forçage de la version API v1 (Stable)
+# 2. Configuration
 genai.configure(
     api_key=st.secrets["GEMINI_API_KEY"],
-    transport="rest" # On force le protocole REST pour éviter les bugs de tunnel
+    transport="rest"
 )
 
-# On change de famille de modèle pour forcer une autre route
-model = genai.GenerativeModel(model_name='models/gemini-1.5-pro')
+# 3. On choisit un modèle présent dans TA liste (le numéro 16 ou 18)
+# Ce sont des "alias" qui pointent toujours vers la version valide
+model = genai.GenerativeModel('gemini-flash-latest')
+
+st.write(f"Version de la bibliothèque : {genai.__version__}")
 
 
 # --- 1. CONFIGURATION DE LA PAGE ---
