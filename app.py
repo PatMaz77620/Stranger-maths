@@ -188,7 +188,7 @@ def afficher_interface_quiz():
         st.write(f"Prêt pour une mission personnalisée sur **{theme_actuel}** ?")
         
         if st.button(f"🔦 Lancer une mission Eleven", key=f"gen_{st.session_state.page}"):
-            with st.spinner(f"Eleven se concentre sur le chapitre : {theme_actuel}..."):
+            with st.spinner(f"Eleven se concentre sur le chapitre..."):
                 # 3. On envoie ce thème précis à Gemini
                 quiz = generer_mission_gemini(theme_actuel)
                 if quiz:
