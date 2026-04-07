@@ -105,38 +105,31 @@ def aller_a_home():
     st.session_state.page = 'home'
 
 def generer_mission_gemini(theme_maths):
-    prompt_systeme = f"Crée un quiz court sur {theme_maths}. Réponds en JSON uniquement."
+    # On précise bien le format attendu dans le prompt
+    prompt_systeme = f"""
+    Crée un quiz de maths sur {theme_maths}. 
+    Réponds EXCLUSIVEMENT sous ce format JSON :
+    {{
+        "question": "ton énoncé ici",
+        "options": ["choix1", "choix2", "choix3", "choix4"],
+        "reponse": "la bonne option"
+    }}
+    """
     
-    # --- SCANNER DE DIAGNOSTIC ---
-    st.write("🔍 **Diagnostic en cours...**")
     try:
-        # 1. Test de la configuration actuelle
-        st.write(f"📡 Tentative avec le modèle : {model.model_name}")
-        
-        # 2. On tente un appel ultra-minimaliste sans options complexes
         response = model.generate_content(prompt_systeme)
+        # Nettoyage des balises Markdown si présentes
+        txt = response.text.strip().replace('```json', '').replace('```', '')
+        data = json.loads(txt)
         
-        # 3. Si ça marche, on traite le JSON
-        texte_propre = response.text.strip().replace('```json', '').replace('```', '')
-        return json.loads(texte_propre)
+        # --- SÉCURITÉ : Si l'IA renvoie une liste au lieu d'un dictionnaire ---
+        if isinstance(data, list):
+            return data[0]
+        return data
 
     except Exception as e:
-        # --- AFFICHAGE DE L'ERREUR DÉTAILLÉE ---
-        st.error(f"❌ Échec de la mission !")
-        st.write(f"**Détails de l'erreur :** {e}")
-        
-        # 4. On essaie de lister les modèles réels autorisés pour CETTE clé
-        st.write("📋 **Modèles réellement accessibles avec cette clé :**")
-        try:
-            m_list = [m.name for m in genai.list_models()]
-            st.write(m_list)
-        except Exception as e_list:
-            st.write(f"Impossible de lister les modèles : {e_list}")
-            
+        st.error(f"Erreur de décodage Eleven : {e}")
         return None
-
-
-
 
 chemin_logo = "Stranger_Maths_Logo.png"
 
@@ -401,8 +394,9 @@ if st.button("🔦 Lancer une Mission Aléatoire"):
 # Affichage du quiz s'il existe en mémoire
 if 'quiz_dynamique' in st.session_state:
     q = st.session_state.quiz_dynamique
-    st.info(f"**MISSION :** {q['question']}")
-    
+    # Au lieu de q['question'], on utilise .get() qui ne plante jamais
+    question_texte = q.get('question', q.get('énoncé', 'Mission inconnue...'))
+    st.info(f"**MISSION :** {question_texte}")    
     choix = st.radio("Ta réponse :", q['options'], key="radio_gemini")
     
     if st.button("Valider la mission"):
