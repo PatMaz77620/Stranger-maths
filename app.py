@@ -168,13 +168,13 @@ def afficher_interface_quiz():
     else:
         # 1. On définit la correspondance entre l'identifiant technique et le nom réel
         themes = {
-            'chap0': 'Fonctions (Généralités : images, antécédents, domaine de définition)',
-            'chap1': 'Information chiffrée (Coeff. Multiplicateur, Taux d'évolution, Évolutions Successives)',
-            'chap2': 'Suites numériques (Généralités, suites arithmétiques, suites Géométriques)',
-            'chap3': 'Polynômes du 2nd degré (Les 3 Formes, racines, sommet de la parabole, tableaux de variation, tableaux de signes)',
-            'chap4': 'Probabilités (fréquence marginale ou conditionnelle, tableaux, arbres, formules)'
+            "chap0": "Fonctions (Généralités : images, antécédents, domaine de définition)",
+            "chap1": "Information chiffrée (Coeff. Multiplicateur, Taux d'évolution, Évolutions Successives)",
+            "chap2": "Suites numériques (Généralités, suites arithmétiques, suites Géométriques)",
+            "chap3": "Polynômes du 2nd degré (Les 3 Formes, racines, sommet de la parabole, tableaux de variation, tableaux de signes)",
+            "chap4": "Probabilités (fréquence marginale ou conditionnelle, tableaux, arbres, formules)"
         }
-        
+                
         # 2. On récupère le thème basé sur la page où se trouve l'utilisateur
         # Si la page n'est pas dans la liste, on met "Mathématiques" par défaut
         theme_actuel = themes.get(st.session_state.page, 'Mathématiques')
