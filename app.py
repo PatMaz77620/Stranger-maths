@@ -105,30 +105,39 @@ def aller_a_home():
     st.session_state.page = 'home'
 
 def generer_mission_gemini(theme_maths):
-    # On précise bien le format attendu dans le prompt
     prompt_systeme = f"""
-    Crée un quiz de maths sur {theme_maths}. 
-    Réponds EXCLUSIVEMENT sous ce format JSON :
+    Génère un problème de mathématiques niveau collège sur le thème : {theme_maths}.
+    Format de réponse attendu (JSON uniquement) :
     {{
-        "question": "ton énoncé ici",
-        "options": ["choix1", "choix2", "choix3", "choix4"],
-        "reponse": "la bonne option"
+        "question": "énoncé du problème",
+        "options": ["choix 1", "choix 2", "choix 3", "choix 4"],
+        "reponse": "la valeur exacte parmi les options"
     }}
+    Ne rajoute aucune explication avant ou après le JSON.
     """
     
     try:
         response = model.generate_content(prompt_systeme)
-        # Nettoyage des balises Markdown si présentes
-        txt = response.text.strip().replace('```json', '').replace('```', '')
-        data = json.loads(txt)
+        texte = response.text.strip()
         
-        # --- SÉCURITÉ : Si l'IA renvoie une liste au lieu d'un dictionnaire ---
-        if isinstance(data, list):
-            return data[0]
-        return data
+        # Nettoyage automatique des balises markdown ```json ... ```
+        if "```json" in texte:
+            texte = texte.split("```json")[1].split("```")[0].strip()
+        elif "```" in texte:
+            texte = texte.split("```")[1].split("```")[0].strip()
 
+        data = json.loads(texte)
+        
+        # Vérification des clés indispensables pour éviter le KeyError
+        cles_requises = ["question", "options", "reponse"]
+        if all(k in data for k in cles_requises):
+            return data
+        else:
+            st.error("Format JSON incomplet reçu d'Eleven.")
+            return None
+            
     except Exception as e:
-        st.error(f"Erreur de décodage Eleven : {e}")
+        st.error(f"Erreur de communication avec Eleven : {e}")
         return None
 
 chemin_logo = "Stranger_Maths_Logo.png"
@@ -391,22 +400,36 @@ if st.button("🔦 Lancer une Mission Aléatoire"):
         else:
             st.error("La connexion avec Eleven a été coupée. Réessaye !")
 
-# Affichage du quiz s'il existe en mémoire
+# --- Affichage du quiz s'il existe en mémoire ---
 if 'quiz_dynamique' in st.session_state:
     q = st.session_state.quiz_dynamique
-    # Au lieu de q['question'], on utilise .get() qui ne plante jamais
-    question_texte = q.get('question', q.get('énoncé', 'Mission inconnue...'))
-    st.info(f"**MISSION :** {question_texte}")    
-    choix = st.radio("Ta réponse :", q['options'], key="radio_gemini")
+    
+    # 1. Extraction sécurisée des données (évite les KeyError)
+    # On cherche 'question' ou 'énoncé', sinon on met un texte par défaut
+    question_texte = q.get('question', q.get('énoncé', 'Mission inconnue (problème de lecture)...'))
+    
+    # On récupère la liste des options, sinon une liste par défaut pour éviter que st.radio plante
+    choix_possibles = q.get('options', ['Option A', 'Option B', 'Option C', 'Option D'])
+    
+    # On récupère la bonne réponse et l'explication
+    bonne_reponse = q.get('reponse', q.get('réponse', ''))
+    explication = q.get('explication', 'Pas d\'explication fournie par Eleven.')
+
+    # 2. Affichage de l'interface
+    st.info(f"**MISSION :** {question_texte}")
+    
+    # st.radio ne plantera pas car choix_possibles est garanti d'être une liste
+    choix = st.radio("Ta réponse :", choix_possibles, key="radio_gemini")
     
     if st.button("Valider la mission"):
-        if choix == q['reponse']:
+        if choix == bonne_reponse:
             st.balloons()
-            st.success(f"🎯 TERMINÉ ! {q['explication']}")
-            # Optionnel : effacer le quiz après réussite pour en générer un nouveau
-            # del st.session_state.quiz_dynamique 
+            st.success(f"🎯 TERMINÉ ! {explication}")
+            # Optionnel : décommenter pour forcer un nouveau quiz après réussite
+            # del st.session_state.quiz_dynamique
+            # st.rerun()
         else:
-            st.error(f"⚠️ Alerte Demogorgon ! {q['explication']}")
+            st.error(f"⚠️ Alerte Demogorgon ! {explication}")
 
 
 # =================================================================
