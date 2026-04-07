@@ -111,9 +111,10 @@ def generer_mission_gemini(theme_maths):
     {{
         "question": "énoncé du problème",
         "options": ["choix 1", "choix 2", "choix 3", "choix 4"],
-        "reponse": "la valeur exacte parmi les options"
+        "reponse": "la valeur exacte parmi les options",
+        "explication": "Une explication pédagogique courte pour comprendre la solution."
     }}
-    Ne rajoute aucune explication avant ou après le JSON.
+    Ne rajoute aucune explication textuelle avant ou après le JSON.
     """
     
     try:
@@ -127,11 +128,11 @@ def generer_mission_gemini(theme_maths):
             texte = texte.split("```")[1].split("```")[0].strip()
 
         data = json.loads(texte)
-        
-        # Vérification des clés indispensables pour éviter le KeyError
-        cles_requises = ["question", "options", "reponse"]
+
+        # On ajoute 'explication' dans la liste de vérification
+        cles_requises = ["question", "options", "reponse", "explication"]
         if all(k in data for k in cles_requises):
-            return data
+            return data        
         else:
             st.error("Format JSON incomplet reçu d'Eleven.")
             return None
