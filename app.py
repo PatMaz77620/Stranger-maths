@@ -43,56 +43,50 @@ if 'page' not in st.session_state:
 # --- 2. STYLE CSS UNIFIÉ ET ROBUSTE ---
 st.markdown("""
     <style>
+    /* Fond de l'application et couleurs de texte de base */
     .stApp { background-color: #0e1117; }
     .stMarkdown, p, span, label, li { color: #ffffff !important; }
-    h1, h2, h3 { color: #ff0000 !important; text-shadow: 2px 2px 10px #ff0000; text-align: center; }
+    
+    /* Style des titres Stranger Things */
+    h1, h2, h3 { 
+        color: #ff0000 !important; 
+        text-shadow: 2px 2px 10px #ff0000; 
+        text-align: center; 
+    }
 
-    /* Forçage de la grille d'accueil */
+    /* Forçage de la grille d'accueil (colonnes) */
     [data-testid="column"] {
         width: 100% !important;
         flex: 1 1 0% !important;
         min-width: 0 !important;
     }
 
-    /* Design des boutons (Cartes) */
-    button[kind="secondary"] {
-        /* On enlève width: 100% pour laisser les espaces pousser les bords */
-        width: max-content !important; 
-        min-width: 300px !important; /* Optionnel : définit une base minimale pour la sécurité */
-        background-color: #161b22 !important;
-        border: 2px solid #ff0000 !important;
-        border-radius: 15px !important;
-        transition: all 0.3s ease !important;
-        height: 160px !important;
-        box-shadow: 0px 4px 15px rgba(255, 0, 0, 0.2) !important;
-        margin: auto !important; /* Centre le bouton dans sa colonne */
-        display: block !important;
-    }
-    button[kind="secondary"] p {
-        color: #ffffff !important;
-        font-weight: bold !important;
-        font-size: 1.1rem !important;
-        text-align: center !important;
+    /* STYLE DES BOUTONS (Version liste simple) */
+    /* On enlève les hauteurs fixes et les bordures rouges forcées */
+    button {
+        border-radius: 8px !important;
+        transition: all 0.2s ease !important;
     }
 
-    /* Survol */
-    button[kind="secondary"]:hover {
-        transform: scale(1.02) !important;
-        box-shadow: 0px 0px 25px #ff0000 !important;
-        background-color: #1e2129 !important;
+    /* Effet de survol discret pour les boutons du quiz */
+    button:hover {
+        border-color: #ff0000 !important;
+        color: #ff0000 !important;
     }
-    button[kind="secondary"]:hover p { color: #ff0000 !important; }
 
-    /* Bouton Retour */
+    /* Centrage des tableaux (Chapitre 4) */
+    div[data-testid="stTable"] table { margin: auto !important; }
+    div[data-testid="stTable"] td, div[data-testid="stTable"] th { 
+        text-align: center !important; 
+        color: white !important;
+    }
+    
+    /* Style spécifique pour le bouton retour pour qu'il ne soit pas trop gros */
     .btn-retour button {
         height: auto !important;
         width: auto !important;
-        padding: 8px 25px !important;
+        padding: 5px 15px !important;
     }
-
-    /* Centrage Tableaux Ch4 */
-    div[data-testid="stTable"] table { margin: auto !important; }
-    div[data-testid="stTable"] td, div[data-testid="stTable"] th { text-align: center !important; }
     </style>
     """, unsafe_allow_html=True)
 
