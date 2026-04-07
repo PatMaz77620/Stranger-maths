@@ -897,29 +897,31 @@ elif st.session_state.page == 'chap5':
             # On place le VRAI titre ici : il sera TOUJOURS lisible
             st.markdown("""
                 <h5 style='color: #00d4ff;'>📍 MÉTHODE : Dresser un tableau de variations</h5>
-                <p style='color: white;'><b>Énoncé :</b> Dresser le tableau de variations de f(x) = x² - 4x</p>
+                <p style='color: white;'><b>Énoncé :</b> Dresser le tableau de variations de f(x) = x² - 6x</p>
             """, unsafe_allow_html=True)
             
-            st.write("1. **Dérivée :** $f'(x) = 2x - 4$")
-            st.write("2. **Racine :** $2x - 4 = 0 \implies x = 2$")
-
+            st.write("1. **Dérivée :** $f'(x) = 2x - 6$")
+            st.write("2. **Racine :** $2x - 6 = 0 \implies 2x = 6 \implies x = 3$")
+            st.write("3. **Image du sommet :** $f(3) = 3^2 - 6 \\times 3 = 9 - 18 = -9$")
 
             # Le tableau avec forçage de couleur blanche ligne par ligne
             st.latex(r"""
             \begin{array}{|c|ccccc|}
             \hline
-            \color{white} x & \color{white} -\infty & & \color{white} 2 & & \color{white} +\infty \\
+            \color{white} x & \color{white} -\infty & & \color{white} 3 & & \color{white} +\infty \\
             \hline
             \color{white} \text{Signe de } f'(x) & & \color{white} - & \color{white} 0 & \color{white} + & \\
             \hline
             & \color{white} +\infty & & & & \color{white} +\infty \\
             \color{white} \text{Variations de } f & & \color{white} \searrow & & \color{white} \nearrow & \\
-            & & & \color{white} -4 & & \\
+            & & & \color{white} -9 & & \\
             \hline
             \end{array}
             """)
+            
+            st.info("💡 **Analyse :** La dérivée $2x-6$ est négative pour $x < 3$ (la fonction descend) et positive pour $x > 3$ (la fonction monte).")
 
-            st.info("💡 **Analyse :** La dérivée est négative avant 2, donc la courbe descend.")
+    
     
     # --- SOUS-CHAPITRE 3 : MÉTHODES DE CALCUL (LES TUYAUX) ---
     with tab3:
