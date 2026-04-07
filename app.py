@@ -141,6 +141,50 @@ def generer_mission_gemini(theme_maths):
         st.error(f"Erreur de communication avec Eleven : {e}")
         return None
 
+def afficher_interface_quiz():
+    if 'quiz_dynamique' in st.session_state:
+        q = st.session_state.quiz_dynamique
+        
+        st.markdown("### 🔦 Mission Eleven")
+        
+        # Extraction sécurisée
+        question_texte = q.get('question', 'Mission inconnue...')
+        choix_possibles = q.get('options', ['A', 'B', 'C', 'D'])
+        bonne_reponse = q.get('reponse', '')
+        explication = q.get('explication', "Pas d'explication fournie.")
+
+        st.info(f"**ÉNONCÉ :** {question_texte}")
+        
+        # Utilisation de la page actuelle dans la clé pour éviter les conflits
+        choix = st.radio("Ta réponse :", choix_possibles, key=f"radio_{st.session_state.page}")
+        
+        if st.button("Valider la mission", key=f"btn_{st.session_state.page}"):
+            if choix == bonne_reponse:
+                st.balloons()
+                st.success(f"🎯 TERMINÉ ! {explication}")
+            else:
+                st.error(f"⚠️ Alerte Demogorgon ! {explication}")
+        
+        if st.button("🔄 Autre mission"):
+            del st.session_state.quiz_dynamique
+            st.rerun()
+    else:
+        # Détermination du thème en fonction de la page
+        themes = {
+            'calculs': 'Nombres et Calculs',
+            'fonctions': 'Fonctions et Algèbre',
+            'geometrie': 'Géométrie'
+        }
+        theme_actuel = themes.get(st.session_state.page, 'Mathématiques')
+        
+        st.write(f"Prêt pour une mission sur **{theme_actuel}** ?")
+        if st.button(f"🔦 Lancer une mission"):
+            with st.spinner("Onction de la faille en cours..."):
+                quiz = generer_mission_gemini(theme_actuel)
+                if quiz:
+                    st.session_state.quiz_dynamique = quiz
+                    st.rerun()
+
 chemin_logo = "Stranger_Maths_Logo.png"
 
 # =================================================================
@@ -191,10 +235,11 @@ elif st.session_state.page == 'chap0':
     st.title("🌀 Fonctions : Généralités")
     st.write("---")
 
-    tab1, tab2, tab3 = st.tabs([
+    tab1, tab2, tab3, tab4 = st.tabs([
         "🚪 Portail (Images/Antécédents)", 
         "🗺️ Territoire (Domaine)", 
-        "📍 Lecture de Carte"
+        "📍 Lecture de Carte", 
+        "🕹️ Mission Eleven"
     ])
 
     # --- SOUS-CHAPITRE 1 : IMAGES ET ANTÉCÉDENTS ---
@@ -301,6 +346,13 @@ elif st.session_state.page == 'chap0':
 
         st.pyplot(fig)
         st.success("✅ la fonction représentée ci-dessus est la suivante : $$f(x) = 0,1(4 - x)(x + 1)(x + 5)$$. As-tu trouvé les racines de la fonction (les valeurs de $$x$$ qui annulent la fonction) ? Vérifie sur la représentation graphique les valeurs que tu as trouvées par le calcul... Peux-tu en déduire le tableau de signes facilement ?")
+
+    
+    # --- SOUS-CHAPITRE 4 : QUIZZ ---
+    with tab4:
+        # On appelle la fonction de quiz qu'on a créée plus haut
+        afficher_interface_quiz()
+
 
 # =================================================================
 # CHAPITRE 1 : INFORMATION CHIFFRÉE
