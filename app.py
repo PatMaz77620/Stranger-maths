@@ -822,9 +822,10 @@ elif st.session_state.page == 'chap5':
     st.title("📈 Dérivation : Le Taux de Variation")
     st.write("---")
 
-    tab1, tab2, tab3, tab4 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
         "🔍 Nombre Dérivé", 
-        "⚡ Fonctions Dérivées", 
+        "🧪 Formules", 
+        "⚡ Méthodes", 
         "🏹 Tangentes", 
         "🕹️ Mission Eleven"
     ])
@@ -878,9 +879,35 @@ elif st.session_state.page == 'chap5':
         
         st.warning("🧠 **Rappel :** Si la dérivée est POSITIVE, la fonction MONTE. Si elle est NÉGATIVE, la fonction DESCEND.")
 
-    
-    # --- SOUS-CHAPITRE 3 : ÉQUATION DE TANGENTE ---
+    # --- SOUS-CHAPITRE 3 : MÉTHODES DE CALCUL (LES TUYAUX) ---
     with tab3:
+        st.subheader("⚡ Protocoles de Combinaison")
+        st.write("Pour dériver des fonctions complexes, Eleven utilise deux règles fondamentales :")
+
+        # Règle 1 : La Somme
+        st.info("### 1️⃣ La Règle de la Somme")
+        st.latex(r"(u + v)' = u' + v'")
+        st.write("**Le tuyau :** Si ta fonction est une addition, tu dérives chaque morceau séparément et tu les recopies avec leurs signes.")
+        st.success("**Exemple :** $f(x) = x^2 + x$ \n\n On dérive $x^2$ en $2x$ et $x$ en $1$. \n\n Résultat : $f'(x) = 2x + 1$")
+
+        # Règle 2 : Constante multiplicatrice
+        st.info("### 2️⃣ La Règle du Coefficient")
+        st.latex(r"(k \times u)' = k \times u'")
+        st.write("**Le tuyau :** Si un nombre est 'collé' (multiplié) à une fonction, il reste là pendant que tu dérives la fonction.")
+        st.success("**Exemple :** $g(x) = 5x^3$ \n\n Le $5$ reste devant. On dérive $x^3$ en $3x^2$. \n\n Calcul : $5 \times 3x^2 = 15x^2$")
+
+        # L'AVERTISSEMENT CRUCIAL
+        st.error("⚠️ **ALERTE DEMOGORGON : LE PIÈGE DU PRODUIT**")
+        st.markdown("""
+        Attention ! Ces règles ne marchent **QUE** pour l'addition ou la multiplication par un nombre fixe.
+        
+        Si tu as un produit de deux fonctions (ex: $x^2 \times \sqrt{x}$), **tu ne peux pas** juste multiplier les dérivées. 
+        Pour cela, il faudra un protocole beaucoup plus complexe (la formule $u'v + uv'$ que nous verrons plus tard).
+        """)
+
+    
+    # --- SOUS-CHAPITRE 4 : ÉQUATION DE TANGENTE ---
+    with tab4:
         st.subheader("🏹 L'arme de précision")
         st.write("L'équation de la droite tangente au point $a$ est donnée par la formule magique :")
         st.latex(r"y = f'(a)(x - a) + f(a)")
@@ -893,8 +920,8 @@ elif st.session_state.page == 'chap5':
         4. Remplacer dans la formule.
         """)
 
-    # --- SOUS-CHAPITRE 4 : MISSION ELEVEN ---
-    with tab4:
+    # --- SOUS-CHAPITRE 5 : MISSION ELEVEN ---
+    with tab5:
         # Pense à ajouter 'chap5' dans ton dictionnaire 'themes' de la fonction afficher_interface_quiz
         afficher_interface_quiz()
 
