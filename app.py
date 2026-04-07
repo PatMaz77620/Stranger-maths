@@ -864,7 +864,7 @@ elif st.session_state.page == 'chap5':
             ax.legend()
             st.pyplot(fig)
 
-# --- SOUS-CHAPITRE 2 : FONCTIONS DÉRIVÉES ---
+    # --- SOUS-CHAPITRE 2 : FONCTIONS DÉRIVÉES ---
     with tab2:
         st.subheader("🧪 Formulaire des pouvoirs")
         st.write("Voici les formules pour transformer une fonction en sa dérivée :")
@@ -900,7 +900,7 @@ elif st.session_state.page == 'chap5':
                 <p style='color: white;'><b>Énoncé :</b> Dresser le tableau de variations de f(x) = x² - 6x</p>
             """, unsafe_allow_html=True)
             
-            st.write("1. **Dérivée :** $f'(x) = 2x - 6$ (fonction affine de coefficient a = 2 qui est positif)")
+            st.write("1. **Dérivée :** $f'(x) = 2x - 6$ : fonction affine de coefficient a = 2 qui est positif")
             st.write("2. **Racine :** $2x - 6 = 0 \implies 2x = 6 \implies x = 3$")
             st.write("3. **Image du sommet :** $f(3) = 3^2 - 6 \\times 3 = 9 - 18 = -9$")
 
