@@ -868,16 +868,23 @@ elif st.session_state.page == 'chap5':
         st.subheader("🧪 Formulaire des pouvoirs")
         st.write("Voici les formules de base pour transformer une fonction en sa dérivée :")
         
+        # On utilise le paramètre language='python' pour forcer la couleur
         c1, c2 = st.columns(2)
         with c1:
-            st.code("f(x) = xⁿ  =>  f'(x) = n·xⁿ⁻¹")
-            st.code("f(x) = ax + b  =>  f'(x) = a")
+            st.code("f(x) = x^n   =>  f'(x) = n * x^(n-1)", language='python')
+            st.code("f(x) = ax + b =>  f'(x) = a", language='python')
         with c2:
-            st.code("f(x) = 1/x  =>  f'(x) = -1/x²")
-            st.code("f(x) = √x  =>  f'(x) = 1/(2√x)")
+            st.code("f(x) = 1/x   =>  f'(x) = -1/x^2", language='python')
+            st.code("f(x) = sqrt(x) => f'(x) = 1/(2*sqrt(x))", language='python')
+        
+        # Alternative si st.code reste illisible : Utiliser st.latex
+        st.markdown("---")
+        st.write("**Récapitulatif en notation mathématique :**")
+        st.latex(r"(x^n)' = n x^{n-1}")
         
         st.warning("🧠 **Rappel :** Si la dérivée est POSITIVE, la fonction MONTE. Si elle est NÉGATIVE, la fonction DESCEND.")
 
+    
     # --- SOUS-CHAPITRE 3 : ÉQUATION DE TANGENTE ---
     with tab3:
         st.subheader("🏹 L'arme de précision")
