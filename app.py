@@ -7,13 +7,20 @@ import random
 import google.generativeai as genai
 import json
 
-# Configuration sécurisée via Streamlit Secrets
-GENAI_KEY = st.secrets["GEMINI_API_KEY"]
-genai.configure(api_key=GENAI_KEY)
+import google.generativeai as genai
+from google.generativeai.types import RequestOptions
 
-# Utilisation du nom complet 'models/...' 
-# C'est souvent la solution quand le nom court renvoie une 404
-model = genai.GenerativeModel('models/gemini-1.5-flash')
+# Configuration avec forçage de la version API v1 (Stable)
+genai.configure(
+    api_key=st.secrets["GEMINI_API_KEY"],
+    transport="rest" # On force le protocole REST pour éviter les bugs de tunnel
+)
+
+# On utilise une option de requête pour forcer la version v1
+model = genai.GenerativeModel(
+    model_name='gemini-1.5-flash'
+)
+
 
 # --- 1. CONFIGURATION DE LA PAGE ---
 st.set_page_config(
