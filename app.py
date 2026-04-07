@@ -93,6 +93,21 @@ st.markdown("""
     /* Centrage Tableaux Ch4 */
     div[data-testid="stTable"] table { margin: auto !important; }
     div[data-testid="stTable"] td, div[data-testid="stTable"] th { text-align: center !important; }
+
+    /* Règle spéciale pour le QUIZ : on annule le style "Carte" uniquement ici */
+    .stButtonGroup, [data-testid="stVerticalBlock"] .stButton button {
+        height: auto !important; /* On laisse le bouton s'adapter au texte */
+        min-width: 0px !important; /* On enlève la largeur forcée */
+        padding: 10px !important; /* On remet un espacement normal */
+    }
+
+    /* Optionnel : si tu veux que les boutons du quiz soient moins épais que les cartes */
+    div.stButton > button {
+        margin-bottom: 5px !important;
+    }
+    
+
+    
     </style>
     """, unsafe_allow_html=True)
 
