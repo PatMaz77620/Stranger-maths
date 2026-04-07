@@ -879,30 +879,29 @@ elif st.session_state.page == 'chap5':
         
         st.warning("🧠 **Rappel :** Si la dérivée est POSITIVE, la fonction MONTE. Si elle est NÉGATIVE, la fonction DESCEND.")
 
-    # --- SOUS-CHAPITRE 3 : MÉTHODES DE CALCUL (LES TUYAUX) ---
+# --- SOUS-CHAPITRE 3 : MÉTHODES DE CALCUL (LES TUYAUX) ---
     with tab3:
         st.subheader("⚡ Protocoles de Combinaison")
-        st.write("Pour dériver des fonctions complexes, Eleven utilise deux règles fondamentales :")
+        st.write("Pour dériver les fonctions du programme, Eleven utilise deux règles simples :")
 
         # Règle 1 : La Somme
         st.info("### 1️⃣ La Règle de la Somme")
-        st.latex(r"(u + v)' = u' + v'")
-        st.write("**Le tuyau :** Si ta fonction est une addition, tu dérives chaque morceau séparément et tu les recopies avec leurs signes.")
-        st.success("**Exemple :** $f(x) = x^2 + x$ \n\n On dérive $x^2$ en $2x$ et $x$ en $1$. \n\n Résultat : $f'(x) = 2x + 1$")
+        # Note le 'r' avant les guillemets pour éviter le bug "imes"
+        st.latex(r"f(x) = u(x) + v(x) \implies f'(x) = u'(x) + v'(x)")
+        st.write("**Le tuyau :** On dérive chaque morceau séparément. C'est la règle magique pour les polynômes !")
+        st.success("**Exemple :** $f(x) = x^2 + 5x - 3$ \n\n - $x^2$ devient $2x$ \n\n - $5x$ devient $5$ \n\n - $-3$ devient $0$ \n\n **Résultat :** $f'(x) = 2x + 5$")
 
         # Règle 2 : Constante multiplicatrice
-        st.info("### 2️⃣ La Règle du Coefficient")
-        st.latex(r"(k \times u)' = k \times u'")
-        st.write("**Le tuyau :** Si un nombre est 'collé' (multiplié) à une fonction, il reste là pendant que tu dérives la fonction.")
-        st.success("**Exemple :** $g(x) = 5x^3$ \n\n Le $5$ reste devant. On dérive $x^3$ en $3x^2$. \n\n Calcul : $5 \times 3x^2 = 15x^2$")
+        st.info("### 2️⃣ La Règle du Nombre Collé (Coefficient)")
+        st.latex(r"f(x) = k \cdot u(x) \implies f'(x) = k \cdot u'(x)")
+        st.write("**Le tuyau :** Si un nombre est multiplié à $x$, il 'survit' et attend que la puissance de $x$ descende.")
+        st.success(r"**Exemple :** $g(x) = 4x^3$ \n\n On garde le $4$. On dérive $x^3$ en $3x^2$. \n\n **Calcul :** $4 \times 3x^2 = 12x^2$")
 
+        
         # L'AVERTISSEMENT CRUCIAL
         st.error("⚠️ **ALERTE DEMOGORGON : LE PIÈGE DU PRODUIT**")
         st.markdown("""
-        Attention ! Ces règles ne marchent **QUE** pour l'addition ou la multiplication par un nombre fixe.
-        
-        Si tu as un produit de deux fonctions (ex: $x^2 \times \sqrt{x}$), **tu ne peux pas** juste multiplier les dérivées. 
-        Pour cela, il faudra un protocole beaucoup plus complexe (la formule $u'v + uv'$ que nous verrons plus tard).
+        ⚠️ **CONSIGNE DE SÉCURITÉ :** En STMG, si tu vois un produit complexe ou une division de 2 fonctions, on te demandera souvent de 'développer' l'expression d'abord pour n'avoir que des additions à gérer !
         """)
 
     
