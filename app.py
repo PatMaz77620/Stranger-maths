@@ -177,7 +177,8 @@ def afficher_interface_quiz():
             "chap1": "Information chiffrée (Coeff. Multiplicateur, Taux d'évolution, Évolutions Successives)",
             "chap2": "Suites numériques (Généralités, suites arithmétiques, suites Géométriques)",
             "chap3": "Polynômes du 2nd degré (Les 3 Formes, racines, sommet de la parabole, tableaux de variation, tableaux de signes)",
-            "chap4": "Probabilités (fréquence marginale ou conditionnelle, tableaux, arbres, formules)"
+            "chap4": "Probabilités (fréquence marginale ou conditionnelle, tableaux, arbres, formules)",
+            "chap5": "Dérivation (définition, fonctions usuelles, tangentes et équation)"
         }
                 
         # 2. On récupère le thème basé sur la page où se trouve l'utilisateur
@@ -232,6 +233,11 @@ if st.session_state.page == 'home':
             if st.button("🛸 Second\nDegré\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0", key="btn_c3"):
                 st.session_state.page = 'chap3'
                 st.rerun()
+            # --- NOUVEAU BOUTON DÉRIVÉES ---
+            if st.button("📉 Dérivation :\nNombre Dérivé\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0", key="btn_c5"):
+                st.session_state.page = 'chap5'
+                st.rerun()
+                
         st.markdown('</div>', unsafe_allow_html=True)
 
 # =================================================================
@@ -803,5 +809,91 @@ elif st.session_state.page == 'chap4':
     # --- SOUS-CHAPITRE 4 : QUIZZ ---
     with tab4:
         # On appelle la fonction de quiz qu'on a créée plus haut
+        afficher_interface_quiz()
+
+# =================================================================
+# CHAPITRE 5 : DÉRIVATION
+# =================================================================
+elif st.session_state.page == 'chap5':
+    st.markdown('<div class="btn-retour">', unsafe_allow_html=True)
+    st.button("⬅️ Retour au QG", on_click=aller_a_home)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.title("📈 Dérivation : Le Taux de Variation")
+    st.write("---")
+
+    tab1, tab2, tab3, tab4 = st.tabs([
+        "🔍 Nombre Dérivé", 
+        "⚡ Fonctions Dérivées", 
+        "🏹 Tangentes", 
+        "🕹️ Mission Eleven"
+    ])
+
+    # --- SOUS-CHAPITRE 1 : LE NOMBRE DÉRIVÉ ---
+    with tab1:
+        st.subheader("📍 Zoom sur un point : La pente locale")
+        st.info("Le nombre dérivé $f'(a)$ est la pente (le coefficient directeur) de la tangente à la courbe au point d'abscisse $a$.")
+        
+        col_slope, col_viz = st.columns([1, 1])
+        with col_slope:
+            st.write("**Exploration interactive : $f(x) = x^2$**")
+            a_val = st.slider("Choisissez le point a :", -3.0, 3.0, 1.0, step=0.1)
+            f_a = a_val**2
+            # La dérivée de x² est 2x
+            pente = 2 * a_val
+            st.metric(label=f"Nombre dérivé f'({a_val})", value=f"{pente:.2f}")
+            st.write(f"En ce point, la courbe monte avec une pente de **{pente:.2f}**.")
+
+        with col_viz:
+            # Graphique interactif de la tangente
+            x_range = np.linspace(-4, 4, 100)
+            y_curve = x_range**2
+            # Équation de la tangente : y = f'(a)(x-a) + f(a)
+            y_tangent = pente * (x_range - a_val) + f_a
+
+            fig, ax = plt.subplots()
+            ax.plot(x_range, y_curve, color='white', label="f(x) = x²")
+            ax.plot(x_range, y_tangent, color='#ff0000', linestyle='--', label="Tangente")
+            ax.scatter([a_val], [f_a], color='#ff0000', zorder=5) # Le point de contact
+            
+            ax.set_ylim(-1, 10)
+            ax.set_facecolor('#0e1117')
+            fig.patch.set_facecolor('#0e1117')
+            ax.tick_params(colors='white')
+            ax.legend()
+            st.pyplot(fig)
+
+    # --- SOUS-CHAPITRE 2 : FONCTIONS DÉRIVÉES ---
+    with tab2:
+        st.subheader("🧪 Formulaire des pouvoirs")
+        st.write("Voici les formules de base pour transformer une fonction en sa dérivée :")
+        
+        c1, c2 = st.columns(2)
+        with c1:
+            st.code("f(x) = xⁿ  =>  f'(x) = n·xⁿ⁻¹")
+            st.code("f(x) = ax + b  =>  f'(x) = a")
+        with c2:
+            st.code("f(x) = 1/x  =>  f'(x) = -1/x²")
+            st.code("f(x) = √x  =>  f'(x) = 1/(2√x)")
+        
+        st.warning("🧠 **Rappel :** Si la dérivée est POSITIVE, la fonction MONTE. Si elle est NÉGATIVE, la fonction DESCEND.")
+
+    # --- SOUS-CHAPITRE 3 : ÉQUATION DE TANGENTE ---
+    with tab3:
+        st.subheader("🏹 L'arme de précision")
+        st.write("L'équation de la droite tangente au point $a$ est donnée par la formule magique :")
+        st.latex(r"y = f'(a)(x - a) + f(a)")
+        
+        st.markdown("""
+        **Étapes pour réussir :**
+        1. Calculer l'image : $f(a)$
+        2. Calculer la dérivée : $f'(x)$
+        3. Calculer le nombre dérivé : $f'(a)$
+        4. Remplacer dans la formule.
+        """)
+
+    # --- SOUS-CHAPITRE 4 : MISSION ELEVEN ---
+    with tab4:
+        # Pense à ajouter 'chap5' dans ton dictionnaire 'themes' de la fonction afficher_interface_quiz
         afficher_interface_quiz()
 
