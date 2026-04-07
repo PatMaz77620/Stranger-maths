@@ -9,6 +9,9 @@ import json
 import google.generativeai as genai
 from google.generativeai.types import RequestOptions
 
+st.write(f"Version de la bibliothèque : {genai.__version__}")
+
+
 # Configuration avec forçage de la version API v1 (Stable)
 genai.configure(
     api_key=st.secrets["GEMINI_API_KEY"],
