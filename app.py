@@ -127,7 +127,7 @@ def generer_mission_gemini(theme_maths):
         return None
         
 def afficher_interface_quiz():
-    # Initialisation des variables de session pour le mode "Série"
+    # 1. Initialisation des variables de session si elles n'existent pas
     if 'index_question' not in st.session_state:
         st.session_state.index_question = 0
     if 'score' not in st.session_state:
@@ -135,65 +135,69 @@ def afficher_interface_quiz():
     if 'repondu' not in st.session_state:
         st.session_state.repondu = False
 
-    # CAS A : Le quiz est chargé et en cours
+    # CAS A : La mission est en cours
     if 'quiz_dynamique' in st.session_state and st.session_state.quiz_dynamique:
         questions = st.session_state.quiz_dynamique
         idx = st.session_state.index_question
 
-        # Si on n'a pas encore fini les 10 questions
+        # A.1. Il reste des questions à poser
         if idx < len(questions):
             q = questions[idx]
             
-            # Barre de progression
-            progress = (idx) / len(questions)
+            # Barre de progression visuelle
+            progress = idx / len(questions)
             st.progress(progress)
             st.write(f"### 🛰️ Mission Eleven : Question {idx + 1} / {len(questions)}")
             
             st.markdown(f"**{q['question']}**")
-            
-            # Affichage des options
-            for option in q['options']:
-                if st.button(option, key=f"opt_{idx}_{option}", use_container_width=True):
-                    if not st.session_state.repondu:
+            st.write("") # Petit espace
+
+            # --- AFFICHAGE DES RÉPONSES ---
+            if not st.session_state.repondu:
+                # On affiche la liste des boutons
+                for option in q['options']:
+                    if st.button(option, key=f"opt_{idx}_{option}", use_container_width=True):
                         st.session_state.dernière_reponse = option
                         st.session_state.repondu = True
                         if option == q['reponse']:
                             st.session_state.score += 1
                         st.rerun()
-
-            # Affichage du feedback après réponse
-            if st.session_state.repondu:
+            else:
+                # On affiche le résultat de la réponse choisie
+                st.write(f"Ton choix : **{st.session_state.dernière_reponse}**")
+                
                 if st.session_state.dernière_reponse == q['reponse']:
                     st.success(f"✅ Bravo ! {q['explication']}")
                 else:
-                    st.error(f"❌ Erreur. La réponse était : {q['reponse']}. {q['explication']}")
+                    st.error(f"❌ Erreur. La réponse était : {q['reponse']}")
+                    st.info(f"💡 **Explication :** {q['explication']}")
                 
-                if st.button("Question suivante ➡️"):
+                st.write("")
+                if st.button("Question suivante ➡️", use_container_width=True):
                     st.session_state.index_question += 1
                     st.session_state.repondu = False
                     st.rerun()
 
-        # Si les 10 questions sont finies
+        # A.2. Fin de la mission (Score final)
         else:
             st.balloons()
             st.title("🏆 Mission Accomplie !")
             score_final = st.session_state.score
-            st.metric("Score Final", f"{score_final} / {len(questions)}")
+            st.metric("Ton Score Final", f"{score_final} / {len(questions)}")
             
             if score_final >= 7:
                 st.success("Impressionnant ! Tes pouvoirs mathématiques sont au niveau d'Eleven.")
             else:
-                st.warning("Mission terminée, mais tu devrais t'entraîner encore un peu pour vaincre le Demogorgon.")
+                st.warning("Mission terminée. Entraîne-toi encore pour vaincre le Demogorgon !")
                 
-            if st.button("🔄 Nouvelle Mission"):
-                # Reset complet
+            if st.button("🔄 Lancer une nouvelle série", use_container_width=True):
                 del st.session_state.quiz_dynamique
                 st.session_state.index_question = 0
                 st.session_state.score = 0
                 st.session_state.repondu = False
                 st.rerun()
 
-    # CAS B : Pas de quiz chargé (Écran d'accueil du quiz)
+    # CAS B : Écran de lancement (Pas de mission chargée)
     else:
         themes = {
             "chap0": "Fonctions (Généralités)",
@@ -205,10 +209,12 @@ def afficher_interface_quiz():
         }
         theme_actuel = themes.get(st.session_state.page, "Mathématiques")
         
-        st.write(f"Prêt pour une série de **10 questions** sur {theme_actuel} ?")
+        st.markdown("---")
+        st.write(f"Prêt pour une série de **10 questions** sur le thème :")
+        st.subheader(f"🌀 {theme_actuel}")
         
-        if st.button("🔦 Lancer la Mission Eleven"):
-            with st.spinner("Eleven scanne l'Upside Down pour générer 10 défis..."):
+        if st.button("🔦 Lancer la Mission Eleven", use_container_width=True):
+            with st.spinner("Eleven scanne l'Upside Down pour préparer tes 10 défis..."):
                 quiz = generer_mission_gemini(theme_actuel)
                 if quiz:
                     st.session_state.quiz_dynamique = quiz
@@ -216,6 +222,9 @@ def afficher_interface_quiz():
                     st.session_state.score = 0
                     st.session_state.repondu = False
                     st.rerun()
+
+
+
 chemin_logo = "Stranger_Maths_Logo.png"
 
 # =================================================================
