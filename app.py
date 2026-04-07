@@ -889,7 +889,8 @@ elif st.session_state.page == 'chap5':
         - Si $f'(x) < 0$ (négative) : la fonction $f$ est **décroissante** (elle descend).
         """)
 
-        # --- EXEMPLE DE TABLEAU DE VARIATION ---
+
+    # --- EXEMPLE DE TABLEAU DE VARIATION ---
         st.write("---")
         with st.expander("📝 CLIQUE POUR L'EXEMPLE", expanded=False):
             # On regroupe le titre ET l'énoncé dans un bloc HTML pour maîtriser les couleurs
@@ -915,37 +916,7 @@ elif st.session_state.page == 'chap5':
             \end{array}
             """)
             st.info("💡 **Analyse :** La dérivée est négative avant 2, donc la courbe descend.")
-
-
-        
-        # --- EXEMPLE DE TABLEAU DE VARIATION ---
-        st.write("---")
-        # On met un titre minimaliste (l'emoji aide à garder le contraste)
-        with st.expander("📝 CLIQUE POUR L'EXEMPLE", expanded=False):
-            # On force le VRAI titre ici en couleur Cyan pour être sûr qu'il flashe
-            st.markdown("<h4 style='color: #00d4ff;'>📍 MÉTHODE : Dresser un tableau de variations</h4>", unsafe_allow_html=True)
-            
-            st.write("Dresser le tableau de variations de $f(x) = x^2 - 4x$ :")
-            st.write("1. **Dérivée :** $f'(x) = 2x - 4$")
-            st.write("2. **Racine :** $2x - 4 = 0 \implies x = 2$")
-            
-            # Le tableau en Latex (Garantit la lisibilité)
-            st.latex(r"""
-            \begin{array}{|c|ccccc|}
-            \hline
-            x & -\infty & & 2 & & +\infty \\
-            \hline
-            \text{Signe de } f'(x) & & - & 0 & + & \\
-            \hline
-            & +\infty & & & & +\infty \\
-            \text{Variations de } f & & \searrow & & \nearrow & \\
-            & & & -4 & & \\
-            \hline
-            \end{array}
-            """)
-            st.info("💡 **Analyse :** La dérivée est négative avant 2, donc la courbe descend. Elle est positive après 2, donc elle monte.")
-            
-
+    
     # --- SOUS-CHAPITRE 3 : MÉTHODES DE CALCUL (LES TUYAUX) ---
     with tab3:
         st.subheader("⚡ Protocoles de Combinaison")
