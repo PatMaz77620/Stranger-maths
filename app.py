@@ -889,13 +889,15 @@ elif st.session_state.page == 'chap5':
         - Si $f'(x) < 0$ (négative) : la fonction $f$ est **décroissante** (elle descend).
         """)
 
+
         # --- EXEMPLE DE TABLEAU DE VARIATION ---
-        with st.expander("📝 Voir un exemple de tableau (Méthode)"):
-            st.write("**Exemple : $f(x) = x^2 - 4x$**")
-            st.write("1. Dérivée : $f'(x) = 2x - 4$")
-            st.write("2. On cherche quand $f'(x) = 0$ : $2x = 4 \implies x = 2$")
+        st.write("---")
+        with st.expander("📝 CLIQUER ICI : EXEMPLE DE MÉTHODE (Tableau)", expanded=False):
+            st.markdown("#### Étude de $f(x) = x^2 - 4x$")
+            st.write("1. **Dérivée :** $f'(x) = 2x - 4$")
+            st.write("2. **Racine :** $2x - 4 = 0 \implies x = 2$")
             
-            # Simulation visuelle du tableau en Markdown/Latex
+            # Le tableau en Latex (Garantit la lisibilité)
             st.latex(r"""
             \begin{array}{|c|ccccc|}
             \hline
@@ -909,8 +911,8 @@ elif st.session_state.page == 'chap5':
             \hline
             \end{array}
             """)
-            st.info("On voit que la fonction descend jusqu'à $x=2$ puis remonte.")
-
+            st.info("💡 **Analyse :** La dérivée est négative avant 2, donc la courbe descend. Elle est positive après 2, donc elle monte.")
+            
 
     # --- SOUS-CHAPITRE 3 : MÉTHODES DE CALCUL (LES TUYAUX) ---
     with tab3:
