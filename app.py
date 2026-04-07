@@ -13,7 +13,7 @@ genai.configure(api_key=GENAI_KEY)
 
 # Utilisation du nom complet 'models/...' 
 # C'est souvent la solution quand le nom court renvoie une 404
-model = genai.GenerativeModel('gemini-1.5-flash-latest')
+model = genai.GenerativeModel('models/gemini-1.5-flash')
 
 # --- 1. CONFIGURATION DE LA PAGE ---
 st.set_page_config(
