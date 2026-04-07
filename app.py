@@ -276,7 +276,7 @@ if st.session_state.page == 'home':
                 st.session_state.page = 'chap3'
                 st.rerun()
             # --- NOUVEAU BOUTON DÉRIVÉES ---
-            if st.button("📉 Dérivation \u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0", key="btn_c5"):
+            if st.button("📉 Dérivation \u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0", key="btn_c5"):
                 st.session_state.page = 'chap5'
                 st.rerun()
                 
