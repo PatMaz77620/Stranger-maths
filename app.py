@@ -893,10 +893,9 @@ elif st.session_state.page == 'chap5':
         st.write("---")
         
         # On laisse le titre de l'expander vide de texte pour éviter le bug de couleur
-        with st.expander("📝", expanded=False):
+        with st.expander("📝 MÉTHODE : Dresser un tableau de variations", expanded=False):
             # On place le VRAI titre ici : il sera TOUJOURS lisible
             st.markdown("""
-                <h4 style='color: white; margin-top: -10px;'>📝 CLIQUE POUR L'EXEMPLE</h4>
                 <h5 style='color: #00d4ff;'>📍 MÉTHODE : Dresser un tableau de variations</h5>
                 <p style='color: white;'><b>Énoncé :</b> Dresser le tableau de variations de f(x) = x² - 4x</p>
             """, unsafe_allow_html=True)
