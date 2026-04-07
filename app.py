@@ -19,7 +19,8 @@ genai.configure(
 )
 
 # On change de famille de modèle pour forcer une autre route
-model = genai.GenerativeModel('gemini-1.5-pro-latest')
+model = genai.GenerativeModel(model_name='models/gemini-1.5-pro')
+
 
 # --- 1. CONFIGURATION DE LA PAGE ---
 st.set_page_config(
