@@ -901,7 +901,13 @@ elif st.session_state.page == 'chap5':
         # L'AVERTISSEMENT CRUCIAL
         st.error("⚠️ **ALERTE DEMOGORGON : LE PIÈGE DU PRODUIT**")
         st.markdown("""
-        En STMG, si tu vois un produit complexe ou une division de 2 fonctions, on te demandera souvent de 'développer' l'expression d'abord pour n'avoir que des additions à gérer !
+        En STMG, si tu vois un produit de deux parenthèses, **ne dérive pas chaque parenthèse séparément !** La technique secrète consiste à **développer** l'expression d'abord pour n'avoir que des additions à gérer.
+        
+        **Exemple :** Soit $f(x) = (x + 3)(x - 2)$
+        1. **On développe :** $f(x) = x^2 - 2x + 3x - 6 = x^2 + x - 6$
+        2. **Maintenant, on dérive facilement :** $f'(x) = 2x + 1$
+        
+        *C'est beaucoup plus sûr et c'est ce qui est attendu au Bac !*
         """)
     
     # --- SOUS-CHAPITRE 4 : ÉQUATION DE TANGENTE ---
