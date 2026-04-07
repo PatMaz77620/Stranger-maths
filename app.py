@@ -953,20 +953,48 @@ elif st.session_state.page == 'chap5':
         
         *C'est beaucoup plus sûr et c'est ce qui est attendu au Bac !*
         """)
-    
+
     # --- SOUS-CHAPITRE 4 : ÉQUATION DE TANGENTE ---
     with tab4:
         st.subheader("🏹 L'arme de précision")
-        st.write("L'équation de la droite tangente au point $a$ est donnée par la formule magique :")
+        st.write("L'équation de la droite tangente au point d'abscisse $a$ est donnée par la formule :")
         st.latex(r"y = f'(a)(x - a) + f(a)")
         
         st.markdown("""
-        **Étapes pour réussir :**
-        1. Calculer l'image : $f(a)$
-        2. Calculer la dérivée : $f'(x)$
-        3. Calculer le nombre dérivé : $f'(a)$
-        4. Remplacer dans la formule.
+        **Les 4 étapes pour réussir :**
+        1. **Calculer l'image** : $f(a)$
+        2. **Calculer la dérivée** : $f'(x)$
+        3. **Calculer le nombre dérivé** : $f'(a)$
+        4. **Remplacer** les valeurs dans la formule magique.
         """)
+
+        st.write("---")
+        # On réutilise l'astuce de l'expander "safe" pour le mode sombre
+        with st.expander("📝", expanded=False):
+            st.markdown("""
+                <h4 style='color: white; margin-top: -10px;'>📝 EXEMPLE DÉTAILLÉ</h4>
+                <h5 style='color: #00d4ff;'>📍 Équation de tangente pour f(x) = x² au point a = 3</h5>
+                <p style='color: white;'>On veut trouver l'équation de la droite qui "frôle" la parabole au point d'abscisse 3.</p>
+            """, unsafe_allow_html=True)
+
+            col_etapes, col_bilan = st.columns([1.5, 1])
+            
+            with col_etapes:
+                st.write("**Étape 1 :** Calcul de l'image")
+                st.success("$f(3) = 3^2 = 9$")
+                
+                st.write("**Étape 2 & 3 :** Dérivée et nombre dérivé")
+                st.info("$f'(x) = 2x$ \n\n Donc $f'(3) = 2 \\times 3 = 6$")
+            
+            with col_bilan:
+                st.write("**Étape 4 :** On remplace")
+                st.warning("""
+                $y = 6(x - 3) + 9$  
+                $y = 6x - 18 + 9$  
+                **$y = 6x - 9$**
+                """)
+
+            st.info("💡 **Interprétation :** La tangente est une droite de pente 6 qui passe par le point (3 ; 9).")
 
     # --- SOUS-CHAPITRE 5 : MISSION ELEVEN ---
     with tab5:
