@@ -23,9 +23,6 @@ genai.configure(
 # Ce sont des "alias" qui pointent toujours vers la version valide
 model = genai.GenerativeModel('gemini-flash-latest')
 
-st.write(f"Version de la bibliothèque : {genai.__version__}")
-
-
 # --- 1. CONFIGURATION DE LA PAGE ---
 st.set_page_config(
     page_title="Stranger Maths",
@@ -169,17 +166,25 @@ def afficher_interface_quiz():
             del st.session_state.quiz_dynamique
             st.rerun()
     else:
-        # Détermination du thème en fonction de la page
+        # 1. On définit la correspondance entre l'identifiant technique et le nom réel
         themes = {
-            'calculs': 'Nombres et Calculs',
-            'fonctions': 'Fonctions et Algèbre',
-            'geometrie': 'Géométrie'
+            'chap0': 'Fonctions (Généralités : images, antécédents, domaine de définition)',
+            'chap1': 'Information chiffrée (Coeff. Multiplicateur, Taux d'évolution, Évolutions Successives)',
+            'chap2': 'Suites numériques (Généralités, suites arithmétiques, suites Géométriques)',
+            'chap3': 'Polynômes du 2nd degré (Les 3 Formes, racines, sommet de la parabole, tableaux de variation, tableaux de signes)',
+            'chap4': 'Probabilités (fréquence marginale ou conditionnelle, tableaux, arbres, formules)'
         }
+        
+        # 2. On récupère le thème basé sur la page où se trouve l'utilisateur
+        # Si la page n'est pas dans la liste, on met "Mathématiques" par défaut
         theme_actuel = themes.get(st.session_state.page, 'Mathématiques')
         
-        st.write(f"Prêt pour une mission sur **{theme_actuel}** ?")
-        if st.button(f"🔦 Lancer une mission"):
-            with st.spinner("Onction de la faille en cours..."):
+        st.markdown("---")
+        st.write(f"Prêt pour une mission personnalisée sur **{theme_actuel}** ?")
+        
+        if st.button(f"🔦 Lancer une mission Eleven", key=f"gen_{st.session_state.page}"):
+            with st.spinner(f"Eleven se concentre sur le chapitre : {theme_actuel}..."):
+                # 3. On envoie ce thème précis à Gemini
                 quiz = generer_mission_gemini(theme_actuel)
                 if quiz:
                     st.session_state.quiz_dynamique = quiz
@@ -362,7 +367,7 @@ elif st.session_state.page == 'chap1':
     st.button("⬅️ Retour au QG", on_click=aller_a_home)
     st.markdown('</div>', unsafe_allow_html=True)
     st.title("📟 Information Chiffrée")
-    tab1, tab2, tab3 = st.tabs(["🔢 Coeff. Multiplicateur", "📈 Taux d'évolution", "🔄 Évolutions Successives"])
+    tab1, tab2, tab3, tab4 = st.tabs(["🔢 Coeff. Multiplicateur", "📈 Taux d'évolution", "🔄 Évolutions Successives", "🕹️ Mission Eleven"])
 
     with tab1:
         st.subheader("🎯 Le Multiplicateur Magique")
@@ -440,7 +445,10 @@ elif st.session_state.page == 'chap1':
         else:
             st.error(f"Pas tout à fait. Le calcul était : {st.session_state.vd_quiz} × {formater_fr(1+st.session_state.tx_quiz/100)}.")
 
-
+    # --- SOUS-CHAPITRE 4 : QUIZZ ---
+    with tab4:
+        # On appelle la fonction de quiz qu'on a créée plus haut
+        afficher_interface_quiz()
 
 # =================================================================
 # CHAPITRE 2 : SUITES NUMÉRIQUES
@@ -450,7 +458,7 @@ elif st.session_state.page == 'chap2':
     st.button("⬅️ Retour au QG", on_click=aller_a_home)
     st.markdown('</div>', unsafe_allow_html=True)
     st.title("📈 Chapitre 2 : Suites Numériques")
-    t_gen, t_ari, t_geo = st.tabs(["📚 Généralités", "➕ Arithmétiques", "✖️ Géométriques"])
+    t_gen, t_ari, t_geo, tab4 = st.tabs(["📚 Généralités", "➕ Arithmétiques", "✖️ Géométriques", "🕹️ Mission Eleven"])
     # --- ONGLET 1 : GÉNÉRALITÉS ---
     with t_gen:
         st.subheader("📚 Guide de survie : Les Bases")
@@ -537,6 +545,12 @@ elif st.session_state.page == 'chap2':
         else:
             st.error(f"Oups ! Revois ta formule. Le résultat attendu était {formater_fr(sol_suite)}.")
 
+    # --- SOUS-CHAPITRE 4 : QUIZZ ---
+    with tab4:
+        # On appelle la fonction de quiz qu'on a créée plus haut
+        afficher_interface_quiz()
+
+
 # =================================================================
 # CHAPITRE 3 : POLYNÔMES DU 2ND DEGRÉ
 # =================================================================
@@ -545,8 +559,8 @@ elif st.session_state.page == 'chap3':
     st.button("⬅️ Retour au QG", on_click=aller_a_home)
     st.markdown('</div>', unsafe_allow_html=True)
     st.title("🛸 Chapitre 3 : Second Degré")
-    t_cours, t_galerie, t_calc = st.tabs(["📚 Les 3 Formes", "🖼️ Galerie", "📈 Simulateur"])
-
+    t_cours, t_galerie, t_calc, tab4 = st.tabs(["📚 Les 3 Formes", "🖼️ Galerie", "📈 Simulateur", "🕹️ Mission Eleven"])
+    
     # --- ONGLET 1 : LES FORMES (COURS) ---
     with t_cours:
         st.subheader("🧬 Les 3 visages d'une même fonction")
@@ -677,6 +691,12 @@ elif st.session_state.page == 'chap3':
         else:
             st.error(f"Faux. La réponse était {st.session_state.q3_val}.")
 
+    # --- SOUS-CHAPITRE 4 : QUIZZ ---
+    with tab4:
+        # On appelle la fonction de quiz qu'on a créée plus haut
+        afficher_interface_quiz()
+
+
 
 # =================================================================
 # CHAPITRE 4 : PROBABILITÉS
@@ -686,7 +706,7 @@ elif st.session_state.page == 'chap4':
     st.button("⬅️ Retour au QG", on_click=aller_a_home)
     st.markdown('</div>', unsafe_allow_html=True)
     st.title("🎲 Chapitre 4 : Probabilités")
-    tab_cours, tab_tab, tab_arbre = st.tabs(["📚 Rappels", "📊 Tableau", "🌳 Arbre"])
+    tab_cours, tab_tab, tab_arbre, tab4 = st.tabs(["📚 Rappels", "📊 Tableau", "🌳 Arbre", "🕹️ Mission Eleven"])
 
     # --- 1. RAPPELS DE COURS ---
     with tab_cours:
@@ -829,4 +849,10 @@ elif st.session_state.page == 'chap4':
         2. Pour calculer la probabilité d'un chemin complet, on **multiplie** les probabilités.
         3. La somme des fleurs de l'arbre (les probabilités à droite) fait 1 ou 100%.
         """)
-        
+
+
+    # --- SOUS-CHAPITRE 4 : QUIZZ ---
+    with tab4:
+        # On appelle la fonction de quiz qu'on a créée plus haut
+        afficher_interface_quiz()
+
