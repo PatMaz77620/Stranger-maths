@@ -453,37 +453,6 @@ if st.button("🔦 Lancer une Mission Aléatoire"):
         else:
             st.error("La connexion avec Eleven a été coupée. Réessaye !")
 
-# --- Affichage du quiz s'il existe en mémoire ---
-if 'quiz_dynamique' in st.session_state:
-    q = st.session_state.quiz_dynamique
-    
-    # 1. Extraction sécurisée des données (évite les KeyError)
-    # On cherche 'question' ou 'énoncé', sinon on met un texte par défaut
-    question_texte = q.get('question', q.get('énoncé', 'Mission inconnue (problème de lecture)...'))
-    
-    # On récupère la liste des options, sinon une liste par défaut pour éviter que st.radio plante
-    choix_possibles = q.get('options', ['Option A', 'Option B', 'Option C', 'Option D'])
-    
-    # On récupère la bonne réponse et l'explication
-    bonne_reponse = q.get('reponse', q.get('réponse', ''))
-    explication = q.get('explication', 'Pas d\'explication fournie par Eleven.')
-
-    # 2. Affichage de l'interface
-    st.info(f"**MISSION :** {question_texte}")
-    
-    # st.radio ne plantera pas car choix_possibles est garanti d'être une liste
-    choix = st.radio("Ta réponse :", choix_possibles, key="radio_gemini")
-    
-    if st.button("Valider la mission"):
-        if choix == bonne_reponse:
-            st.balloons()
-            st.success(f"🎯 TERMINÉ ! {explication}")
-            # Optionnel : décommenter pour forcer un nouveau quiz après réussite
-            # del st.session_state.quiz_dynamique
-            # st.rerun()
-        else:
-            st.error(f"⚠️ Alerte Demogorgon ! {explication}")
-
 
 # =================================================================
 # CHAPITRE 2 : SUITES NUMÉRIQUES
