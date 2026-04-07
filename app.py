@@ -879,7 +879,7 @@ elif st.session_state.page == 'chap5':
         
         st.warning("🧠 **Rappel :** Si la dérivée est POSITIVE, la fonction MONTE. Si elle est NÉGATIVE, la fonction DESCEND.")
 
-# --- SOUS-CHAPITRE 3 : MÉTHODES DE CALCUL (LES TUYAUX) ---
+    # --- SOUS-CHAPITRE 3 : MÉTHODES DE CALCUL (LES TUYAUX) ---
     with tab3:
         st.subheader("⚡ Protocoles de Combinaison")
         st.write("Pour dériver les fonctions du programme, Eleven utilise deux règles simples :")
@@ -895,13 +895,13 @@ elif st.session_state.page == 'chap5':
         st.info("### 2️⃣ La Règle du Nombre Collé (Coefficient)")
         st.latex(r"f(x) = k \cdot u(x) \implies f'(x) = k \cdot u'(x)")
         st.write("**Le tuyau :** Si un nombre est multiplié à $x$, il 'survit' et attend que la puissance de $x$ descende.")
-        st.success(r"**Exemple :** $g(x) = 4x^3$ \n\n On garde le $4$. On dérive $x^3$ en $3x^2$. \n\n **Calcul :** $4 \times 3x^2 = 12x^2$")
+        st.success(r"**Exemple :** $g(x) = 4x^3$ : On garde le $4$, on dérive $x^3$ en $3x^2$. **Calcul :** $4 \times 3x^2 = 12x^2$")
 
         
         # L'AVERTISSEMENT CRUCIAL
         st.error("⚠️ **ALERTE DEMOGORGON : LE PIÈGE DU PRODUIT**")
         st.markdown("""
-        ⚠️ **CONSIGNE DE SÉCURITÉ :** En STMG, si tu vois un produit complexe ou une division de 2 fonctions, on te demandera souvent de 'développer' l'expression d'abord pour n'avoir que des additions à gérer !
+        En STMG, si tu vois un produit complexe ou une division de 2 fonctions, on te demandera souvent de 'développer' l'expression d'abord pour n'avoir que des additions à gérer !
         """)
 
     
