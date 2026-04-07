@@ -107,95 +107,115 @@ def aller_a_home():
     st.session_state.page = 'home'
 
 def generer_mission_gemini(theme_maths):
-    prompt_systeme = f"""
-    Génère un problème de mathématiques niveau collège sur le thème : {theme_maths}.
-    Format de réponse attendu (JSON uniquement) :
-    {{
-        "question": "énoncé du problème",
-        "options": ["choix 1", "choix 2", "choix 3", "choix 4"],
-        "reponse": "la valeur exacte parmi les options",
-        "explication": "Une explication pédagogique courte pour comprendre la solution."
-    }}
-    Ne rajoute aucune explication textuelle avant ou après le JSON.
+    # On demande explicitement une liste de 10 objets
+    prompt = f"""Génère une LISTE de 10 questions de mathématiques (niveau STMG) sur le thème : {theme_maths}.
+    Format JSON strict : une liste d'objets [{{...}}, {{...}}] contenant :
+    - 'question': texte de la question
+    - 'options': liste de 4 choix
+    - 'reponse': la réponse exacte parmi les options
+    - 'explication': une courte explication pédagogique
     """
     
     try:
-        response = model.generate_content(prompt_systeme)
-        texte = response.text.strip()
-        
-        # Nettoyage automatique des balises markdown ```json ... ```
-        if "```json" in texte:
-            texte = texte.split("```json")[1].split("```")[0].strip()
-        elif "```" in texte:
-            texte = texte.split("```")[1].split("```")[0].strip()
-
-        data = json.loads(texte)
-
-        # On ajoute 'explication' dans la liste de vérification
-        cles_requises = ["question", "options", "reponse", "explication"]
-        if all(k in data for k in cles_requises):
-            return data        
-        else:
-            st.error("Format JSON incomplet reçu d'Eleven.")
-            return None
-            
+        response = model.generate_content(prompt)
+        # Nettoyage si jamais le modèle ajoute des balises markdown
+        data = response.text.replace('```json', '').replace('```', '').strip()
+        quiz_data = json.loads(data)
+        return quiz_data # Retourne une liste de 10 questions
     except Exception as e:
-        st.error(f"Erreur de communication avec Eleven : {e}")
+        st.error(f"Erreur de connexion avec Eleven : {e}")
         return None
-
+        
 def afficher_interface_quiz():
-    if 'quiz_dynamique' in st.session_state:
-        q = st.session_state.quiz_dynamique
-        
-        st.markdown("### 🔦 Mission Eleven")
-        
-        # Extraction sécurisée
-        question_texte = q.get('question', 'Mission inconnue...')
-        choix_possibles = q.get('options', ['A', 'B', 'C', 'D'])
-        bonne_reponse = q.get('reponse', '')
-        explication = q.get('explication', "Pas d'explication fournie.")
+    # Initialisation des variables de session pour le mode "Série"
+    if 'index_question' not in st.session_state:
+        st.session_state.index_question = 0
+    if 'score' not in st.session_state:
+        st.session_state.score = 0
+    if 'repondu' not in st.session_state:
+        st.session_state.repondu = False
 
-        st.info(f"**ÉNONCÉ :** {question_texte}")
-        
-        # Utilisation de la page actuelle dans la clé pour éviter les conflits
-        choix = st.radio("Ta réponse :", choix_possibles, key=f"radio_{st.session_state.page}")
-        
-        if st.button("Valider la mission", key=f"btn_{st.session_state.page}"):
-            if choix == bonne_reponse:
-                st.balloons()
-                st.success(f"🎯 TERMINÉ ! {explication}")
-            else:
-                st.error(f"⚠️ Alerte Demogorgon ! {explication}")
-        
-        if st.button("🔄 Autre mission"):
-            del st.session_state.quiz_dynamique
-            st.rerun()
-    else:
-        # 1. On définit la correspondance entre l'identifiant technique et le nom réel
-        themes = {
-            "chap0": "Fonctions (Généralités : images, antécédents, domaine de définition)",
-            "chap1": "Information chiffrée (Coeff. Multiplicateur, Taux d'évolution, Évolutions Successives)",
-            "chap2": "Suites numériques (Généralités, suites arithmétiques, suites Géométriques)",
-            "chap3": "Polynômes du 2nd degré (Les 3 Formes, racines, sommet de la parabole, tableaux de variation, tableaux de signes)",
-            "chap4": "Probabilités (fréquence marginale ou conditionnelle, tableaux, arbres, formules)",
-            "chap5": "Dérivation (définition, fonctions usuelles, tangentes et équation)"
-        }
+    # CAS A : Le quiz est chargé et en cours
+    if 'quiz_dynamique' in st.session_state and st.session_state.quiz_dynamique:
+        questions = st.session_state.quiz_dynamique
+        idx = st.session_state.index_question
+
+        # Si on n'a pas encore fini les 10 questions
+        if idx < len(questions):
+            q = questions[idx]
+            
+            # Barre de progression
+            progress = (idx) / len(questions)
+            st.progress(progress)
+            st.write(f"### 🛰️ Mission Eleven : Question {idx + 1} / {len(questions)}")
+            
+            st.markdown(f"**{q['question']}**")
+            
+            # Affichage des options
+            for option in q['options']:
+                if st.button(option, key=f"opt_{idx}_{option}", use_container_width=True):
+                    if not st.session_state.repondu:
+                        st.session_state.dernière_reponse = option
+                        st.session_state.repondu = True
+                        if option == q['reponse']:
+                            st.session_state.score += 1
+                        st.rerun()
+
+            # Affichage du feedback après réponse
+            if st.session_state.repondu:
+                if st.session_state.dernière_reponse == q['reponse']:
+                    st.success(f"✅ Bravo ! {q['explication']}")
+                else:
+                    st.error(f"❌ Erreur. La réponse était : {q['reponse']}. {q['explication']}")
                 
-        # 2. On récupère le thème basé sur la page où se trouve l'utilisateur
-        # Si la page n'est pas dans la liste, on met "Mathématiques" par défaut
-        theme_actuel = themes.get(st.session_state.page, 'Mathématiques')
+                if st.button("Question suivante ➡️"):
+                    st.session_state.index_question += 1
+                    st.session_state.repondu = False
+                    st.rerun()
+
+        # Si les 10 questions sont finies
+        else:
+            st.balloons()
+            st.title("🏆 Mission Accomplie !")
+            score_final = st.session_state.score
+            st.metric("Score Final", f"{score_final} / {len(questions)}")
+            
+            if score_final >= 7:
+                st.success("Impressionnant ! Tes pouvoirs mathématiques sont au niveau d'Eleven.")
+            else:
+                st.warning("Mission terminée, mais tu devrais t'entraîner encore un peu pour vaincre le Demogorgon.")
+                
+            if st.button("🔄 Nouvelle Mission"):
+                # Reset complet
+                del st.session_state.quiz_dynamique
+                st.session_state.index_question = 0
+                st.session_state.score = 0
+                st.session_state.repondu = False
+                st.rerun()
+
+    # CAS B : Pas de quiz chargé (Écran d'accueil du quiz)
+    else:
+        themes = {
+            "chap0": "Fonctions (Généralités)",
+            "chap1": "Information chiffrée",
+            "chap2": "Suites numériques",
+            "chap3": "Polynômes du 2nd degré",
+            "chap4": "Probabilités",
+            "chap5": "Dérivation (Nombre dérivé, tangentes, variations)"
+        }
+        theme_actuel = themes.get(st.session_state.page, "Mathématiques")
         
-        st.markdown("---")
-        st.write(f"Prêt pour une mission personnalisée sur **{theme_actuel}** ?")
+        st.write(f"Prêt pour une série de **10 questions** sur {theme_actuel} ?")
         
-        if st.button(f"🔦 Lancer une mission Eleven", key=f"gen_{st.session_state.page}"):
-            with st.spinner(f"Eleven se concentre sur le chapitre..."):
-                # 3. On envoie ce thème précis à Gemini
+        if st.button("🔦 Lancer la Mission Eleven"):
+            with st.spinner("Eleven scanne l'Upside Down pour générer 10 défis..."):
                 quiz = generer_mission_gemini(theme_actuel)
                 if quiz:
                     st.session_state.quiz_dynamique = quiz
+                    st.session_state.index_question = 0
+                    st.session_state.score = 0
+                    st.session_state.repondu = False
                     st.rerun()
-
 chemin_logo = "Stranger_Maths_Logo.png"
 
 # =================================================================
