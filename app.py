@@ -902,19 +902,23 @@ elif st.session_state.page == 'chap5':
             
             st.write("1. **Dérivée :** $f'(x) = 2x - 4$")
             st.write("2. **Racine :** $2x - 4 = 0 \implies x = 2$")
-            
-            # Ton tableau Latex
+
+
+            # Le tableau avec forçage de couleur blanche ligne par ligne
             st.latex(r"""
             \begin{array}{|c|ccccc|}
             \hline
-            x & -\infty & & 2 & & +\infty \\
+            \color{white} x & \color{white} -\infty & & \color{white} 2 & & \color{white} +\infty \\
             \hline
-            f'(x) & & - & 0 & + & \\
+            \color{white} \text{Signe de } f'(x) & & \color{white} - & \color{white} 0 & \color{white} + & \\
             \hline
-            f(x) & & \searrow & & \nearrow & \\
+            & \color{white} +\infty & & & & \color{white} +\infty \\
+            \color{white} \text{Variations de } f & & \color{white} \searrow & & \color{white} \nearrow & \\
+            & & & \color{white} -4 & & \\
             \hline
             \end{array}
             """)
+
             st.info("💡 **Analyse :** La dérivée est négative avant 2, donc la courbe descend.")
     
     # --- SOUS-CHAPITRE 3 : MÉTHODES DE CALCUL (LES TUYAUX) ---
