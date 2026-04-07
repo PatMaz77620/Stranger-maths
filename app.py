@@ -903,7 +903,6 @@ elif st.session_state.page == 'chap5':
         st.markdown("""
         En STMG, si tu vois un produit complexe ou une division de 2 fonctions, on te demandera souvent de 'développer' l'expression d'abord pour n'avoir que des additions à gérer !
         """)
-
     
     # --- SOUS-CHAPITRE 4 : ÉQUATION DE TANGENTE ---
     with tab4:
