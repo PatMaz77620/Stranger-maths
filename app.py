@@ -432,24 +432,6 @@ elif st.session_state.page == 'chap1':
         st.metric("Taux d'évolution global", f"{formater_fr(taux_g)} %")
         st.write(f"Calcul : ${formater_fr(cm1)} \\times {formater_fr(cm2)} = {formater_fr(cm_g)}$")
 
-    # --- PETIT DÉFI POUR FINIR ---
-    st.divider()
-    if 'vd_quiz' not in st.session_state:
-        st.session_state.vd_quiz = random.randint(50, 200)
-        st.session_state.tx_quiz = random.choice([5, 10, 20, 25, 50])
-
-    st.write(f"### ❓ Mission Flash :")
-    st.write(f"Un objet coûte **{st.session_state.vd_quiz} €**. Son prix augmente de **{st.session_state.tx_quiz} %**.")
-    rep_eleve = st.number_input("Quel est le nouveau prix ?", value=0.0, key="input_c1_quiz")
-    
-    if st.button("Vérifier la réponse"):
-        correction = st.session_state.vd_quiz * (1 + st.session_state.tx_quiz / 100)
-        if abs(rep_eleve - correction) < 0.1:
-            st.balloons()
-            st.success(f"Bravo ! C'est exactement {formater_fr(correction)} €.")
-        else:
-            st.error(f"Pas tout à fait. Le calcul était : {st.session_state.vd_quiz} × {formater_fr(1+st.session_state.tx_quiz/100)}.")
-
     # --- SOUS-CHAPITRE 4 : QUIZZ ---
     with tab4:
         # On appelle la fonction de quiz qu'on a créée plus haut
@@ -525,30 +507,6 @@ elif st.session_state.page == 'chap2':
             st.area_chart(data_geo)
             st.caption("Évolution des 10 premiers termes (Progression exponentielle)")
 
-    # --- DÉFI DES SUITES ---
-    st.divider()
-    if 'suite_type' not in st.session_state:
-        st.session_state.suite_type = random.choice(["Arithmétique", "Géométrique"])
-        st.session_state.s_u0 = random.randint(2, 10)
-        st.session_state.s_r = random.randint(2, 5)
-        st.session_state.s_n = random.randint(2, 4)
-
-    st.write(f"### ❓ Défi Mission :")
-    if st.session_state.suite_type == "Arithmétique":
-        st.write(f"Soit une suite **Arithmétique** de premier terme $u_0 = {st.session_state.s_u0}$ et de raison $r = {st.session_state.s_r}$.")
-        sol_suite = st.session_state.s_u0 + (st.session_state.s_n * st.session_state.s_r)
-    else:
-        st.write(f"Soit une suite **Géométrique** de premier terme $u_0 = {st.session_state.s_u0}$ et de raison $q = {st.session_state.s_r}$.")
-        sol_suite = st.session_state.s_u0 * (st.session_state.s_r ** st.session_state.s_n)
-
-    rep_suite = st.number_input(f"Calculez la valeur de $u_{st.session_state.s_n}$ :", value=0.0, key="quiz_suite")
-    
-    if st.button("Vérifier le résultat", key="btn_quiz_suite"):
-        if abs(rep_suite - sol_suite) < 0.1:
-            st.balloons()
-            st.success(f"Félicitations ! $u_{st.session_state.s_n}$ vaut bien {formater_fr(sol_suite)}.")
-        else:
-            st.error(f"Oups ! Revois ta formule. Le résultat attendu était {formater_fr(sol_suite)}.")
 
     # --- SOUS-CHAPITRE 4 : QUIZZ ---
     with tab4:
@@ -681,20 +639,6 @@ elif st.session_state.page == 'chap3':
         else:
             st.warning("📏 **a = 0** : C'est une droite horizontale !")
 
-    # --- DÉFI ---
-    st.divider()
-    st.write("### ❓ Défi Sommet")
-    if 'q3_val' not in st.session_state:
-        st.session_state.q3_val = random.randint(-5, 5)
-
-    st.write(f"Dans la forme $f(x) = 3(x - 2)^2 + ({st.session_state.q3_val})$, quelle est l'ordonnée du sommet ($\\beta$) ?")
-    ans3 = st.number_input("Votre réponse :", value=0, key="quiz_c3")
-    
-    if st.button("Vérifier"):
-        if ans3 == st.session_state.q3_val:
-            st.balloons(); st.success("Bravo ! C'est le nombre seul à la fin de la forme canonique.")
-        else:
-            st.error(f"Faux. La réponse était {st.session_state.q3_val}.")
 
     # --- SOUS-CHAPITRE 4 : QUIZZ ---
     with tab4:
