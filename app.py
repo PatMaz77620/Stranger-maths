@@ -279,8 +279,25 @@ if st.session_state.page == 'home':
             if st.button("📉 Dérivation \u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0", key="btn_c5"):
                 st.session_state.page = 'chap5'
                 st.rerun()
-                
+
         st.markdown('</div>', unsafe_allow_html=True)
+        
+        # --- SECTION PUB : LE PHARE ---
+        st.write("---")
+        st.markdown("""
+            <div style="background-color: #161b22; border: 1px solid #00d4ff; border-radius: 10px; padding: 20px; text-align: center;">
+                <h3 style="color: #00d4ff; margin-top: 0;">🔦 Besoin d'un guide ?</h3>
+                <p style="color: white; font-size: 1.1rem;">
+                    Besoin d'aide pour tes devoirs ou tes révisions ? <br>
+                    Découvre <b>Le Phare</b>, l'association qui t'accompagne vers la réussite.
+                </p>
+                <a href="https://www.association-le-phare.com/" target="_blank" 
+                   style="display: inline-block; background-color: #00d4ff; color: #0e1117; padding: 10px 20px; 
+                   border-radius: 5px; text-decoration: none; font-weight: bold; transition: 0.3s;">
+                   ⚓ Visiter le Phare
+                </a>
+            </div>
+        """, unsafe_allow_html=True)
 
 # =================================================================
 # CHAPITRE 0 : FONCTIONS (GÉNÉRALITÉS)
