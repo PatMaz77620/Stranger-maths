@@ -819,7 +819,7 @@ elif st.session_state.page == 'chap5':
     st.button("⬅️ Retour au QG", on_click=aller_a_home)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    st.title("📈 Dérivation : Le Taux de Variation")
+    st.title("📈 Dérivation")
     st.write("---")
 
     tab1, tab2, tab3, tab4, tab5 = st.tabs([
