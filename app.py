@@ -898,19 +898,21 @@ elif st.session_state.page == 'chap5':
             st.write("2. **Racine :** $2x - 4 = 0 \implies x = 2$")
             
             # Le tableau en Latex (Garantit la lisibilité)
+            # Le tableau avec forçage de couleur blanche ligne par ligne
             st.latex(r"""
             \begin{array}{|c|ccccc|}
             \hline
-            x & -\infty & & 2 & & +\infty \\
+            \color{white} x & \color{white} -\infty & & \color{white} 2 & & \color{white} +\infty \\
             \hline
-            \text{Signe de } f'(x) & & - & 0 & + & \\
+            \color{white} \text{Signe de } f'(x) & & \color{white} - & \color{white} 0 & \color{white} + & \\
             \hline
-            & +\infty & & & & +\infty \\
-            \text{Variations de } f & & \searrow & & \nearrow & \\
-            & & & -4 & & \\
+            & \color{white} +\infty & & & & \color{white} +\infty \\
+            \color{white} \text{Variations de } f & & \color{white} \searrow & & \color{white} \nearrow & \\
+            & & & \color{white} -4 & & \\
             \hline
             \end{array}
             """)
+            
             st.info("💡 **Analyse :** La dérivée est négative avant 2, donc la courbe descend. Elle est positive après 2, donc elle monte.")
             
 
