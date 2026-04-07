@@ -101,40 +101,38 @@ def aller_a_home():
     st.session_state.page = 'home'
 
 def generer_mission_gemini(theme_maths):
-    prompt_systeme = f"""
-    Tu es un expert en pédagogie mathématique pour la section STMG en France.
-    Ta mission est de créer une question de quiz unique pour l'application "Stranger Maths".
+    prompt_systeme = f"Crée un quiz court sur {theme_maths}. Réponds en JSON uniquement."
     
-    CONTEXTE : Hawkins, Stranger Things, le Monde à l'Envers.
-    SUJET MATHS : {theme_maths}
-    NIVEAU : Terminale STMG.
-    
-    RÈGLES STRICTES :
-    1. Utilise des prénoms de la série (Eleven, Mike, Dustin, etc.).
-    2. Le calcul doit être exact et réaliste pour le niveau STMG.
-    3. Utilise la virgule comme séparateur décimal.
-    4. Réponds UNIQUEMENT au format JSON brut, sans balises de code markdown, avec cette structure :
-    {{
-        "question": "Texte de la question ici",
-        "options": ["Choix A", "Choix B", "Choix C", "Choix D"],
-        "reponse": "Le texte exact de la bonne option",
-        "explication": "Une explication courte et fun avec une référence à la série"
-    }}
-    """
-    
+    # --- SCANNER DE DIAGNOSTIC ---
+    st.write("🔍 **Diagnostic en cours...**")
     try:
+        # 1. Test de la configuration actuelle
+        st.write(f"📡 Tentative avec le modèle : {model.model_name}")
+        
+        # 2. On tente un appel ultra-minimaliste sans options complexes
         response = model.generate_content(prompt_systeme)
-        texte = response.text
-        # On cherche le premier '{' et le dernier '}' pour isoler le JSON
-        debut = texte.find('{')
-        fin = texte.rfind('}') + 1
-        json_str = texte[debut:fin]
-        return json.loads(json_str)
+        
+        # 3. Si ça marche, on traite le JSON
+        texte_propre = response.text.strip().replace('```json', '').replace('```', '')
+        return json.loads(texte_propre)
 
     except Exception as e:
-        # Affiche l'erreur en console pour debug
-        st.error(f"🚨 ERREUR TECHNIQUE : {e}")
+        # --- AFFICHAGE DE L'ERREUR DÉTAILLÉE ---
+        st.error(f"❌ Échec de la mission !")
+        st.write(f"**Détails de l'erreur :** {e}")
+        
+        # 4. On essaie de lister les modèles réels autorisés pour CETTE clé
+        st.write("📋 **Modèles réellement accessibles avec cette clé :**")
+        try:
+            m_list = [m.name for m in genai.list_models()]
+            st.write(m_list)
+        except Exception as e_list:
+            st.write(f"Impossible de lister les modèles : {e_list}")
+            
         return None
+
+
+
 
 chemin_logo = "Stranger_Maths_Logo.png"
 
