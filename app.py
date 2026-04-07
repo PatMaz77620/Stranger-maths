@@ -867,20 +867,14 @@ elif st.session_state.page == 'chap5':
     with tab2:
         st.subheader("🧪 Formulaire des pouvoirs")
         st.write("Voici les formules de base pour transformer une fonction en sa dérivée :")
-        
-        # On utilise le paramètre language='python' pour forcer la couleur
+
         c1, c2 = st.columns(2)
         with c1:
-            st.code("f(x) = x^n   =>  f'(x) = n * x^(n-1)", language='python')
-            st.code("f(x) = ax + b =>  f'(x) = a", language='python')
+            st.success("**Puissances** \n $f(x) = x^n \implies f'(x) = n x^{n-1}$")
+            st.success("**Affine** \n $f(x) = ax + b \implies f'(x) = a$")
         with c2:
-            st.code("f(x) = 1/x   =>  f'(x) = -1/x^2", language='python')
-            st.code("f(x) = sqrt(x) => f'(x) = 1/(2*sqrt(x))", language='python')
-        
-        # Alternative si st.code reste illisible : Utiliser st.latex
-        st.markdown("---")
-        st.write("**Récapitulatif en notation mathématique :**")
-        st.latex(r"(x^n)' = n x^{n-1}")
+            st.success("**Inverse** \n $f(x) = \\frac{1}{x} \implies f'(x) = -\\frac{1}{x^2}$")
+            st.success("**Racine** \n $f(x) = \sqrt{x} \implies f'(x) = \\frac{1}{2\sqrt{x}}$")
         
         st.warning("🧠 **Rappel :** Si la dérivée est POSITIVE, la fonction MONTE. Si elle est NÉGATIVE, la fonction DESCEND.")
 
