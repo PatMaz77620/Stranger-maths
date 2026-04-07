@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import random
-import google.generativeai as genai
 import json
 
 import google.generativeai as genai
