@@ -970,7 +970,7 @@ elif st.session_state.page == 'chap5':
 
         st.write("---")
         # On réutilise l'astuce de l'expander "safe" pour le mode sombre
-        with st.expander("📝", expanded=False):
+        with st.expander("📝 EXEMPLE DÉTAILLÉ", expanded=False):
             st.markdown("""
                 <h4 style='color: white; margin-top: -10px;'>📝 EXEMPLE DÉTAILLÉ</h4>
                 <h5 style='color: #00d4ff;'>📍 Équation de tangente pour f(x) = x² au point a = 3</h5>
