@@ -889,51 +889,31 @@ elif st.session_state.page == 'chap5':
         - Si $f'(x) < 0$ (négative) : la fonction $f$ est **décroissante** (elle descend).
         """)
 
-
         # --- EXEMPLE DE TABLEAU DE VARIATION ---
         st.write("---")
-        with st.expander("📝 CLIQUER ICI : EXEMPLE DE MÉTHODE (Tableau)", expanded=False):
-            st.markdown("#### Étude de $f(x) = x^2 - 4x$")
+        # On met un titre minimaliste (l'emoji aide à garder le contraste)
+        with st.expander("📝 CLIQUE POUR L'EXEMPLE", expanded=False):
+            # On force le VRAI titre ici en couleur Cyan pour être sûr qu'il flashe
+            st.markdown("<h4 style='color: #00d4ff;'>📍 MÉTHODE : Dresser un tableau de variations</h4>", unsafe_allow_html=True)
+            
+            st.write("Dresser le tableau de variations de $f(x) = x^2 - 4x$ :")
             st.write("1. **Dérivée :** $f'(x) = 2x - 4$")
             st.write("2. **Racine :** $2x - 4 = 0 \implies x = 2$")
             
-# Création d'un tableau de variation "Image" (Infaillible)
-            fig_tab, ax_tab = plt.subplots(figsize=(8, 3))
-            fig_tab.patch.set_facecolor('#0e1117') # Fond sombre comme ton app
-            ax_tab.set_facecolor('#0e1117')
-
-            # Dessin des lignes du tableau
-            ax_tab.axhline(0.8, color='white', lw=1) # Ligne sous x
-            ax_tab.axhline(0.4, color='white', lw=1) # Ligne sous f'(x)
-            ax_tab.axvline(0.2, color='white', lw=1) # Ligne verticale gauche
-
-            # Texte du tableau
-            # Ligne x
-            ax_tab.text(0.1, 0.9, "x", color='white', ha='center', fontweight='bold')
-            ax_tab.text(0.3, 0.9, "-∞", color='white', ha='center')
-            ax_tab.text(0.6, 0.9, "2", color='white', ha='center')
-            ax_tab.text(0.9, 0.9, "+∞", color='white', ha='center')
-
-            # Ligne f'(x)
-            ax_tab.text(0.1, 0.6, "f'(x)", color='white', ha='center', fontweight='bold')
-            ax_tab.text(0.45, 0.6, "-", color='#ff4b4b', ha='center', fontsize=15, fontweight='bold')
-            ax_tab.text(0.6, 0.6, "0", color='white', ha='center')
-            ax_tab.text(0.75, 0.6, "+", color='#00d4ff', ha='center', fontsize=15, fontweight='bold')
-
-            # Ligne f(x) avec flèches
-            ax_tab.text(0.1, 0.2, "f(x)", color='white', ha='center', fontweight='bold')
-            # Flèche descendante
-            ax_tab.annotate('', xy=(0.55, 0.05), xytext=(0.35, 0.35),
-                            arrowprops=dict(arrowstyle='->', color='white', lw=2))
-            # Flèche montante
-            ax_tab.annotate('', xy=(0.85, 0.35), xytext=(0.65, 0.05),
-                            arrowprops=dict(arrowstyle='->', color='white', lw=2))
-            # Valeur du minimum
-            ax_tab.text(0.6, 0.02, "-4", color='#00d4ff', ha='center', fontweight='bold')
-
-            ax_tab.axis('off') # On cache les axes inutiles
-            st.pyplot(fig_tab)
-            
+            # Le tableau en Latex (Garantit la lisibilité)
+            st.latex(r"""
+            \begin{array}{|c|ccccc|}
+            \hline
+            x & -\infty & & 2 & & +\infty \\
+            \hline
+            \text{Signe de } f'(x) & & - & 0 & + & \\
+            \hline
+            & +\infty & & & & +\infty \\
+            \text{Variations de } f & & \searrow & & \nearrow & \\
+            & & & -4 & & \\
+            \hline
+            \end{array}
+            """)
             st.info("💡 **Analyse :** La dérivée est négative avant 2, donc la courbe descend. Elle est positive après 2, donc elle monte.")
             
 
