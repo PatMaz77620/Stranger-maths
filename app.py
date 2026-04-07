@@ -889,21 +889,22 @@ elif st.session_state.page == 'chap5':
         - Si $f'(x) < 0$ (négative) : la fonction $f$ est **décroissante** (elle descend).
         """)
 
-
-    # --- EXEMPLE DE TABLEAU DE VARIATION ---
+        # --- EXEMPLE DE TABLEAU DE VARIATION ---
         st.write("---")
-        with st.expander("📝 CLIQUE POUR L'EXEMPLE", expanded=False):
-            # On regroupe le titre ET l'énoncé dans un bloc HTML pour maîtriser les couleurs
+        
+        # On laisse le titre de l'expander vide de texte pour éviter le bug de couleur
+        with st.expander("📝", expanded=False):
+            # On place le VRAI titre ici : il sera TOUJOURS lisible
             st.markdown("""
-                <h4 style='color: #00d4ff; margin-bottom: 0px;'>📍 MÉTHODE : Dresser un tableau de variations</h4>
-                <p style='color: white; font-weight: bold;'>Énoncé : Dresser le tableau de variations de f(x) = x² - 4x</p>
+                <h4 style='color: white; margin-top: -10px;'>📝 CLIQUE POUR L'EXEMPLE</h4>
+                <h5 style='color: #00d4ff;'>📍 MÉTHODE : Dresser un tableau de variations</h5>
+                <p style='color: white;'><b>Énoncé :</b> Dresser le tableau de variations de f(x) = x² - 4x</p>
             """, unsafe_allow_html=True)
             
-            # On continue avec les étapes
             st.write("1. **Dérivée :** $f'(x) = 2x - 4$")
             st.write("2. **Racine :** $2x - 4 = 0 \implies x = 2$")
             
-            # Le tableau (version Latex simple)
+            # Ton tableau Latex
             st.latex(r"""
             \begin{array}{|c|ccccc|}
             \hline
