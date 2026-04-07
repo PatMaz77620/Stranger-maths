@@ -864,20 +864,53 @@ elif st.session_state.page == 'chap5':
             ax.legend()
             st.pyplot(fig)
 
-    # --- SOUS-CHAPITRE 2 : FONCTIONS DÉRIVÉES ---
+# --- SOUS-CHAPITRE 2 : FONCTIONS DÉRIVÉES ---
     with tab2:
         st.subheader("🧪 Formulaire des pouvoirs")
-        st.write("Voici les formules de base pour transformer une fonction en sa dérivée :")
+        st.write("Voici les formules pour transformer une fonction en sa dérivée :")
 
         c1, c2 = st.columns(2)
         with c1:
-            st.success("**Puissances** \n $f(x) = x^n \implies f'(x) = n x^{n-1}$")
-            st.success("**Affine** \n $f(x) = ax + b \implies f'(x) = a$")
+            st.success("**Constante** \n $f(x) = k \implies f'(x) = 0$")
+            st.success("**Carré** \n $f(x) = x^2 \implies f'(x) = 2x$")
+            st.success("**Cube** \n $f(x) = x^3 \implies f'(x) = 3x^2$")
+            st.success("**Puissance $n$** \n $f(x) = x^n \implies f'(x) = n x^{n-1}$")
         with c2:
+            st.success("**Affine** \n $f(x) = ax + b \implies f'(x) = a$")
             st.success("**Inverse** \n $f(x) = \\frac{1}{x} \implies f'(x) = -\\frac{1}{x^2}$")
             st.success("**Racine** \n $f(x) = \sqrt{x} \implies f'(x) = \\frac{1}{2\sqrt{x}}$")
         
-        st.warning("🧠 **Rappel :** Si la dérivée est POSITIVE, la fonction MONTE. Si elle est NÉGATIVE, la fonction DESCEND.")
+        st.markdown("---")
+        st.subheader("🧠 Le lien Sacré : Signe ➡️ Variation")
+        
+        st.warning("""
+        **Règle d'or :** Étudier les variations d'une fonction $f$, c'est étudier le **SIGNE** de sa dérivée $f'$.
+        - Si $f'(x) > 0$ (positive) : la fonction $f$ est **croissante** (elle monte).
+        - Si $f'(x) < 0$ (négative) : la fonction $f$ est **décroissante** (elle descend).
+        """)
+
+        # --- EXEMPLE DE TABLEAU DE VARIATION ---
+        with st.expander("📝 Voir un exemple de tableau (Méthode)"):
+            st.write("**Exemple : $f(x) = x^2 - 4x$**")
+            st.write("1. Dérivée : $f'(x) = 2x - 4$")
+            st.write("2. On cherche quand $f'(x) = 0$ : $2x = 4 \implies x = 2$")
+            
+            # Simulation visuelle du tableau en Markdown/Latex
+            st.latex(r"""
+            \begin{array}{|c|ccccc|}
+            \hline
+            x & -\infty & & 2 & & +\infty \\
+            \hline
+            \text{Signe de } f'(x) & & - & 0 & + & \\
+            \hline
+            & +\infty & & & & +\infty \\
+            \text{Variations de } f & & \searrow & & \nearrow & \\
+            & & & -4 & & \\
+            \hline
+            \end{array}
+            """)
+            st.info("On voit que la fonction descend jusqu'à $x=2$ puis remonte.")
+
 
     # --- SOUS-CHAPITRE 3 : MÉTHODES DE CALCUL (LES TUYAUX) ---
     with tab3:
