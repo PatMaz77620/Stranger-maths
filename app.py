@@ -537,7 +537,7 @@ elif st.session_state.page == 'chap2':
     # --- ONGLET 2 : ARITHMÉTIQUES ---
     with t_ari:
         st.subheader("🪜 Suites Arithmétiques (Addition)")
-        st.info("""
+        st.info(r"""
         **Règle :** On passe d'un terme au suivant en **ajoutant** toujours le même nombre $r$ (la raison).
         - **Récurrence :** $u_{n+1} = u_n + r$
         - **Explicite :** $u_n = u_0 + n \times r$
