@@ -122,8 +122,8 @@ def aller_a_home():
     st.session_state.page = 'home'
 
 def generer_mission_gemini(theme_maths):
-    # On demande explicitement une liste de 10 objets
-    prompt = f"""Génère une LISTE de 10 questions de mathématiques (niveau STMG) sur le thème : {theme_maths}.
+    # On demande explicitement une liste de 11 objets
+    prompt = f"""Génère une LISTE de 11 questions de mathématiques (niveau 1ERE STMG) sur le thème : {theme_maths}.
     Format JSON strict : une liste d'objets [{{...}}, {{...}}] contenant :
     - 'question': texte de la question
     - 'options': liste de 4 choix
@@ -225,11 +225,11 @@ def afficher_interface_quiz():
         theme_actuel = themes.get(st.session_state.page, "Mathématiques")
         
         st.markdown("---")
-        st.write(f"Prêt pour une série de **10 questions** sur le thème :")
+        st.write(f"Prêt pour une série de **Eleven questions** sur le thème :")
         st.subheader(f"🌀 {theme_actuel}")
         
         if st.button("🔦 Lancer la Mission Eleven", use_container_width=True):
-            with st.spinner("Eleven scanne l'Upside Down pour préparer tes 10 défis..."):
+            with st.spinner("Eleven scanne l'Upside Down pour préparer tes 11 défis..."):
                 quiz = generer_mission_gemini(theme_actuel)
                 if quiz:
                     st.session_state.quiz_dynamique = quiz
