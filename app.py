@@ -556,7 +556,7 @@ elif st.session_state.page == 'chap2':
     # --- ONGLET 3 : GÉOMÉTRIQUES ---
     with t_geo:
         st.subheader("🚀 Suites Géométriques (Multiplication)")
-        st.warning("""
+        st.warning(r"""
         **Règle :** On passe d'un terme au suivant en **multipliant** toujours par le même nombre $q$ (la raison).
         - **Récurrence :** $u_{n+1} = u_n \times q$
         - **Explicite :** $u_n = u_0 \times q^n$
