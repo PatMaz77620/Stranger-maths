@@ -321,6 +321,7 @@ elif st.session_state.page == 'chap0':
     with tab1:
         st.subheader("⚙️ La Machine à Transformer")
         st.info("Une fonction est un processus. On entre un nombre **x** (antécédent), on applique une règle, et il ressort un nombre **f(x)** (image).")
+        
         col_calc, col_viz = st.columns([1, 1])
 
         with col_calc:
@@ -338,6 +339,18 @@ elif st.session_state.page == 'chap0':
             *Un antécédent n'a qu'une seule image, mais une image peut avoir plusieurs antécédents !*
             """)
 
+        # --- TON NOUVEAU BLOC PÉDAGOGIQUE ---
+        st.write("---")
+        st.success(r"""
+        **💡 Pourquoi utilise-t-on des formules ?**
+        
+        La formule $f(x) = 2x^2 - 3$ permet d'écrire de façon ultra compacte ce que l'on dirait en français :  
+        *"Prends n'importe quel nombre, multiplie-le par lui-même, multiplie le résultat par 2, et enlève 3 au résultat final."*
+        
+        **C'est beaucoup plus fastoche à noter sous forme de fonction, non ?** 🚀
+        """)
+
+    
     # --- SOUS-CHAPITRE 2 : DOMAINE DE DÉFINITION ---
     with tab2:
         st.subheader("🚧 Le Territoire de la fonction")
