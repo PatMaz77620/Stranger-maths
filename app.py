@@ -509,7 +509,7 @@ elif st.session_state.page == 'chap2':
     st.markdown('<div class="btn-retour">', unsafe_allow_html=True)
     st.button("⬅️ Retour au QG", on_click=aller_a_home)
     st.markdown('</div>', unsafe_allow_html=True)
-    st.title("📈 Chapitre 2 : Suites Numériques")
+    st.title("📈 Suites Numériques")
     t_gen, t_ari, t_geo, tab4 = st.tabs(["📚 Généralités", "➕ Arithmétiques", "✖️ Géométriques", "🕹️ Mission Eleven"])
     # --- ONGLET 1 : GÉNÉRALITÉS ---
     with t_gen:
@@ -586,7 +586,7 @@ elif st.session_state.page == 'chap3':
     st.markdown('<div class="btn-retour">', unsafe_allow_html=True)
     st.button("⬅️ Retour au QG", on_click=aller_a_home)
     st.markdown('</div>', unsafe_allow_html=True)
-    st.title("🛸 Chapitre 3 : Second Degré")
+    st.title("🛸 Polynômes du Second Degré")
     t_cours, t_galerie, t_calc, tab4 = st.tabs(["📚 Les 3 Formes", "🖼️ Galerie", "📈 Simulateur", "🕹️ Mission Eleven"])
     
     # --- ONGLET 1 : LES FORMES (COURS) ---
@@ -719,7 +719,7 @@ elif st.session_state.page == 'chap4':
     st.markdown('<div class="btn-retour">', unsafe_allow_html=True)
     st.button("⬅️ Retour au QG", on_click=aller_a_home)
     st.markdown('</div>', unsafe_allow_html=True)
-    st.title("🎲 Chapitre 4 : Probabilités")
+    st.title("🎲 Probabilités")
     tab_cours, tab_tab, tab_arbre, tab4 = st.tabs(["📚 Rappels", "📊 Tableau", "🌳 Arbre", "🕹️ Mission Eleven"])
 
     # --- 1. RAPPELS DE COURS ---
