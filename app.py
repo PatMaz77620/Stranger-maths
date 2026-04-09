@@ -528,11 +528,11 @@ elif st.session_state.page == 'chap2':
             st.latex(r"\begin{cases} u_0 = 5 \\ u_{n+1} = u_n + 3 \end{cases}")
             st.warning("⚠️ *Ici, pour avoir $u_{10}$, il faut d'abord calculer $u_1, u_2, u_3...$ jusqu'à 9. C'est long !*")
 
-        with st.expander("📉 La Monotonie (Sens de variation)"):
+        with st.expander("🔄 Sens de variation (Monotonie)"):
             st.write("Pour savoir si une suite monte ou descend, on calcule :")
             st.latex(r"u_{n+1} - u_n")
-            st.success("⬆️ Résultat > 0 : La suite est **Croissante**.")
-            st.error("⬇️ Résultat < 0 : La suite est **Décroissante**.")
+            st.success("↗️ Résultat > 0 : La suite est **Croissante**.")
+            st.error("↘️ Résultat < 0 : La suite est **Décroissante**.")
 
     # --- ONGLET 2 : ARITHMÉTIQUES ---
     with t_ari:
