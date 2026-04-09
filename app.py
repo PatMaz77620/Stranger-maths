@@ -837,69 +837,95 @@ elif st.session_state.page == 'chap4':
             else:
                 st.error(f"Pas tout à fait. Cherchez la case 'Filles' + 'Sportifs' (15) et divisez par le Total (40).")
 
-    # --- 3. ARBRE DE CHOIX (BASÉ SUR LES DONNÉES DU TABLEAU) ---
+    # --- 3. ARBRE DE CHOIX (STYLE GRAPHIQUE ÉPURÉ ET MATHÉMATIQUE) ---
     with tab_arbre:
         st.subheader("🌳 Arbre de Probabilités")
-        st.write("Voici les données du tableau précédent transformées en arbre (Premier choix : Genre / Deuxième choix : Sport) :")
+        st.write("Visualisation mathématique des chemins possibles (basée sur les données du tableau) :")
 
-        # Configuration du graphique
-        fig, ax = plt.subplots(figsize=(10, 6))
+        # Configuration du graphique plus grand pour éviter les chevauchements
+        fig, ax = plt.subplots(figsize=(12, 7)) # Taille augmentée
         fig.patch.set_facecolor('#0e1117')
         ax.set_facecolor('#161b22')
 
-        # Coordonnées des nœuds ajustées pour la lisibilité
+        # Définition des événements (pour la clarté pédagogique)
+        # A = Fille, B = Sportif
+        
+        # Coordonnées des nœuds ajustées pour aérer l'affichage
         nodes = {
             'START': (0, 0),
-            'Garçon': (1, 1),
-            'Fille': (1, -1),
-            'G_Sport': (2, 1.5),
-            'G_NonS': (2, 0.5),
-            'F_Sport': (2, -0.5),
-            'F_NonS': (2, -1.5)
+            'A': (1, 1.2),      # Fille
+            'nonA': (1, -1.2),  # Garçon (non Fille)
+            'B_A': (2.2, 1.8),  # Sportif sachant Fille
+            'nonB_A': (2.2, 0.6), # Non Sportif sachant Fille
+            'B_nonA': (2.2, -0.6), # Sportif sachant Garçon
+            'nonB_nonA': (2.2, -1.8) # Non Sportif sachant Garçon
         }
 
-        # Fonction pour dessiner les branches avec les valeurs du tableau
-        def draw_branch(p1, p2, label, sub_label):
+        # Dessiner les branches (Lignes Rouges fines)
+        def draw_branch(p1, p2, label):
             ax.plot([nodes[p1][0], nodes[p2][0]], [nodes[p1][1], nodes[p2][1]], 
-                    color='#ff0000', lw=3, zorder=1)
+                    color='#ff4b4b', lw=2.5, zorder=1) # Rouge plus discret
+            # Label de probabilité (notation mathématique)
             mid_x = (nodes[p1][0] + nodes[p2][0]) / 2
             mid_y = (nodes[p1][1] + nodes[p2][1]) / 2
-            # Probabilité (Label principal)
-            ax.text(mid_x, mid_y + 0.15, label, color='#00d4ff', fontweight='bold', ha='center', fontsize=11)
-            # Détail du calcul (Sub-label plus petit)
-            ax.text(mid_x, mid_y - 0.25, sub_label, color='white', fontsize=9, ha='center', fontstyle='italic')
+            # Texte blanc, gras, taille raisonnable
+            ax.text(mid_x, mid_y + 0.12, label, color='white', fontweight='bold', ha='center', fontsize=11)
 
-        # 1er Niveau : Genre (Total 40, G=20, F=20)
-        draw_branch('START', 'Garçon', '0,5', '(20/40)')
-        draw_branch('START', 'Fille', '0,5', '(20/40)')
+        # Dessiner les branches avec les notations mathématiques P(A), P_A(B)
+        draw_branch('START', 'A', r'$P(A)$')
+        draw_branch('START', 'nonA', r'$P(\bar{A})$')
+        draw_branch('A', 'B_A', r'$P_A(B)$')
+        draw_branch('A', 'nonB_A', r'$P_A(\bar{B})$')
+        draw_branch('nonA', 'B_nonA', r'$P_{\bar{A}}(B)$')
+        draw_branch('nonA', 'nonB_nonA', r'$P_{\bar{A}}(\bar{B})$')
 
-        # 2ème Niveau : Sport sachant Garçon (Total G=20, S=12, NS=8)
-        draw_branch('Garçon', 'G_Sport', '0,6', '(12/20)')
-        draw_branch('Garçon', 'G_NonS', '0,4', '(8/20)')
-
-        # 2ème Niveau : Sport sachant Fille (Total F=20, S=15, NS=5)
-        draw_branch('Fille', 'F_Sport', '0,75', '(15/20)')
-        draw_branch('Fille', 'F_NonS', '0,25', '(5/20)')
-
-        # Dessiner les nœuds
+        # Dessiner les nœuds (Points Cyan plus petits)
         for name, pos in nodes.items():
-            ax.scatter(pos[0], pos[1], color='#00d4ff', s=250, zorder=2, edgecolors='white')
-            # On n'affiche pas "START" pour plus de clarté
-            label_node = "" if name == "START" else name.replace("G_", "").replace("F_", "")
-            ax.text(pos[0] + 0.1, pos[1], label_node, color='white', fontsize=10, fontweight='bold', va='center')
+            ax.scatter(pos[0], pos[1], color='#00d4ff', s=150, zorder=2, edgecolors='white')
+            # Label du nœud (simple lettre) placé à droite pour gagner de l'espace
+            if name != 'START':
+                label_node = name.replace("B_nonA", r"$\bar{A}\cap B$").replace("nonB_nonA", r"$\bar{A}\cap \bar{B}$").replace("B_A", r"$A\cap B$").replace("nonB_A", r"$A\cap \bar{B}$")
+                # Cas particuliers pour les noeuds intermédiaires
+                if name == 'A': label_node = r'$A$'
+                if name == 'nonA': label_node = r'$\bar{A}$'
+                
+                # Placement stratégique du texte
+                ax.text(pos[0] + 0.08, pos[1], label_node, color='#00d4ff', fontsize=12, va='center', fontweight='bold')
 
-        ax.set_xlim(-0.2, 2.8)
-        ax.set_ylim(-2, 2)
-        ax.axis('off')
+        # Nettoyage du graphique
+        ax.set_xlim(-0.3, 2.8)
+        ax.set_ylim(-2.2, 2.2)
+        ax.axis('off') # On cache les axes pour l'arbre
+
         st.pyplot(fig)
 
-        st.info(r"""
-        **💡 Comment lire cet arbre issu du tableau :**
-        1. **Au départ :** On divise par le **Total Général** ($40$). Ex: $P(Fille) = 20/40 = 0,5$.
-        2. **Au second niveau :** Ce sont des **Probabilités Conditionnelles**. On divise par le total de la ligne précédente. 
-           *Exemple :* Sachant qu'on a une fille (on est sur la branche du bas), quelle est la probabilité qu'elle soit sportive ? 
-           On regarde le tableau : $15$ filles sportives sur $20$ filles au total $\implies 15/20 = 0,75$.
-        """)
+        # --- NOUVEAU BLOC DE CORRESPONDANCE (DISCRET ET CLAIR) ---
+        st.write("---")
+        st.write("### 📐 Correspondance avec les données du Tableau")
+        
+        c1, c2 = st.columns(2)
+        
+        with c1:
+            st.info(r"""
+            **Événements définis :**
+            - $A$ : Choisir une Fille
+            - $\bar{A}$ : Choisir un Garçon
+            - $B$ : Choisir un(e) Sportif(ve)
+            """)
+            st.success(r"""
+            **Calculs issus du Tableau :**
+            - $P(A) = 20 / 40 = 0,5$
+            - $P(\bar{A}) = 20 / 40 = 0,5$
+            """)
+
+        with c2:
+            st.warning(r"""
+            **Probabilités Conditionnelles (2nd niveau) :**
+            - $P_A(B) = 15 / 20 = 0,75$ (Filles sportives parmi les filles)
+            - $P_A(\bar{B}) = 5 / 20 = 0,25$ (Filles non sportives parmi les filles)
+            - $P_{\bar{A}}(B) = 12 / 20 = 0,6$ (Garçons sportifs parmi les garçons)
+            - $P_{\bar{A}}(\bar{B}) = 8 / 20 = 0,4$ (Garçons non sportifs parmi les garçons)
+            """)
 
 
     # --- SOUS-CHAPITRE 4 : QUIZZ ---
