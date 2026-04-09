@@ -837,62 +837,68 @@ elif st.session_state.page == 'chap4':
             else:
                 st.error(f"Pas tout à fait. Cherchez la case 'Filles' + 'Sportifs' (15) et divisez par le Total (40).")
 
-    # --- 3. ARBRE DE CHOIX (STYLE GRAPHIQUE NOIR/CYAN/ROUGE) ---
+    # --- 3. ARBRE DE CHOIX (BASÉ SUR LES DONNÉES DU TABLEAU) ---
     with tab_arbre:
         st.subheader("🌳 Arbre de Probabilités")
-        st.write("Visualisation des chemins possibles :")
+        st.write("Voici les données du tableau précédent transformées en arbre (Premier choix : Genre / Deuxième choix : Sport) :")
 
-
-        # Configuration du graphique identique au Ch0/Ch3
-        fig, ax = plt.subplots(figsize=(10, 5))
+        # Configuration du graphique
+        fig, ax = plt.subplots(figsize=(10, 6))
         fig.patch.set_facecolor('#0e1117')
         ax.set_facecolor('#161b22')
 
-        # Construction de l'arbre
-        # Coordonnées des nœuds
+        # Coordonnées des nœuds ajustées pour la lisibilité
         nodes = {
-            'Départ': (0, 0),
-            'A': (1, 1),
-            'nonA': (1, -1),
-            'B_sachant_A': (2, 1.5),
-            'nonB_sachant_A': (2, 0.5),
-            'B_sachant_nonA': (2, -0.5),
-            'nonB_sachant_nonA': (2, -1.5)
+            'START': (0, 0),
+            'Garçon': (1, 1),
+            'Fille': (1, -1),
+            'G_Sport': (2, 1.5),
+            'G_NonS': (2, 0.5),
+            'F_Sport': (2, -0.5),
+            'F_NonS': (2, -1.5)
         }
 
-        # Dessiner les branches (Lignes Rouges)
-        def draw_branch(p1, p2, label):
+        # Fonction pour dessiner les branches avec les valeurs du tableau
+        def draw_branch(p1, p2, label, sub_label):
             ax.plot([nodes[p1][0], nodes[p2][0]], [nodes[p1][1], nodes[p2][1]], 
                     color='#ff0000', lw=3, zorder=1)
-            # Label de probabilité au milieu de la branche
             mid_x = (nodes[p1][0] + nodes[p2][0]) / 2
             mid_y = (nodes[p1][1] + nodes[p2][1]) / 2
-            ax.text(mid_x, mid_y + 0.1, label, color='white', fontweight='bold', ha='center')
+            # Probabilité (Label principal)
+            ax.text(mid_x, mid_y + 0.15, label, color='#00d4ff', fontweight='bold', ha='center', fontsize=11)
+            # Détail du calcul (Sub-label plus petit)
+            ax.text(mid_x, mid_y - 0.25, sub_label, color='white', fontsize=9, ha='center', fontstyle='italic')
 
-        draw_branch('Départ', 'A', 'P(A)')
-        draw_branch('Départ', 'nonA', 'P(nonA)')
-        draw_branch('A', 'B_sachant_A', 'P_A(B)')
-        draw_branch('A', 'nonB_sachant_A', 'P_A(nonB)')
-        draw_branch('nonA', 'B_sachant_nonA', 'P_nonA(B)')
-        draw_branch('nonA', 'nonB_sachant_nonA', 'P_nonA(nonB)')
+        # 1er Niveau : Genre (Total 40, G=20, F=20)
+        draw_branch('START', 'Garçon', '0,5', '(20/40)')
+        draw_branch('START', 'Fille', '0,5', '(20/40)')
 
-        # Dessiner les nœuds (Points Cyan)
+        # 2ème Niveau : Sport sachant Garçon (Total G=20, S=12, NS=8)
+        draw_branch('Garçon', 'G_Sport', '0,6', '(12/20)')
+        draw_branch('Garçon', 'G_NonS', '0,4', '(8/20)')
+
+        # 2ème Niveau : Sport sachant Fille (Total F=20, S=15, NS=5)
+        draw_branch('Fille', 'F_Sport', '0,75', '(15/20)')
+        draw_branch('Fille', 'F_NonS', '0,25', '(5/20)')
+
+        # Dessiner les nœuds
         for name, pos in nodes.items():
-            ax.scatter(pos[0], pos[1], color='#00d4ff', s=200, zorder=2, edgecolors='white')
-            ax.text(pos[0], pos[1]-0.3, name, color='#00d4ff', fontsize=10, ha='center', fontweight='bold')
+            ax.scatter(pos[0], pos[1], color='#00d4ff', s=250, zorder=2, edgecolors='white')
+            # On n'affiche pas "START" pour plus de clarté
+            label_node = "" if name == "START" else name.replace("G_", "").replace("F_", "")
+            ax.text(pos[0] + 0.1, pos[1], label_node, color='white', fontsize=10, fontweight='bold', va='center')
 
-        # Nettoyage du graphique
-        ax.set_xlim(-0.5, 2.5)
+        ax.set_xlim(-0.2, 2.8)
         ax.set_ylim(-2, 2)
-        ax.axis('off') # On cache les axes pour l'arbre
-
+        ax.axis('off')
         st.pyplot(fig)
 
-        st.info("""
-        **📏 Règle d'or de l'arbre :**
-        1. La somme des branches partant d'un même nœud vaut toujours **1**.
-        2. Pour calculer la probabilité d'un chemin complet, on **multiplie** les probabilités.
-        3. La somme des fleurs de l'arbre (les probabilités à droite) fait 1 ou 100%.
+        st.info(r"""
+        **💡 Comment lire cet arbre issu du tableau :**
+        1. **Au départ :** On divise par le **Total Général** ($40$). Ex: $P(Fille) = 20/40 = 0,5$.
+        2. **Au second niveau :** Ce sont des **Probabilités Conditionnelles**. On divise par le total de la ligne précédente. 
+           *Exemple :* Sachant qu'on a une fille (on est sur la branche du bas), quelle est la probabilité qu'elle soit sportive ? 
+           On regarde le tableau : $15$ filles sportives sur $20$ filles au total $\implies 15/20 = 0,75$.
         """)
 
 
