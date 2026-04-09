@@ -873,11 +873,11 @@ elif st.session_state.page == 'chap4':
 
         # Dessiner les branches avec les notations mathématiques P(A), P_A(B)
         draw_branch('START', 'A', r'$P(A)$')
-        draw_branch('START', 'nonA', r'$P(\text{non } A)$') # Utilise \text{non }
+        draw_branch('START', 'nonA', r'$P(\bar{A})$')
         draw_branch('A', 'B_A', r'$P_A(B)$')
-        draw_branch('A', 'nonB_A', r'$P_A(\text{non } B)$')
-        draw_branch('nonA', 'B_nonA', r'$P_{\text{non } A}(B)$')
-        draw_branch('nonA', 'nonB_nonA', r'$P_{\text{non } A}(\text{non } B)$')
+        draw_branch('A', 'nonB_A', r'$P_A(\bar{B})$')
+        draw_branch('nonA', 'B_nonA', r'$P_{\bar{A}}(B)$')
+        draw_branch('nonA', 'nonB_nonA', r'$P_{\bar{A}}(\bar{B})$')
         
         # Dessiner les nœuds (Points Cyan plus petits)
         for name, pos in nodes.items():
