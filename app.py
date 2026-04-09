@@ -595,9 +595,10 @@ elif st.session_state.page == 'chap3':
         st.write("Exemple unique pour tout le cours : $f(x) = 2x^2 + 4x - 6$")
 
         with st.expander("1. Forme Développée : $f(x) = ax^2 + bx + c$"):
-            st.info("**Interprétation :** Le nombre **c = -6** est l'ordonnée à l'origine (coupe l'axe vertical).")
+            st.info("**Utile :** Le nombre **c = -6** est l'ordonnée à l'origine (coupe l'axe vertical).")
             st.latex(r"f(0) = c = -6")
-            
+            st.info("**Utile encore :** Le nombre **a** est ici positif **a = 2** ce qui donne le sens de la courbe (parabole dirigée vers le haut en forme de cuvette) ; si **a** avait été négatif, la parabole aurait été dirigée vers le bas (forme de colline).")
+        
         with st.expander("2. Forme Canonique : $f(x) = a(x - \\alpha)^2 + \\beta$"):
             st.success(r"""
             **🎯 Le Sommet $S(\alpha ; \beta)$ :**
