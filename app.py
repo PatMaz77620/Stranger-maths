@@ -529,11 +529,21 @@ elif st.session_state.page == 'chap2':
             st.warning("⚠️ *Ici, pour avoir $u_{10}$, il faut d'abord calculer $u_1, u_2, u_3...$ jusqu'à 9. C'est long !*")
 
         with st.expander("🔄 Sens de variation (Monotonie)"):
-            st.write("Pour savoir si une suite monte ou descend, on calcule :")
+            st.write("Pour savoir si une suite monte ou descend, on calcule la différence :")
             st.latex(r"u_{n+1} - u_n")
-            st.success("↗️ Résultat > 0 : La suite est **Croissante**.")
-            st.error("↘️ Résultat < 0 : La suite est **Décroissante**.")
+            
+            st.info("⚠️ **Condition :** Le signe doit être le même **quel que soit $n$** (le résultat ne doit pas dépendre de $n$).")
+            
+            st.success("↗️ **Résultat > 0 :** La suite est **Croissante**.")
+            st.error("↘️ **Résultat < 0 :** La suite est **Décroissante**.")
+            
+            st.warning("""
+            **Attention :** Certaines suites ne sont ni l'une ni l'autre !  
+            *Exemple :* $u_n = (-1)^n$ donne une suite qui alterne : $1, -1, 1, -1...$  
+            On dit qu'elle n'est **pas monotone**.
+            """)
 
+    
     # --- ONGLET 2 : ARITHMÉTIQUES ---
     with t_ari:
         st.subheader("🪜 Suites Arithmétiques (Addition)")
