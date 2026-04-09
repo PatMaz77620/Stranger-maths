@@ -609,7 +609,7 @@ elif st.session_state.page == 'chap3':
             
 
         with st.expander("3. Forme Factorisée : $f(x) = a(x - x_1)(x - x_2)$"):
-            st.warning("**Interprétation :** $x_1$ et $x_2$ sont les **racines** (là où la courbe coupe l'axe horizontal).")
+            st.warning("**Interprétation :** $x_1$ et $x_2$ sont les **racines** (les valeurs de $x$ pour lesquelles la fonction $f$ s'annule, donc là où la courbe coupe l'axe horizontal).")
             st.latex(r"f(x) = 2(x - 1)(x + 3) \rightarrow x_1 = 1, x_2 = -3")
 
 # --- ONGLET 2 : GALERIE (STYLE UNIFIÉ CH0) ---
