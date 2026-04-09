@@ -531,8 +531,8 @@ elif st.session_state.page == 'chap2':
         with st.expander("📉 La Monotonie (Sens de variation)"):
             st.write("Pour savoir si une suite monte ou descend, on calcule :")
             st.latex(r"u_{n+1} - u_n")
-            st.success("✅ Résultat > 0 : La suite est **Croissante**.")
-            st.error("❌ Résultat < 0 : La suite est **Décroissante**.")
+            st.success("⬆️ Résultat > 0 : La suite est **Croissante**.")
+            st.error("⬇️ Résultat < 0 : La suite est **Décroissante**.")
 
     # --- ONGLET 2 : ARITHMÉTIQUES ---
     with t_ari:
