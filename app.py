@@ -876,8 +876,8 @@ elif st.session_state.page == 'chap4':
         draw_branch('START', 'nonA', r'$P(\bar{A})$')
         draw_branch('A', 'B_A', r'$P_A(B)$')
         draw_branch('A', 'nonB_A', r'$P_A(\bar{B})$')
-        draw_branch('non A', 'B_nonA', r'$P_{\bar{A}}(B)$')
-        draw_branch('non A', 'nonB_nonA', r'$P_{\bar{A}}(\bar{B})$')
+        draw_branch('nonA', 'B_nonA', r'$P_{\bar{A}}(B)$')
+        draw_branch('nonA', 'nonB_nonA', r'$P_{\bar{A}}(\bar{B})$')
 
         # Dessiner les nœuds (Points Cyan plus petits)
         for name, pos in nodes.items():
