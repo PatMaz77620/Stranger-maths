@@ -673,8 +673,8 @@ elif st.session_state.page == 'chap3':
         with col_p:
             st.write("**Paramètres (Forme Canonique) :**")
             sa = st.slider("Coefficient a (Ouverture et sens)", -4.0, 4.0, 1.0, step=0.5)
-            s_alpha = st.number_input("Alpha (abscisse du sommet)", value=0.0)
-            s_beta = st.number_input("Beta (ordonnée du sommet)", value=0.0)
+            s_alpha = st.number_input("Alpha (abscisse du sommet)", value=2.0)
+            s_beta = st.number_input("Beta (ordonnée du sommet)", value=3.0)
         
         with col_v:
             # Création du graphique dynamique
