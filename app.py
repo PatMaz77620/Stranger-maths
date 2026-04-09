@@ -611,8 +611,14 @@ elif st.session_state.page == 'chap3':
             st.warning("**Interprétation :** $x_1$ et $x_2$ sont les **racines** (les valeurs de $x$ pour lesquelles la fonction $f$ s'annule, donc là où la courbe coupe l'axe horizontal).")
             st.latex(r"f(x) = 2(x - 1)(x + 3) \rightarrow x_1 = 1, x_2 = -3")
             st.warning("**IMPORTANT :** les **racines** permettent de connaître le signe de la fonction $f$ : je retiens que la fonction $f$ est du signe de **a** à l'extérieur des **racines** $x_1$ et $x_2$")
-            st.write("👉 *$f(x)$ est positif jusque -3, négatif entre -3 et 1, puis à nouveau positif à partir de 1*")
+            st.write(r"👉 *$f(x)$ est positif jusque -3, négatif entre -3 et 1, puis à nouveau positif à partir de 1*")
+            st.write(r"**Version mathématique :**")
+            st.info(r"""
+            - $f(x) \geqslant 0$ si $x \in ]-\infty ; -3] \cup [1 ; +\infty[$
+            - $f(x) \leqslant 0$ si $x \in [-3 ; 1]$
+            """)
 
+    
 # --- ONGLET 2 : GALERIE (STYLE UNIFIÉ CH0) ---
     with t_galerie:
 
