@@ -519,7 +519,7 @@ elif st.session_state.page == 'chap2':
             st.write("#### 1️⃣ Forme Explicite (Le calcul direct)")
             st.write("On calcule n'importe quel terme directement avec **n**.")
             st.latex(r"u_n = f(n)")
-            st.info("👉 *Exemple :* $u_n = 3n + 2$. Pour $u_{100}$, on fait $3 \times 100 + 2$. Rapide !")
+            st.info(r"👉 *Exemple :* $u_n = 3n + 2$. Pour $u_{100}$, on fait $3 \times 100 + 2$. Rapide !")
             
             st.divider()
             
