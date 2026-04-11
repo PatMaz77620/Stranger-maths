@@ -1160,4 +1160,3 @@ elif st.session_state.page == 'chap5':
     with tab5:
         # Pense à ajouter 'chap5' dans ton dictionnaire 'themes' de la fonction afficher_interface_quiz
         afficher_interface_quiz()
-
