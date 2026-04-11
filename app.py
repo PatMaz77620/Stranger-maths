@@ -121,10 +121,17 @@ def aller_a_home():
     st.session_state.clear()
     st.session_state.page = 'home'
 
-def generer_mission_gemini(theme_maths):
-    # On demande explicitement une liste de 11 objets
-    prompt = f"""Génère une LISTE de 11 questions de mathématiques (niveau 1ERE STMG) sur le thème : {theme_maths}.
-    Format JSON strict : une liste d'objets [{{...}}, {{...}}] contenant :
+def generer_mission_gemini(theme_maths, difficulte):
+    # Précisions pour guider l'IA sur le niveau des questions
+    niveaux = {
+        "Facile": "Niveau 1 : Applications directes du cours, calculs simples et évidents.",
+        "Moyen": "Niveau 2 : Niveau standard STMG, mélanger lecture d'énoncés et calculs à 2 étapes.",
+        "Difficile": "Niveau 3 : Questions type Bac, cas particuliers, et raisonnements plus poussés. Assure-toi que les calculs sont réalisables rapidement avec une calculatrice de poche ou, sinon, précise le dans la question que l'on doit utiliser une calculatrice scientifique (par exemple une TI-83 Premium CE)"
+    }
+    
+    prompt = f"""Génère une LISTE de 11 questions de mathématiques (niveau 1ERE STMG - à respecteur strictement) sur le thème : {theme_maths}.
+    Difficulté : {difficulte} ({niveaux[difficulte]}).
+     Format JSON strict : une liste d'objets [{{...}}, {{...}}] contenant :
     - 'question': texte de la question
     - 'options': liste de 4 choix
     - 'reponse': la réponse exacte parmi les options
@@ -197,19 +204,39 @@ def afficher_interface_quiz():
         else:
             st.balloons()
             st.title("🏆 Mission Accomplie !")
-            score_final = st.session_state.score
-            st.metric("Ton Score Final", f"{score_final} / {len(questions)}")
             
-            if score_final >= 7:
-                st.success("Impressionnant ! Tes pouvoirs mathématiques sont au niveau d'Eleven.")
+            # Récupération des infos
+            score_final = st.session_state.score
+            total_q = len(st.session_state.quiz_dynamique)
+            diff = st.session_state.get('difficulte_active', 'Moyen')
+            
+            # Affichage du score
+            st.metric(f"Score Final (Niveau {diff})", f"{score_final} / {total_q}")
+            
+            # --- LOGIQUE DES MESSAGES PERSONNALISÉS ---
+            if score_final == total_q:
+                st.success(f"🔥 **INCROYABLE !** Un sans-faute en mode **{diff}**. Tes pouvoirs dépassent ceux d'Eleven !")
+            
+            elif score_final >= 7:
+                if diff == "Difficile":
+                    st.success("💪 **Expert confirmé !** Tu as terrassé le Demogorgon au niveau maximum. Les maths n'ont plus de secrets pour toi.")
+                else:
+                    st.success(f"👏 **Bravo !** Tu maîtrises le niveau **{diff}**. Prêt pour le niveau supérieur ?")
+            
+            elif score_final >= 5:
+                st.warning(f"🥉 **Moyenne atteinte.** Le niveau **{diff}** est en cours d'acquisition, mais attention aux pièges de l'Upside Down.")
+            
             else:
-                st.warning("Mission terminée. Entraîne-toi encore pour vaincre le Demogorgon !")
-                
+                st.error(f"🛸 **Mission périlleuse...** Le niveau **{diff}** était peut-être un peu haut. Reprends tes forces et réessaie !")
+
+            # --- BOUTON DE RELANCE ---
             if st.button("🔄 Lancer une nouvelle série", use_container_width=True):
+                # Nettoyage complet pour la prochaine mission
                 del st.session_state.quiz_dynamique
                 st.session_state.index_question = 0
                 st.session_state.score = 0
                 st.session_state.repondu = False
+                # On ne supprime pas difficulte_active pour qu'elle serve par défaut au prochain coup
                 st.rerun()
 
     # CAS B : Écran de lancement
@@ -226,16 +253,27 @@ def afficher_interface_quiz():
         
         st.markdown("---")
         st.write(f"Prêt pour une série de **Eleven questions** sur le thème :")
+
         st.subheader(f"🌀 {theme_actuel}")
+
+        # Choix de la difficulté
+        difficulte_choisie = st.select_slider(
+            "Sélectionnez le niveau de menace dans l'Upside Down :",
+            options=["Facile", "Moyen", "Difficile"],
+            value="Moyen"
+        )
+
         
         if st.button("🔦 Lancer la Mission Eleven", use_container_width=True):
-            with st.spinner("Eleven scanne l'Upside Down pour préparer tes 11 défis..."):
-                quiz = generer_mission_gemini(theme_actuel)
+            with st.spinner(f"Eleven scanne l'Upside Down pour préparer tes 11 défis (Niveau {difficulte_choisie})..."):
+                quiz = generer_mission_gemini(theme_actuel, difficulte_choisie)
                 if quiz:
                     st.session_state.quiz_dynamique = quiz
                     st.session_state.index_question = 0
                     st.session_state.score = 0
                     st.session_state.repondu = False
+                    # On stocke la difficulté pour le message final
+                    st.session_state.difficulte_active = difficulte_choisie
                     st.rerun()
 
 chemin_logo = "Stranger_Maths_Logo.png"
