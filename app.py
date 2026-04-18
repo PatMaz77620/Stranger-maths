@@ -6,26 +6,10 @@ import numpy as np
 import random
 import json
 
-import os
-import google.generativeai as genai
+from openai import OpenAI
 
-# 1. On force la désactivation des protocoles qui perdent l'API
-os.environ["GOOGLE_API_USE_MTLS"] = "never"
-os.environ["GRPC_DNS_RESOLVER"] = "native"
-
-# 2. Configuration
-genai.configure(
-    api_key=st.secrets["GEMINI_API_KEY"],
-    transport="rest"
-)
-
-# 3. On choisit un modèle présent dans TA liste (le numéro 16 ou 18)
-# Ce sont des "alias" qui pointent toujours vers la version valide
-# Configuration avec mode JSON forcé (plus rapide et plus fiable)
-model = genai.GenerativeModel(
-    model_name='gemini-flash-latest',
-    generation_config={"response_mime_type": "application/json"}
-)
+# Initialisation du client OpenAI (beaucoup plus simple)
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 
 # --- 1. CONFIGURATION DE LA PAGE ---
@@ -121,15 +105,14 @@ def aller_a_home():
     st.session_state.clear()
     st.session_state.page = 'home'
 
-def generer_mission_gemini(theme_maths, difficulte):
-    # Précisions pour guider l'IA sur le niveau des questions
+def generer_mission_openai(theme_maths, difficulte):  # Vous pouvez garder le nom ou le changer
     niveaux = {
         "Facile": "Niveau 1 : Applications directes du cours, calculs simples et évidents.",
         "Moyen": "Niveau 2 : Niveau standard STMG, mélanger lecture d'énoncés et calculs à 2 étapes.",
-        "Difficile": "Niveau 3 : Questions type Bac, cas particuliers, et raisonnements plus poussés. Assure-toi que les calculs sont réalisables rapidement avec une calculatrice de poche ou, sinon, précise le dans la question que l'on doit utiliser une calculatrice scientifique (par exemple une TI-83 Premium CE)"
+        "Difficile": "Niveau 3 : Questions type Bac, cas particuliers, et raisonnements plus poussés."
     }
-    
-    prompt = f"""Génère une LISTE de 11 questions de mathématiques (niveau 1ERE STMG - à respecteur strictement) sur le thème : {theme_maths}.
+
+    prompt = f"""Génère une LISTE de 11 questions de mathématiques (niveau 1ERE STMG) sur le thème : {theme_maths}.
     Difficulté : {difficulte} ({niveaux[difficulte]}).
      Format JSON strict : une liste d'objets [{{...}}, {{...}}] contenant :
     - 'question': texte de la question
@@ -137,17 +120,36 @@ def generer_mission_gemini(theme_maths, difficulte):
     - 'reponse': la réponse exacte parmi les options
     - 'explication': une courte explication pédagogique
     """
-    
+
     try:
-        response = model.generate_content(prompt)
-        # Nettoyage si jamais le modèle ajoute des balises markdown
-        data = response.text.replace('```json', '').replace('```', '').strip()
+        # --- CHANGEMENT ICI POUR OPENAI ---
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system",
+                 "content": "Tu es un expert en mathématiques pédagogiques pour le niveau STMG. Tu réponds uniquement en JSON."},
+                {"role": "user", "content": prompt}
+            ],
+            response_format={"type": "json_object"}
+        )
+
+        # Extraction du contenu texte
+        data = response.choices[0].message.content
         quiz_data = json.loads(data)
-        return quiz_data # Retourne une liste de 10 questions
+
+        # Sécurité : OpenAI peut parfois encapsuler la liste dans une clé "questions"
+        if isinstance(quiz_data, dict) and "questions" in quiz_data:
+            return quiz_data["questions"]
+        elif isinstance(quiz_data, dict) and not isinstance(quiz_data, list):
+            # Si c'est un dictionnaire mais pas une liste, on cherche la première liste dedans
+            for val in quiz_data.values():
+                if isinstance(val, list): return val
+
+        return quiz_data
     except Exception as e:
-        st.error(f"Erreur de connexion avec Eleven : {e}")
+        st.error(f"Erreur de connexion avec OpenAI : {e}")
         return None
-        
+
 def afficher_interface_quiz():
     # 1. Initialisation des variables de session si elles n'existent pas
     if 'index_question' not in st.session_state:
@@ -266,7 +268,7 @@ def afficher_interface_quiz():
         
         if st.button("🔦 Lancer la Mission Eleven", use_container_width=True):
             with st.spinner(f"Eleven scanne l'Upside Down pour préparer tes 11 défis (Niveau {difficulte_choisie})..."):
-                quiz = generer_mission_gemini(theme_actuel, difficulte_choisie)
+                quiz = generer_mission_openai(theme_actuel, difficulte_choisie)
                 if quiz:
                     st.session_state.quiz_dynamique = quiz
                     st.session_state.index_question = 0
