@@ -95,27 +95,35 @@ st.markdown("""
 
 # --- FONCTIONS ---
 def tracer_graphique_automatisme(graph_data):
-    """Génère un graphique style Stranger Maths à partir des données JSON"""
+    """Génère un graphique avec sécurité contre les clés manquantes"""
+    if not graph_data:
+        return
+        
     fig, ax = plt.subplots(figsize=(5, 4))
-    fig.patch.set_facecolor('#0e1117')  # Fond noir
+    fig.patch.set_facecolor('#0e1117')
     ax.set_facecolor('#0e1117')
     
-    # Configuration des axes et grille
     ax.grid(True, color='gray', linestyle='--', linewidth=0.5, alpha=0.5)
     ax.axhline(0, color='white', linewidth=1.5)
     ax.axvline(0, color='white', linewidth=1.5)
     ax.tick_params(colors='white')
     
-    # Type de tracé selon la demande de l'IA
     x = np.linspace(-5, 5, 400)
-    if graph_data['type'] == 'parabola':
-        # f(x) = a(x-alpha)^2 + beta
-        a, alpha, beta = graph_data['a'], graph_data['alpha'], graph_data['beta']
+    
+    # Récupération sécurisée des paramètres
+    g_type = graph_data.get('type', 'line')
+    
+    if g_type == 'parabola':
+        # Valeurs par défaut si l'IA oublie une clé
+        a = graph_data.get('a', 1)
+        alpha = graph_data.get('alpha', 0)
+        beta = graph_data.get('beta', 0)
         y = a * (x - alpha)**2 + beta
-        ax.plot(x, y, color='#ff0000', linewidth=2.5) # Rouge néon
-    elif graph_data['type'] == 'line':
-        # f(x) = ax + b
-        a, b = graph_data['a'], graph_data['b']
+        ax.plot(x, y, color='#ff0000', linewidth=2.5)
+        
+    elif g_type == 'line':
+        a = graph_data.get('a', 1)
+        b = graph_data.get('b', 0) # Si 'b' manque, on prend 0
         y = a * x + b
         ax.plot(x, y, color='#ff0000', linewidth=2.5)
     
@@ -141,15 +149,20 @@ def generer_automatisme_openai():
     random.shuffle(themes)
     themes_str = ", ".join(themes)
 
+    # 2. On intègre tes consignes précises dans le prompt
     prompt = f"""Génère un quiz de 11 questions d'AUTOMATISMES pour 1ère STMG.
-    Tu DOIS varier les thèmes en piochant impérativement dans cette liste : {themes_str}.
+    Thèmes à couvrir : {themes_str}.
     
-    CONTRAINTES :
+    CONSIGNES TECHNIQUES :
     - Format : 4 options A, B, C, D.
-    - 3 questions doivent impérativement être des LECTURES GRAPHIQUES (has_graph: true).
-    - Pour les lectures graphiques, précise bien dans l'énoncé ce qu'on doit lire.
+    - 3 questions doivent être des LECTURES GRAPHIQUES (has_graph: true).
     
-    Structure JSON attendue :
+    STRUCTURE DES GRAPHES (IMPÉRATIF) :
+    Si has_graph est true, graph_data DOIT être :
+    - Pour une droite : {{"type": "line", "a": coefficient_directeur, "b": ordonnee_a_l_origine}}
+    - Pour une parabole : {{"type": "parabola", "a": coef, "alpha": x_sommet, "beta": y_sommet}}
+    
+    Structure JSON :
     {{
       "questions": [
         {{
@@ -158,7 +171,7 @@ def generer_automatisme_openai():
           "reponse": "A. ...", 
           "explication": "...",
           "has_graph": true/false,
-          "graph_data": {{"type": "parabola" ou "line", "a": ..., "alpha": ..., "beta": ...}} ou null
+          "graph_data": {{...}} ou null
         }}
       ]
     }}
@@ -166,8 +179,10 @@ def generer_automatisme_openai():
     try:
         response = client.chat.completions.create(
             model="gpt-4o-mini",
-            messages=[{"role": "system", "content": "Tu es un expert en automatismes mathématiques STMG."},
-                      {"role": "user", "content": prompt}],
+            messages=[
+                {"role": "system", "content": "Tu es un expert en mathématiques STMG. Tu respectes strictement le format JSON et les structures de graph_data."},
+                {"role": "user", "content": prompt}
+            ],
             response_format={"type": "json_object"}
         )
         data = json.loads(response.choices[0].message.content)
