@@ -96,6 +96,67 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # --- FONCTIONS ---
+def tracer_graphique_automatisme(graph_data):
+    """Génère un graphique style Stranger Maths à partir des données JSON"""
+    fig, ax = plt.subplots(figsize=(5, 4))
+    fig.patch.set_facecolor('#0e1117')  # Fond noir
+    ax.set_facecolor('#0e1117')
+    
+    # Configuration des axes et grille
+    ax.grid(True, color='gray', linestyle='--', linewidth=0.5, alpha=0.5)
+    ax.axhline(0, color='white', linewidth=1.5)
+    ax.axvline(0, color='white', linewidth=1.5)
+    ax.tick_params(colors='white')
+    
+    # Type de tracé selon la demande de l'IA
+    x = np.linspace(-5, 5, 400)
+    if graph_data['type'] == 'parabola':
+        # f(x) = a(x-alpha)^2 + beta
+        a, alpha, beta = graph_data['a'], graph_data['alpha'], graph_data['beta']
+        y = a * (x - alpha)**2 + beta
+        ax.plot(x, y, color='#ff0000', linewidth=2.5) # Rouge néon
+    elif graph_data['type'] == 'line':
+        # f(x) = ax + b
+        a, b = graph_data['a'], graph_data['b']
+        y = a * x + b
+        ax.plot(x, y, color='#ff0000', linewidth=2.5)
+    
+    ax.set_xlim(-5, 5)
+    ax.set_ylim(-5, 5)
+    st.pyplot(fig)
+
+def generer_automatisme_openai():
+    prompt = """Génère un quiz de 11 questions d'AUTOMATISMES (Maths 1ère STMG).
+    FORMAT : 4 options A, B, C, D.
+    IMPORTANT : Pour chaque question, fournis la lettre de la réponse correcte ET une explication pédagogique très courte.
+    
+    Structure JSON attendue :
+    {
+      "questions": [
+        {
+          "question": "...",
+          "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+          "reponse": "A. ...", 
+          "explication": "Le coefficient multiplicateur pour une baisse de 10% est 0,9. Donc 130 * 0,9 = 117.",
+          "has_graph": false,
+          "graph_data": null
+        }
+      ]
+    }
+    """
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "system", "content": "Tu es un expert en automatismes mathématiques STMG."},
+                      {"role": "user", "content": prompt}],
+            response_format={"type": "json_object"}
+        )
+        data = json.loads(response.choices[0].message.content)
+        return data["questions"]
+    except Exception as e:
+        st.error(f"Erreur OpenAI : {e}")
+        return None
+
 def formater_fr(valeur, decimales=2):
     if valeur is None: return "0"
     s = f"{valeur:.{decimales}f}".replace('.', ',').rstrip('0').rstrip(',')
@@ -283,6 +344,9 @@ chemin_logo = "Stranger_Maths_Logo.png"
 # =================================================================
 # PAGE D'ACCUEIL
 # =================================================================
+
+# --- 🎯 4. LOGIQUE DES ÉCRANS ---
+
 if st.session_state.page == 'home':
     try:
         img = Image.open(chemin_logo)
@@ -292,11 +356,9 @@ if st.session_state.page == 'home':
     
     st.write("### 🎮 Choisissez votre mission :")
     
-    # Utilisation d'un container pour forcer le comportement CSS
     with st.container():
-        st.markdown('<div class="grille-accueil">', unsafe_allow_html=True)
         col1, col2 = st.columns(2, gap="medium")
-        
+
         with col1:
             if st.button("🌀 Fonctions :\nGénéralités", key="btn_c0"):
                 st.session_state.page = 'chap0'
@@ -320,24 +382,99 @@ if st.session_state.page == 'home':
                 st.session_state.page = 'chap5'
                 st.rerun()
 
-        st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("⚡ MISSION AUTOMATISMES (11 min)", use_container_width=True):
+        with st.spinner("Génération des automatismes..."):
+            quiz = generer_automatisme_openai()
+            if quiz:
+                st.session_state.quiz_data = quiz
+                st.session_state.quiz_type = 'automatisme'
+                st.session_state.current_q = 0
+                st.session_state.score = 0
+                st.session_state.start_time = pd.Timestamp.now()
+                st.session_state.page = 'quiz'
+                st.rerun()
+
+    # --- SECTION PUB : LE PHARE ---
+    st.write("---")
+    st.markdown("""
+        <div style="background-color: #161b22; border: 1px solid #00d4ff; border-radius: 10px; padding: 20px; text-align: center;">
+            <h3 style="color: #00d4ff; margin-top: 0;">🔦 Besoin d'un guide ?</h3>
+            <p style="color: white; font-size: 1.1rem;">
+                Besoin d'aide pour tes devoirs ou tes révisions ? <br>
+                Découvre <b>Le Phare</b>, l'association qui t'accompagne vers la réussite.
+            </p>
+            <a href="https://www.association-le-phare.com/" target="_blank" 
+                style="display: inline-block; background-color: #00d4ff; color: #0e1117; padding: 10px 20px; 
+                border-radius: 5px; text-decoration: none; font-weight: bold; transition: 0.3s;">
+                ⚓ Visiter le Phare
+            </a>
+        </div>
+    """, unsafe_allow_html=True)
+
+
+elif st.session_state.page == 'quiz':
+    if not st.session_state.get('quiz_data'):
+        st.session_state.page = 'home'
+        st.rerun()
+
+    # --- CHRONO AUTOMATISMES ---
+    if st.session_state.get('quiz_type') == 'automatisme':
+        elapsed = (pd.Timestamp.now() - st.session_state.start_time).total_seconds()
+        remaining = max(0, int(11 * 60 - elapsed))
+        mins, secs = divmod(remaining, 60)
+        st.markdown(f"<h2 style='text-align:center; color:#ff0000;'>⏳ {mins:02d}:{secs:02d}</h2>", unsafe_allow_html=True)
+        if remaining <= 0:
+            st.error("🚨 TEMPS ÉCOULÉ !")
+            if st.button("Voir le score"): st.session_state.page = 'score'; st.rerun()
+            st.stop()
+
+    idx = st.session_state.current_q
+    q = st.session_state.quiz_data[idx]
+    
+    st.subheader(f"Question {idx + 1} / 11")
+    if q.get('has_graph') and q.get('graph_data'):
+        tracer_graphique_automatisme(q['graph_data'])
+
+    st.markdown(f"### {q['question']}")
+
+    # --- SYSTÈME DE RÉPONSE ---
+    ans_key = f"ans_{idx}"
+    if ans_key not in st.session_state:
+        with st.form(key=f"f_{idx}"):
+            choix = st.radio("Options :", q['options'], index=None)
+            if st.form_submit_button("VÉRIFIER"):
+                if choix:
+                    st.session_state[ans_key] = choix
+                    if choix == q['reponse']: st.session_state.score += 1
+                    st.rerun()
+    else:
+        # Affichage Correction
+        if st.session_state[ans_key] == q['reponse']:
+            st.success(f"✅ BRAVO ! {q['reponse']}")
+        else:
+            st.error(f"❌ MAUVAISE RÉPONSE. C'était : {q['reponse']}")
+        st.info(f"💡 {q['explication']}")
+
+        if st.button("SUIVANT ➡️"):
+            if idx < 10:
+                st.session_state.current_q += 1
+                st.rerun()
+            else:
+                st.session_state.page = 'score'
+                st.rerun()
+
+elif st.session_state.page == 'score':
+    st.balloons()
+    st.title("🏆 MISSION TERMINÉE")
+    st.metric("Score Final", f"{st.session_state.score} / 11")
+    if st.button("🔄 Retour au QG"):
+        # On nettoie tout le state pour recommencer propre
+        for key in list(st.session_state.keys()):
+            if key != 'page': del st.session_state[key]
+        st.session_state.page = 'home'
+        st.rerun()
         
-        # --- SECTION PUB : LE PHARE ---
-        st.write("---")
-        st.markdown("""
-            <div style="background-color: #161b22; border: 1px solid #00d4ff; border-radius: 10px; padding: 20px; text-align: center;">
-                <h3 style="color: #00d4ff; margin-top: 0;">🔦 Besoin d'un guide ?</h3>
-                <p style="color: white; font-size: 1.1rem;">
-                    Besoin d'aide pour tes devoirs ou tes révisions ? <br>
-                    Découvre <b>Le Phare</b>, l'association qui t'accompagne vers la réussite.
-                </p>
-                <a href="https://www.association-le-phare.com/" target="_blank" 
-                   style="display: inline-block; background-color: #00d4ff; color: #0e1117; padding: 10px 20px; 
-                   border-radius: 5px; text-decoration: none; font-weight: bold; transition: 0.3s;">
-                   ⚓ Visiter le Phare
-                </a>
-            </div>
-        """, unsafe_allow_html=True)
 
 # =================================================================
 # CHAPITRE 0 : FONCTIONS (GÉNÉRALITÉS)
@@ -1162,3 +1299,4 @@ elif st.session_state.page == 'chap5':
     with tab5:
         # Pense à ajouter 'chap5' dans ton dictionnaire 'themes' de la fonction afficher_interface_quiz
         afficher_interface_quiz()
+
