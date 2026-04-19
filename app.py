@@ -90,8 +90,6 @@ st.markdown("""
         margin-bottom: 5px !important;
     }
     
-
-    
     </style>
     """, unsafe_allow_html=True)
 
@@ -126,23 +124,44 @@ def tracer_graphique_automatisme(graph_data):
     st.pyplot(fig)
 
 def generer_automatisme_openai():
-    prompt = """Génère un quiz de 11 questions d'AUTOMATISMES (Maths 1ère STMG).
-    FORMAT : 4 options A, B, C, D.
-    IMPORTANT : Pour chaque question, fournis la lettre de la réponse correcte ET une explication pédagogique très courte.
+    # Liste des thèmes pour forcer la diversité
+    themes = [
+        "Proportions et pourcentages",
+        "Taux d'évolution et coefficients multiplicateurs",
+        "Évolutions successives et réciproques",
+        "Calcul littéral (développement, factorisation simple)",
+        "Équations du premier degré",
+        "Lecture graphique d'images et d'antécédents",
+        "Signe d'une expression affine",
+        "Probabilités (fréquences, tableaux croisés)",
+        "Suites (calcul des premiers termes)"
+    ]
+    
+    # On mélange les thèmes et on en pioche pour le prompt
+    random.shuffle(themes)
+    themes_str = ", ".join(themes)
+
+    prompt = f"""Génère un quiz de 11 questions d'AUTOMATISMES pour 1ère STMG.
+    Tu DOIS varier les thèmes en piochant impérativement dans cette liste : {themes_str}.
+    
+    CONTRAINTES :
+    - Format : 4 options A, B, C, D.
+    - 3 questions doivent impérativement être des LECTURES GRAPHIQUES (has_graph: true).
+    - Pour les lectures graphiques, précise bien dans l'énoncé ce qu'on doit lire.
     
     Structure JSON attendue :
-    {
+    {{
       "questions": [
-        {
+        {{
           "question": "...",
           "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
           "reponse": "A. ...", 
-          "explication": "Le coefficient multiplicateur pour une baisse de 10% est 0,9. Donc 130 * 0,9 = 117.",
-          "has_graph": false,
-          "graph_data": null
-        }
+          "explication": "...",
+          "has_graph": true/false,
+          "graph_data": {{"type": "parabola" ou "line", "a": ..., "alpha": ..., "beta": ...}} ou null
+        }}
       ]
-    }
+    }}
     """
     try:
         response = client.chat.completions.create(
@@ -344,8 +363,6 @@ chemin_logo = "Stranger_Maths_Logo.png"
 # =================================================================
 # PAGE D'ACCUEIL
 # =================================================================
-
-# --- 🎯 4. LOGIQUE DES ÉCRANS ---
 
 if st.session_state.page == 'home':
     try:
