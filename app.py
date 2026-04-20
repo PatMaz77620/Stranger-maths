@@ -156,28 +156,41 @@ def tracer_graphique_automatisme(graph_data):
     st.pyplot(fig)
 
 def tracer_tableau_automatisme(data):
-    """Dessine un tableau de signes ou de variations simplifié"""
+    """Dessine un tableau de signes fidèle aux données de l'IA"""
     fig, ax = plt.subplots(figsize=(5, 3))
     fig.patch.set_facecolor('#0e1117')
     ax.set_facecolor('#161b22')
-    
-    # On cache les axes classiques
     ax.axis('off')
     
-    if data['type'] == 'signes':
-        # Exemple simple : x | -inf | val | +inf puis f(x) | + | 0 | -
-        ax.text(0.1, 0.8, "x", color='white', fontweight='bold')
-        ax.text(0.1, 0.4, "f(x)", color='white', fontweight='bold')
-        ax.axhline(0.6, color='white', lw=1)
-        ax.text(0.3, 0.8, "-∞", color='white')
-        ax.text(0.6, 0.8, str(data.get('racine', '0')), color='white')
-        ax.text(0.9, 0.8, "+∞", color='white')
-        ax.text(0.45, 0.4, data.get('signe1', '+'), color='#ff0000', fontsize=15)
-        ax.text(0.6, 0.4, "0", color='white')
-        ax.text(0.75, 0.4, data.get('signe2', '-'), color='#ff0000', fontsize=15)
-    
-    st.pyplot(fig)
+    # Récupération des données avec valeurs par défaut de secours
+    racine = str(data.get('racine', 'x0'))
+    s1 = data.get('signe1', '?')
+    s2 = data.get('signe2', '?')
+    fonction_nom = data.get('fonction', 'f(x)')
 
+    # Structure du tableau
+    ax.axhline(0.7, color='white', lw=1) # Ligne horizontale sous x
+    ax.axvline(0.3, color='white', lw=1) # Ligne verticale après les titres
+
+    # Entêtes
+    ax.text(0.1, 0.85, "x", color='white', fontweight='bold', ha='center')
+    ax.text(0.1, 0.35, fonction_nom, color='white', fontweight='bold', ha='center')
+
+    # Ligne des X
+    ax.text(0.4, 0.85, "-∞", color='white', ha='center')
+    ax.text(0.65, 0.85, racine, color='white', ha='center')
+    ax.text(0.9, 0.85, "+∞", color='white', ha='center')
+
+    # Ligne des Signes
+    ax.text(0.5, 0.35, s1, color='#ff0000', fontsize=18, ha='center', fontweight='bold')
+    ax.text(0.65, 0.35, "0", color='white', ha='center')
+    ax.text(0.8, 0.35, s2, color='#ff0000', fontsize=18, ha='center', fontweight='bold')
+    
+    # Petit filet vertical sous la racine
+    ax.axvline(0.65, ymin=0.1, ymax=0.6, color='white', lw=0.5, linestyle='--')
+
+    st.pyplot(fig)
+    
 def generer_automatisme_openai():
     # Liste des thèmes pour forcer la diversité
     themes = [
@@ -209,7 +222,8 @@ def generer_automatisme_openai():
     - Format : 4 options A, B, C, D.
     - 3 questions doivent être des LECTURES GRAPHIQUES (has_graph: true).
     - attention à bien vérifier la solution, celle que tu affiches comme étant la bonne réponse doit être absolument sûre, sans hallucination possible. 
-    - si tu crées une lecture graphique, tu DOIS d'abord calculer les coordonnées exactes et tu DOIS faire en sorte que le point en question tombe sur une graduation existante et visible avec des nombres entiers.  
+    - si tu crées une lecture graphique de fonction, tu DOIS d'abord calculer les coordonnées exactes et tu DOIS faire en sorte que le point en question tombe sur une graduation existante et visible avec des nombres entiers.  
+    - si tu crées un tableau de signes pour illustrer la question posée, vérifie que le tableau de signes DOIT REPRESENTER exactement la fonction de ta question.
 
     STRUCTURE DES GRAPHES (IMPÉRATIF) :
     Si has_graph est true, graph_data DOIT être :
