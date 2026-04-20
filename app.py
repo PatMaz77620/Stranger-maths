@@ -166,7 +166,12 @@ def generer_automatisme_openai():
         "Lecture graphique d'images et d'antécédents",
         "Signe d'une expression affine",
         "Probabilités (fréquences, tableaux croisés)",
-        "Suites (calcul des premiers termes)"
+        "Suites (calcul des premiers termes)",
+        "Tableaux de signes",
+        "Tableaux de variation",
+        "Dérivations",
+        "équation de tangentes à un polynôme du 2nd degré",
+        "polynômes du 2nd degré (racines, sommets, expression développée / factorisée / canonique)"
     ]
     
     # On mélange les thèmes et on en pioche pour le prompt
@@ -181,6 +186,7 @@ def generer_automatisme_openai():
     - Format : 4 options A, B, C, D.
     - 3 questions doivent être des LECTURES GRAPHIQUES (has_graph: true).
     - attention à bien vérifier la solution, celle que tu affiches comme étant la bonne réponse doit être absolument sûre, sans hallucination possible. 
+    - si tu crées une lecture graphique, tu DOIS d'abord calculer les coordonnées exactes et tu DOIS faire en sorte que le point en question tombe sur une graduation existante et visible avec des nombres entiers.  
     
     STRUCTURE DES GRAPHES (IMPÉRATIF) :
     Si has_graph est true, graph_data DOIT être :
@@ -470,76 +476,77 @@ if st.session_state.page == 'home':
     """, unsafe_allow_html=True)
 
 elif st.session_state.page == 'quiz':
-    # 1. Sécurité : retour à l'accueil si pas de données ou si quiz_data est mal formé
     if 'quiz_data' not in st.session_state or not st.session_state.quiz_data:
         st.session_state.page = 'home'
         st.rerun()
 
-    # 2. Récupération sécurisée de l'index actuel
     idx = st.session_state.get('current_q', 0)
-
-    # Sécurité anti-crash : si l'index dépasse la taille du quiz, on va au score
+    
+    # Sécurité Index
     if idx >= len(st.session_state.quiz_data):
         st.session_state.page = 'score'
         st.rerun()
 
     q = st.session_state.quiz_data[idx]
 
-    # --- CHRONO AUTOMATISMES (Uniquement si type automatisme) ---
-    if st.session_state.get('quiz_type') == 'automatisme' and 'start_time' in st.session_state:
+    # --- CHRONO ---
+    if st.session_state.get('quiz_type') == 'automatisme':
         elapsed = (pd.Timestamp.now() - st.session_state.start_time).total_seconds()
         remaining = max(0, int(11 * 60 - elapsed))
         mins, secs = divmod(remaining, 60)
-        
-        st.markdown(f"""
-            <div style="text-align: center; border: 2px solid #ff0000; border-radius: 10px; padding: 10px; margin-bottom: 20px;">
-                <h2 style="margin: 0; color: #ff0000;">⏳ {mins:02d}:{secs:02d}</h2>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        if remaining <= 0:
-            st.error("🚨 TEMPS ÉCOULÉ !")
-            if st.button("Voir le score"): 
-                st.session_state.page = 'score'
-                st.rerun()
-            st.stop()
+        st.markdown(f"<h2 style='text-align:center; color:#ff0000;'>⏳ {mins:02d}:{secs:02d}</h2>", unsafe_allow_html=True)
 
-    # --- AFFICHAGE QUESTION ---
     st.subheader(f"Question {idx + 1} / {len(st.session_state.quiz_data)}")
-    
-    # Affichage du graphique si présent
-    if q.get('has_graph') and q.get('graph_data'):
-        tracer_graphique_automatisme(q['graph_data'])
 
-    st.markdown(f"### {q['question']}")
-
-    # --- SYSTÈME DE RÉPONSE ---
+    # --- MISE EN PAGE : TEXTE À GAUCHE, GRAPH À DROITE ---
     ans_key = f"answered_{idx}"
     
-    if ans_key not in st.session_state:
-        # On utilise une clé de formulaire unique pour éviter les conflits
-        with st.form(key=f"form_question_{idx}"):
-            choix = st.radio("Options :", q['options'], index=None)
-            valider = st.form_submit_button("VÉRIFIER")
-            
-            if valider and choix:
-                st.session_state[ans_key] = choix
-                if choix == q['reponse']:
-                    st.session_state.score += 1
-                st.rerun()
-    else:
-        # Phase Correction
-        choix_fait = st.session_state[ans_key]
-        if choix_fait == q['reponse']:
-            st.success(f"✅ BIEN JOUÉ ! La réponse était : {q['reponse']}")
-        else:
-            st.error(f"❌ DOMMAGE... La réponse était : {q['reponse']}")
+    if q.get('has_graph') and q.get('graph_data'):
+        col_txt, col_grph = st.columns([1, 1], gap="large")
         
-        st.info(f"**💡 EXPLICATION :** {q['explication']}")
+        with col_grph:
+            tracer_graphique_automatisme(q['graph_data'])
+            
+        with col_txt:
+            st.markdown(f"### {q['question']}")
+            # Gestion du formulaire
+            if ans_key not in st.session_state:
+                with st.form(key=f"f_{idx}"):
+                    choix = st.radio("Sélectionnez votre réponse :", q['options'], index=None)
+                    if st.form_submit_button("VÉRIFIER"):
+                        if choix:
+                            st.session_state[ans_key] = choix
+                            if choix == q['reponse']: st.session_state.score += 1
+                            st.rerun()
+            else:
+                # Affichage correction
+                if st.session_state[ans_key] == q['reponse']:
+                    st.success(f"✅ BRAVO ! {q['reponse']}")
+                else:
+                    st.error(f"❌ MAUVAISE RÉPONSE. C'était : {q['reponse']}")
+                st.info(f"💡 {q['explication']}")
+    else:
+        # Affichage classique sans graphique
+        st.markdown(f"### {q['question']}")
+        if ans_key not in st.session_state:
+            with st.form(key=f"f_{idx}"):
+                choix = st.radio("Options :", q['options'], index=None)
+                if st.form_submit_button("VÉRIFIER"):
+                    if choix:
+                        st.session_state[ans_key] = choix
+                        if choix == q['reponse']: st.session_state.score += 1
+                        st.rerun()
+        else:
+            if st.session_state[ans_key] == q['reponse']:
+                st.success(f"✅ BRAVO !")
+            else:
+                st.error(f"❌ C'était : {q['reponse']}")
+            st.info(f"💡 {q['explication']}")
 
-        # Navigation vers la suite
-        if st.button("QUESTION SUIVANTE ➡️"):
-            if idx < (len(st.session_state.quiz_data) - 1):
+    # --- NAVIGATION ---
+    if ans_key in st.session_state:
+        if st.button("SUIVANT ➡️"):
+            if idx < len(st.session_state.quiz_data) - 1:
                 st.session_state.current_q += 1
                 st.rerun()
             else:
