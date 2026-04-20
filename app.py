@@ -279,39 +279,34 @@ def generer_automatisme_openai():
         )
         
         data = json.loads(response.choices[0].message.content)
+        
         questions = data["questions"]
 
         for q in questions:
-            # 1. On récupère la bonne réponse brute (ex: "A. 42")
-            bonne_reponse_brute = q['reponse']
+            # 1. On récupère la valeur pure de la bonne réponse
+            br = q['reponse']
+            valeur_correcte = br.split('.', 1)[-1].strip() if '.' in br else br.strip()
             
-            # 2. On nettoie les options pour enlever "A. ", "B. ", etc. si l'IA les a mis
-            # On ne garde que le contenu après le point ou l'espace
-            options_propres = []
+            # 2. On nettoie toutes les options pour n'avoir que les valeurs
+            valeurs_pures = []
             for opt in q['options']:
-                contenu = opt.split('.', 1)[-1].strip() if '.' in opt else opt.strip()
-                options_propres.append(contenu)
+                v = opt.split('.', 1)[-1].strip() if '.' in opt else opt.strip()
+                valeurs_pures.append(v)
             
-            # On nettoie aussi la bonne réponse de référence
-            bonne_valeur = bonne_reponse_brute.split('.', 1)[-1].strip() if '.' in bonne_reponse_brute else bonne_reponse_brute.strip()
-
-            # 3. Mélange des valeurs pures
-            random.shuffle(options_propres)
+            # 3. On mélange les valeurs
+            random.shuffle(valeurs_pures)
             
-            # 4. On reconstruit les options avec les lettres A, B, C, D dans l'ordre
+            # 4. On ré-attribue A, B, C, D
             lettres = ["A", "B", "C", "D"]
             nouvelles_options = []
-            nouvelle_bonne_reponse = ""
-
-            for i, valeur in enumerate(options_propres):
-                texte_final = f"{lettres[i]}. {valeur}"
-                nouvelles_options.append(texte_final)
-                # Si cette valeur est la bonne, on enregistre la nouvelle version (ex: "C. 42")
-                if valeur == bonne_valeur:
-                    nouvelle_bonne_reponse = texte_final
-
-            q['options'] = nouvelles_options
-            q['reponse'] = nouvelle_bonne_reponse
+            for i, val in enumerate(valeurs_pures):
+                texte_complet = f"{lettres[i]}. {val}"
+                nouvelles_options.append(texte_complet)
+                # On met à jour la réponse officielle
+                if val == valeur_correcte:
+                    q['reponse'] = texte_complet
+            
+            q['options'] = nouvelles_options # Ici, l'ordre sera toujours A, B, C, D
 
         return questions
 
