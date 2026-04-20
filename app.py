@@ -210,16 +210,13 @@ def generer_automatisme_openai():
     - 3 questions doivent être des LECTURES GRAPHIQUES (has_graph: true).
     - attention à bien vérifier la solution, celle que tu affiches comme étant la bonne réponse doit être absolument sûre, sans hallucination possible. 
     - si tu crées une lecture graphique, tu DOIS d'abord calculer les coordonnées exactes et tu DOIS faire en sorte que le point en question tombe sur une graduation existante et visible avec des nombres entiers.  
-    
+
     STRUCTURE DES GRAPHES (IMPÉRATIF) :
     Si has_graph est true, graph_data DOIT être :
-    - Pour une droite : {{"type": "line", "a": coefficient_directeur, "b": ordonnee_a_l_origine}}
-    - Pour une parabole : {{"type": "parabola", "a": coef, "alpha": x_sommet, "beta": y_sommet}}
+    - Droite : {{"type": "line", "a": pente, "b": ordonnee}}
+    - Parabole : {{"type": "parabola", "a": coef, "alpha": x_sommet, "beta": y_sommet}}
+    - Tableau de signes : {{"type": "signes", "racine": 2, "signe1": "+", "signe2": "-"}}
 
-    CONSIGNE GRAPHIQUE SUPPLÉMENTAIRE :
-    Tu peux aussi demander un tableau de signes.
-    Dans ce cas : has_graph: true et graph_data: {"type": "signes", "racine": 2, "signe1": "+", "signe2": "-"}    
-    
     Structure JSON :
     {{
       "questions": [
@@ -304,15 +301,12 @@ def generer_automatisme_generale_openai():
     - 3 questions doivent être des LECTURES GRAPHIQUES (has_graph: true).
     - attention à bien vérifier la solution, celle que tu affiches comme étant la bonne réponse doit être absolument sûre, sans hallucination possible. 
     - si tu crées une lecture graphique, tu DOIS d'abord calculer les coordonnées exactes et tu DOIS faire en sorte que le point en question tombe sur une graduation existante et visible avec des nombres entiers.  
-    
+
     STRUCTURE DES GRAPHES (IMPÉRATIF) :
     Si has_graph est true, graph_data DOIT être :
-    - Pour une droite : {{"type": "line", "a": coefficient_directeur, "b": ordonnee_a_l_origine}}
-    - Pour une parabole : {{"type": "parabola", "a": coef, "alpha": x_sommet, "beta": y_sommet}}
-    
-    CONSIGNE GRAPHIQUE SUPPLÉMENTAIRE :
-    Tu peux aussi demander un tableau de signes.
-    Dans ce cas : has_graph: true et graph_data: {"type": "signes", "racine": 2, "signe1": "+", "signe2": "-"}    
+    - Droite : {{"type": "line", "a": pente, "b": ordonnee}}
+    - Parabole : {{"type": "parabola", "a": coef, "alpha": x_sommet, "beta": y_sommet}}
+    - Tableau de signes : {{"type": "signes", "racine": 2, "signe1": "+", "signe2": "-"}}
 
     Structure JSON :
     {{
