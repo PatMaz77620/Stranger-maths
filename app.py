@@ -156,38 +156,57 @@ def tracer_graphique_automatisme(graph_data):
     st.pyplot(fig)
 
 def tracer_tableau_automatisme(data):
-    """Dessine un tableau de signes fidèle aux données de l'IA"""
-    fig, ax = plt.subplots(figsize=(5, 3))
+    """Dessine un tableau de signes dynamique (1 ou 2 racines)"""
+    fig, ax = plt.subplots(figsize=(6, 3))
     fig.patch.set_facecolor('#0e1117')
     ax.set_facecolor('#161b22')
     ax.axis('off')
     
-    # Récupération des données avec valeurs par défaut de secours
-    racine = str(data.get('racine', 'x0'))
-    s1 = data.get('signe1', '?')
-    s2 = data.get('signe2', '?')
+    # 1. Normalisation des données (on transforme tout en listes)
+    racines = data.get('racines', [data.get('racine')]) 
+    # On filtre les None au cas où
+    racines = [str(r) for r in racines if r is not None]
+    
+    signes = data.get('signes', [data.get('signe1'), data.get('signe2')])
+    signes = [s for s in signes if s is not None]
+    
     fonction_nom = data.get('fonction', 'f(x)')
 
-    # Structure du tableau
-    ax.axhline(0.7, color='white', lw=1) # Ligne horizontale sous x
-    ax.axvline(0.3, color='white', lw=1) # Ligne verticale après les titres
+    # --- STRUCTURE DE BASE ---
+    ax.axhline(0.7, color='white', lw=1) # Sous la ligne x
+    ax.axvline(0.2, color='white', lw=1) # Après le titre f(x)
 
-    # Entêtes
+    # Titres
     ax.text(0.1, 0.85, "x", color='white', fontweight='bold', ha='center')
     ax.text(0.1, 0.35, fonction_nom, color='white', fontweight='bold', ha='center')
 
-    # Ligne des X
-    ax.text(0.4, 0.85, "-∞", color='white', ha='center')
-    ax.text(0.65, 0.85, racine, color='white', ha='center')
-    ax.text(0.9, 0.85, "+∞", color='white', ha='center')
+    # Bornes infinies
+    ax.text(0.25, 0.85, "-∞", color='white', ha='center')
+    ax.text(0.95, 0.85, "+∞", color='white', ha='center')
 
-    # Ligne des Signes
-    ax.text(0.5, 0.35, s1, color='#ff0000', fontsize=18, ha='center', fontweight='bold')
-    ax.text(0.65, 0.35, "0", color='white', ha='center')
-    ax.text(0.8, 0.35, s2, color='#ff0000', fontsize=18, ha='center', fontweight='bold')
+    # --- DESSIN DYNAMIQUE ---
+    n_racines = len(racines)
     
-    # Petit filet vertical sous la racine
-    ax.axvline(0.65, ymin=0.1, ymax=0.6, color='white', lw=0.5, linestyle='--')
+    if n_racines == 1:
+        positions_x = [0.6] # Position de la racine unique
+        positions_signes = [0.4, 0.8]
+    else:
+        positions_x = [0.45, 0.75] # Positions des deux racines
+        positions_signes = [0.32, 0.6, 0.88]
+
+    # Affichage des racines et des zéros
+    for i, r in enumerate(racines):
+        pos = positions_x[i]
+        ax.text(pos, 0.85, r, color='white', ha='center')
+        ax.text(pos, 0.35, "0", color='white', ha='center')
+        # Pointillés sous le zéro
+        ax.axvline(pos, ymin=0.2, ymax=0.6, color='white', lw=0.5, ls='--')
+
+    # Affichage des signes
+    for i, s in enumerate(signes):
+        if i < len(positions_signes):
+            ax.text(positions_signes[i], 0.35, s, color='#ff0000', 
+                    fontsize=20, ha='center', fontweight='bold')
 
     st.pyplot(fig)
     
@@ -229,7 +248,11 @@ def generer_automatisme_openai():
     Si has_graph est true, graph_data DOIT être :
     - Droite : {{"type": "line", "a": pente, "b": ordonnee}}
     - Parabole : {{"type": "parabola", "a": coef, "alpha": x_sommet, "beta": y_sommet}}
-    - Tableau de signes : {{"type": "signes", "racine": 2, "signe1": "+", "signe2": "-"}}
+
+    CONSIGNE TABLEAU DE SIGNES :
+    - Pour 1 racine (ex: ax+b) : graph_data: {{"type": "signes", "fonction": "f(x)", "racines": [2], "signes": ["-", "+"]}}
+    - Pour 2 racines (ex: second degré) : graph_data: {{"type": "signes", "fonction": "f(x)", "racines": [-1, 3], "signes": ["+", "-", "+"]}}
+    VÉRIFIE : Le nombre de signes doit toujours être égal au nombre de racines + 1.
 
     Structure JSON :
     {{
