@@ -446,7 +446,7 @@ if st.session_state.page == 'home':
                 st.rerun()
 
     st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("⚡ MISSION AUTOMATISMES (11 min)", use_container_width=True):
+    if st.button("⚡ MISSION QCM AUTOMATISMES type BAC (11 min)", use_container_width=True):
         with st.spinner("Génération des automatismes..."):
             quiz = generer_automatisme_openai()
             if quiz:
