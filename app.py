@@ -27,6 +27,10 @@ if 'page' not in st.session_state:
 # --- 2. STYLE CSS UNIFIÉ ET ROBUSTE ---
 st.markdown("""
     <style>
+    button[kind="primaryFormSubmit"] {
+        background-color: #ff0000 !important;
+        color: white !important;
+    }
     .stApp { background-color: #0e1117; }
     .stMarkdown, p, span, label, li { color: #ffffff !important; }
     h1, h2, h3 { color: #ff0000 !important; text-shadow: 2px 2px 10px #ff0000; text-align: center; }
