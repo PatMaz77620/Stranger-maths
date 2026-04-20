@@ -155,6 +155,29 @@ def tracer_graphique_automatisme(graph_data):
     ax.set_ylim(-5, 5)
     st.pyplot(fig)
 
+def tracer_tableau_automatisme(data):
+    """Dessine un tableau de signes ou de variations simplifié"""
+    fig, ax = plt.subplots(figsize=(5, 3))
+    fig.patch.set_facecolor('#0e1117')
+    ax.set_facecolor('#161b22')
+    
+    # On cache les axes classiques
+    ax.axis('off')
+    
+    if data['type'] == 'signes':
+        # Exemple simple : x | -inf | val | +inf puis f(x) | + | 0 | -
+        ax.text(0.1, 0.8, "x", color='white', fontweight='bold')
+        ax.text(0.1, 0.4, "f(x)", color='white', fontweight='bold')
+        ax.axhline(0.6, color='white', lw=1)
+        ax.text(0.3, 0.8, "-∞", color='white')
+        ax.text(0.6, 0.8, str(data.get('racine', '0')), color='white')
+        ax.text(0.9, 0.8, "+∞", color='white')
+        ax.text(0.45, 0.4, data.get('signe1', '+'), color='#ff0000', fontsize=15)
+        ax.text(0.6, 0.4, "0", color='white')
+        ax.text(0.75, 0.4, data.get('signe2', '-'), color='#ff0000', fontsize=15)
+    
+    st.pyplot(fig)
+
 def generer_automatisme_openai():
     # Liste des thèmes pour forcer la diversité
     themes = [
@@ -192,6 +215,10 @@ def generer_automatisme_openai():
     Si has_graph est true, graph_data DOIT être :
     - Pour une droite : {{"type": "line", "a": coefficient_directeur, "b": ordonnee_a_l_origine}}
     - Pour une parabole : {{"type": "parabola", "a": coef, "alpha": x_sommet, "beta": y_sommet}}
+
+    CONSIGNE GRAPHIQUE SUPPLÉMENTAIRE :
+    Tu peux aussi demander un tableau de signes.
+    Dans ce cas : has_graph: true et graph_data: {"type": "signes", "racine": 2, "signe1": "+", "signe2": "-"}    
     
     Structure JSON :
     {{
@@ -211,15 +238,36 @@ def generer_automatisme_openai():
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "Tu es un expert en mathématiques STMG. Tu respectes strictement le format JSON et les structures de graph_data."},
+                {"role": "system", "content": "Tu es un expert en mathématiques. Tu vérifies la cohérence mathématique entre la question, le graphique généré et la réponse correcte. Tu réponds en JSON strict."},
                 {"role": "user", "content": prompt}
             ],
             response_format={"type": "json_object"}
         )
+        
         data = json.loads(response.choices[0].message.content)
-        return data["questions"]
+        questions = data["questions"]
+
+        # --- SYSTÈME ANTI-BIAIS ET SÉCURITÉ ---
+        for q in questions:
+            # 1. Sauvegarde de la bonne réponse brute
+            bonne_reponse_texte = q['reponse']
+            
+            # 2. Mélange aléatoire des options
+            options = q['options']
+            random.shuffle(options)
+            q['options'] = options
+            
+            # 3. Recalibrage de la clé 'reponse' sur la nouvelle position
+            # On cherche l'option qui contient le texte de la bonne réponse
+            for opt in options:
+                if bonne_reponse_texte in opt:
+                    q['reponse'] = opt
+                    break
+
+        return questions
+
     except Exception as e:
-        st.error(f"Erreur OpenAI : {e}")
+        st.error(f"Erreur lors de la génération : {e}")
         return None
 
 def generer_automatisme_generale_openai():
@@ -262,6 +310,10 @@ def generer_automatisme_generale_openai():
     - Pour une droite : {{"type": "line", "a": coefficient_directeur, "b": ordonnee_a_l_origine}}
     - Pour une parabole : {{"type": "parabola", "a": coef, "alpha": x_sommet, "beta": y_sommet}}
     
+    CONSIGNE GRAPHIQUE SUPPLÉMENTAIRE :
+    Tu peux aussi demander un tableau de signes.
+    Dans ce cas : has_graph: true et graph_data: {"type": "signes", "racine": 2, "signe1": "+", "signe2": "-"}    
+
     Structure JSON :
     {{
       "questions": [
@@ -280,17 +332,38 @@ def generer_automatisme_generale_openai():
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "Tu es un expert en mathématiques STMG. Tu respectes strictement le format JSON et les structures de graph_data."},
+                {"role": "system", "content": "Tu es un expert en mathématiques. Tu vérifies la cohérence mathématique entre la question, le graphique généré et la réponse correcte. Tu réponds en JSON strict."},
                 {"role": "user", "content": prompt}
             ],
             response_format={"type": "json_object"}
         )
+        
         data = json.loads(response.choices[0].message.content)
-        return data["questions"]
-    except Exception as e:
-        st.error(f"Erreur OpenAI : {e}")
-        return None
+        questions = data["questions"]
 
+        # --- SYSTÈME ANTI-BIAIS ET SÉCURITÉ ---
+        for q in questions:
+            # 1. Sauvegarde de la bonne réponse brute
+            bonne_reponse_texte = q['reponse']
+            
+            # 2. Mélange aléatoire des options
+            options = q['options']
+            random.shuffle(options)
+            q['options'] = options
+            
+            # 3. Recalibrage de la clé 'reponse' sur la nouvelle position
+            # On cherche l'option qui contient le texte de la bonne réponse
+            for opt in options:
+                if bonne_reponse_texte in opt:
+                    q['reponse'] = opt
+                    break
+
+        return questions
+
+    except Exception as e:
+        st.error(f"Erreur lors de la génération : {e}")
+        return None
+        
 
 def formater_fr(valeur, decimales=2):
     if valeur is None: return "0"
@@ -586,9 +659,13 @@ elif st.session_state.page == 'quiz':
     
     if q.get('has_graph') and q.get('graph_data'):
         col_txt, col_grph = st.columns([1, 1], gap="large")
-        
+
         with col_grph:
-            tracer_graphique_automatisme(q['graph_data'])
+            g_data = q['graph_data']
+            if g_data.get('type') in ['line', 'parabola']:
+                tracer_graphique_automatisme(g_data)
+            elif g_data.get('type') == 'signes':
+                tracer_tableau_automatisme(g_data)
             
         with col_txt:
             st.markdown(f"### {q['question']}")
