@@ -222,6 +222,76 @@ def generer_automatisme_openai():
         st.error(f"Erreur OpenAI : {e}")
         return None
 
+def generer_automatisme_generale_openai():
+    # Liste des thèmes pour forcer la diversité
+    themes = [
+        "Proportions et pourcentages",
+        "Taux d'évolution et coefficients multiplicateurs",
+        "Évolutions successives et réciproques",
+        "Calcul littéral (développement, factorisation simple)",
+        "Équations du premier degré",
+        "Lecture graphique d'images et d'antécédents",
+        "Signe d'une expression affine",
+        "Probabilités (fréquences, tableaux croisés), indépendance",
+        "Vecteurs et produits scalaires",
+        "Trigonométrie (cercle trigonométrique, valeurs remarquables)",
+        "Suites (calcul des premiers termes)",
+        "Tableaux de signes",
+        "Tableaux de variation",
+        "Dérivations",
+        "équation de tangentes à un polynôme du 2nd degré",
+        "polynômes du 2nd degré (racines, sommets, expression développée / factorisée / canonique)"
+    ]
+    
+    # On mélange les thèmes et on en pioche pour le prompt
+    random.shuffle(themes)
+    themes_str = ", ".join(themes)
+
+    # 2. On intègre tes consignes précises dans le prompt
+    prompt = f"""Génère un quiz de 11 questions d'AUTOMATISMES pour 1ère GENERALE.
+    Tu dois absolument varier les sujets en utilisant  : {themes_str}.
+    
+    CONSIGNES TECHNIQUES :
+    - Format : 4 options A, B, C, D.
+    - 3 questions doivent être des LECTURES GRAPHIQUES (has_graph: true).
+    - attention à bien vérifier la solution, celle que tu affiches comme étant la bonne réponse doit être absolument sûre, sans hallucination possible. 
+    - si tu crées une lecture graphique, tu DOIS d'abord calculer les coordonnées exactes et tu DOIS faire en sorte que le point en question tombe sur une graduation existante et visible avec des nombres entiers.  
+    
+    STRUCTURE DES GRAPHES (IMPÉRATIF) :
+    Si has_graph est true, graph_data DOIT être :
+    - Pour une droite : {{"type": "line", "a": coefficient_directeur, "b": ordonnee_a_l_origine}}
+    - Pour une parabole : {{"type": "parabola", "a": coef, "alpha": x_sommet, "beta": y_sommet}}
+    
+    Structure JSON :
+    {{
+      "questions": [
+        {{
+          "question": "...",
+          "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+          "reponse": "A. ...", 
+          "explication": "...",
+          "has_graph": true/false,
+          "graph_data": {{...}} ou null
+        }}
+      ]
+    }}
+    """
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "Tu es un expert en mathématiques STMG. Tu respectes strictement le format JSON et les structures de graph_data."},
+                {"role": "user", "content": prompt}
+            ],
+            response_format={"type": "json_object"}
+        )
+        data = json.loads(response.choices[0].message.content)
+        return data["questions"]
+    except Exception as e:
+        st.error(f"Erreur OpenAI : {e}")
+        return None
+
+
 def formater_fr(valeur, decimales=2):
     if valeur is None: return "0"
     s = f"{valeur:.{decimales}f}".replace('.', ',').rstrip('0').rstrip(',')
@@ -446,7 +516,7 @@ if st.session_state.page == 'home':
                 st.rerun()
 
     st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("⚡ MISSION QCM AUTOMATISMES type BAC (11 min)", use_container_width=True):
+    if st.button("⚡ MISSION QCM AUTOMATISMES type BAC niveau 1ERE STMG ", use_container_width=True):
         with st.spinner("Génération des automatismes..."):
             quiz = generer_automatisme_openai()
             if quiz:
@@ -458,6 +528,19 @@ if st.session_state.page == 'home':
                 st.session_state.page = 'quiz'
                 st.rerun()
 
+    # Nouveau Bouton GÉNÉRALE
+    if st.button("🌀 MISSION QCM AUTOMATISMES type BAC niveau 1ERE GÉNÉRALE", use_container_width=True):
+        with st.spinner("Ouverture du portail vers la Spécialité..."):
+            quiz = generer_automatisme_generale_openai() # On appelle la nouvelle fonction
+            if quiz:
+                st.session_state.quiz_data = quiz
+                st.session_state.quiz_type = 'automatisme'
+                st.session_state.current_q = 0
+                st.session_state.score = 0
+                st.session_state.start_time = pd.Timestamp.now()
+                st.session_state.page = 'quiz'
+                st.rerun()
+    
     # --- SECTION PUB : LE PHARE ---
     st.write("---")
     st.markdown("""
