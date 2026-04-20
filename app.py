@@ -281,22 +281,37 @@ def generer_automatisme_openai():
         data = json.loads(response.choices[0].message.content)
         questions = data["questions"]
 
-        # --- SYSTÈME ANTI-BIAIS ET SÉCURITÉ ---
         for q in questions:
-            # 1. Sauvegarde de la bonne réponse brute
-            bonne_reponse_texte = q['reponse']
+            # 1. On récupère la bonne réponse brute (ex: "A. 42")
+            bonne_reponse_brute = q['reponse']
             
-            # 2. Mélange aléatoire des options
-            options = q['options']
-            random.shuffle(options)
-            q['options'] = options
+            # 2. On nettoie les options pour enlever "A. ", "B. ", etc. si l'IA les a mis
+            # On ne garde que le contenu après le point ou l'espace
+            options_propres = []
+            for opt in q['options']:
+                contenu = opt.split('.', 1)[-1].strip() if '.' in opt else opt.strip()
+                options_propres.append(contenu)
             
-            # 3. Recalibrage de la clé 'reponse' sur la nouvelle position
-            # On cherche l'option qui contient le texte de la bonne réponse
-            for opt in options:
-                if bonne_reponse_texte in opt:
-                    q['reponse'] = opt
-                    break
+            # On nettoie aussi la bonne réponse de référence
+            bonne_valeur = bonne_reponse_brute.split('.', 1)[-1].strip() if '.' in bonne_reponse_brute else bonne_reponse_brute.strip()
+
+            # 3. Mélange des valeurs pures
+            random.shuffle(options_propres)
+            
+            # 4. On reconstruit les options avec les lettres A, B, C, D dans l'ordre
+            lettres = ["A", "B", "C", "D"]
+            nouvelles_options = []
+            nouvelle_bonne_reponse = ""
+
+            for i, valeur in enumerate(options_propres):
+                texte_final = f"{lettres[i]}. {valeur}"
+                nouvelles_options.append(texte_final)
+                # Si cette valeur est la bonne, on enregistre la nouvelle version (ex: "C. 42")
+                if valeur == bonne_valeur:
+                    nouvelle_bonne_reponse = texte_final
+
+            q['options'] = nouvelles_options
+            q['reponse'] = nouvelle_bonne_reponse
 
         return questions
 
