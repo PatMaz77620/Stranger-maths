@@ -27,10 +27,30 @@ if 'page' not in st.session_state:
 # --- 2. STYLE CSS UNIFIÉ ET ROBUSTE ---
 st.markdown("""
     <style>
-    button[kind="primaryFormSubmit"] {
-        background-color: #ff0000 !important;
-        color: white !important;
+    
+    /* --- STYLE DU BOUTON VÉRIFIER (DANS LE FORMULAIRE) --- */
+    div.stForm submit_button > button {
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        border: 2px solid #ff0000 !important;
+        border-radius: 5px !important;
+        padding: 0.5rem 2rem !important;
+        font-weight: bold !important;
+        text-transform: uppercase !important;
+        transition: all 0.3s ease-in-out !important;
+        width: 100% !important; /* Pour qu'il soit bien visible */
     }
+
+    /* --- EFFET AU SURVOL (HALO ROUGE) --- */
+    div.stForm submit_button > button:hover {
+        border-color: #ff0000 !important;
+        color: #ff0000 !important;
+        box-shadow: 0 0 15px #ff0000 !important; /* L'effet de halo */
+        background-color: #000000 !important;
+        transform: scale(1.02) !important;
+    }
+    
+    
     .stApp { background-color: #0e1117; }
     .stMarkdown, p, span, label, li { color: #ffffff !important; }
     h1, h2, h3 { color: #ff0000 !important; text-shadow: 2px 2px 10px #ff0000; text-align: center; }
