@@ -28,28 +28,32 @@ if 'page' not in st.session_state:
 st.markdown("""
     <style>
     
-    /* --- STYLE DU BOUTON VÉRIFIER (DANS LE FORMULAIRE) --- */
-    div.stForm submit_button > button {
+    /* --- STYLE ULTIME DU BOUTON VÉRIFIER --- */
+    div[data-testid="stFormSubmitButton"] > button {
         background-color: #000000 !important;
         color: #ffffff !important;
         border: 2px solid #ff0000 !important;
-        border-radius: 5px !important;
-        padding: 0.5rem 2rem !important;
+        border-radius: 10px !important;
+        padding: 10px 20px !important;
         font-weight: bold !important;
-        text-transform: uppercase !important;
-        transition: all 0.3s ease-in-out !important;
-        width: 100% !important; /* Pour qu'il soit bien visible */
+        width: 100% !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0px 0px 5px rgba(255, 0, 0, 0.5) !important;
     }
 
-    /* --- EFFET AU SURVOL (HALO ROUGE) --- */
-    div.stForm submit_button > button:hover {
+    /* Effet de Halo au survol */
+    div[data-testid="stFormSubmitButton"] > button:hover {
         border-color: #ff0000 !important;
         color: #ff0000 !important;
-        box-shadow: 0 0 15px #ff0000 !important; /* L'effet de halo */
+        box-shadow: 0px 0px 20px #ff0000 !important;
         background-color: #000000 !important;
-        transform: scale(1.02) !important;
+        transform: scale(1.01) !important;
     }
-    
+
+    /* Correction pour le texte à l'intérieur du bouton */
+    div[data-testid="stFormSubmitButton"] > button p {
+        color: inherit !important; /* Force le texte à suivre la couleur blanche du bouton */
+    }
     
     .stApp { background-color: #0e1117; }
     .stMarkdown, p, span, label, li { color: #ffffff !important; }
@@ -175,11 +179,12 @@ def generer_automatisme_openai():
 
     # 2. On intègre tes consignes précises dans le prompt
     prompt = f"""Génère un quiz de 11 questions d'AUTOMATISMES pour 1ère STMG.
-    Thèmes à couvrir : {themes_str}.
+    Tu dois absolument varier les sujets en utilisant  : {themes_str}.
     
     CONSIGNES TECHNIQUES :
     - Format : 4 options A, B, C, D.
     - 3 questions doivent être des LECTURES GRAPHIQUES (has_graph: true).
+    - attention à bien vérifier la solution, celle que tu affiches comme étant la bonne réponse doit être absolument sûre, sans hallucination possible. 
     
     STRUCTURE DES GRAPHES (IMPÉRATIF) :
     Si has_graph est true, graph_data DOIT être :
