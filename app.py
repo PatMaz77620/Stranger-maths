@@ -26,68 +26,30 @@ if 'page' not in st.session_state:
 
 # --- 2. STYLE CSS UNIFIÉ ET ROBUSTE ---
 st.markdown("""
-    <style>
-    
-    /* --- STYLE ULTIME DU BOUTON VÉRIFIER --- */
-    div[data-testid="stFormSubmitButton"] > button {
-        background-color: #000000 !important;
-        color: #ffffff !important;
-        border: 2px solid #ff0000 !important;
-        border-radius: 10px !important;
-        padding: 10px 20px !important;
-        font-weight: bold !important;
-        width: 100% !important;
-        transition: all 0.3s ease !important;
-        box-shadow: 0px 0px 5px rgba(255, 0, 0, 0.5) !important;
-    }
-
-    /* Effet de Halo au survol */
-    div[data-testid="stFormSubmitButton"] > button:hover {
-        border-color: #ff0000 !important;
-        color: #ff0000 !important;
-        box-shadow: 0px 0px 20px #ff0000 !important;
-        background-color: #000000 !important;
-        transform: scale(1.01) !important;
-    }
-
-    /* Correction pour le texte à l'intérieur du bouton */
-    div[data-testid="stFormSubmitButton"] > button p {
-        color: inherit !important; /* Force le texte à suivre la couleur blanche du bouton */
-    }
-    
+<style>
+    /* --- CONFIGURATION GÉNÉRALE --- */
     .stApp { background-color: #0e1117; }
     .stMarkdown, p, span, label, li { color: #ffffff !important; }
     h1, h2, h3 { color: #ff0000 !important; text-shadow: 2px 2px 10px #ff0000; text-align: center; }
 
-    /* Forçage de la grille d'accueil */
-    [data-testid="column"] {
-        width: 100% !important;
-        flex: 1 1 0% !important;
-        min-width: 0 !important;
-    }
-
-    /* Design des boutons (Cartes) */
+    /* --- STYLE DES BOUTONS CARTES (ACCUEIL) --- */
     button[kind="secondary"] {
-        /* On enlève width: 100% pour laisser les espaces pousser les bords */
         width: max-content !important; 
-        min-width: 300px !important; /* Optionnel : définit une base minimale pour la sécurité */
+        min-width: 300px !important;
         background-color: #161b22 !important;
         border: 2px solid #ff0000 !important;
         border-radius: 15px !important;
         transition: all 0.3s ease !important;
         height: 160px !important;
         box-shadow: 0px 4px 15px rgba(255, 0, 0, 0.2) !important;
-        margin: auto !important; /* Centre le bouton dans sa colonne */
+        margin: auto !important;
         display: block !important;
     }
     button[kind="secondary"] p {
         color: #ffffff !important;
         font-weight: bold !important;
         font-size: 1.1rem !important;
-        text-align: center !important;
     }
-
-    /* Survol */
     button[kind="secondary"]:hover {
         transform: scale(1.02) !important;
         box-shadow: 0px 0px 25px #ff0000 !important;
@@ -95,30 +57,64 @@ st.markdown("""
     }
     button[kind="secondary"]:hover p { color: #ff0000 !important; }
 
-    /* Bouton Retour */
+    /* --- STYLE DU BOUTON VÉRIFIER (FORMULAIRE) --- */
+    /* On cible le bouton primaire du formulaire pour lui donner le look Stranger */
+    div[data-testid="stFormSubmitButton"] button {
+        background-color: #161b22 !important;
+        color: #ffffff !important;
+        border: 2px solid #ff0000 !important;
+        border-radius: 10px !important;
+        padding: 10px 20px !important;
+        font-weight: bold !important;
+        width: 100% !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0px 4px 15px rgba(255, 0, 0, 0.2) !important;
+        text-transform: uppercase !important;
+    }
+
+    div[data-testid="stFormSubmitButton"] button:hover {
+        transform: scale(1.01) !important;
+        box-shadow: 0px 0px 25px #ff0000 !important;
+        background-color: #1e2129 !important;
+        color: #ff0000 !important;
+        border-color: #ff0000 !important;
+    }
+
+    /* Forçage de la couleur du texte interne pour éviter le blanc sur blanc */
+    div[data-testid="stFormSubmitButton"] button p {
+        color: white !important;
+    }
+    div[data-testid="stFormSubmitButton"] button:hover p {
+        color: #ff0000 !important;
+    }
+
+    /* --- AJUSTEMENTS TECHNIQUES --- */
+    [data-testid="column"] {
+        width: 100% !important;
+        flex: 1 1 0% !important;
+        min-width: 0 !important;
+    }
+
     .btn-retour button {
         height: auto !important;
         width: auto !important;
         padding: 8px 25px !important;
     }
 
-    /* Centrage Tableaux Ch4 */
     div[data-testid="stTable"] table { margin: auto !important; }
     div[data-testid="stTable"] td, div[data-testid="stTable"] th { text-align: center !important; }
 
-    /* Règle spéciale pour le QUIZ : on annule le style "Carte" uniquement ici */
+    /* On s'assure que les boutons de quiz ne sont pas écrasés par le style "Carte" */
     .stButtonGroup, [data-testid="stVerticalBlock"] .stButton button {
-        height: auto !important; /* On laisse le bouton s'adapter au texte */
-        min-width: 0px !important; /* On enlève la largeur forcée */
-        padding: 10px !important; /* On remet un espacement normal */
+        height: auto !important;
+        min-width: 0px !important;
+        padding: 10px !important;
     }
 
-    /* Optionnel : si tu veux que les boutons du quiz soient moins épais que les cartes */
     div.stButton > button {
         margin-bottom: 5px !important;
     }
-    
-    </style>
+</style>
     """, unsafe_allow_html=True)
 
 # --- FONCTIONS ---
@@ -473,52 +469,77 @@ if st.session_state.page == 'home':
         </div>
     """, unsafe_allow_html=True)
 
-
 elif st.session_state.page == 'quiz':
-    if not st.session_state.get('quiz_data'):
+    # 1. Sécurité : retour à l'accueil si pas de données ou si quiz_data est mal formé
+    if 'quiz_data' not in st.session_state or not st.session_state.quiz_data:
         st.session_state.page = 'home'
         st.rerun()
 
-    # --- CHRONO AUTOMATISMES ---
-    if st.session_state.get('quiz_type') == 'automatisme':
+    # 2. Récupération sécurisée de l'index actuel
+    idx = st.session_state.get('current_q', 0)
+
+    # Sécurité anti-crash : si l'index dépasse la taille du quiz, on va au score
+    if idx >= len(st.session_state.quiz_data):
+        st.session_state.page = 'score'
+        st.rerun()
+
+    q = st.session_state.quiz_data[idx]
+
+    # --- CHRONO AUTOMATISMES (Uniquement si type automatisme) ---
+    if st.session_state.get('quiz_type') == 'automatisme' and 'start_time' in st.session_state:
         elapsed = (pd.Timestamp.now() - st.session_state.start_time).total_seconds()
         remaining = max(0, int(11 * 60 - elapsed))
         mins, secs = divmod(remaining, 60)
-        st.markdown(f"<h2 style='text-align:center; color:#ff0000;'>⏳ {mins:02d}:{secs:02d}</h2>", unsafe_allow_html=True)
+        
+        st.markdown(f"""
+            <div style="text-align: center; border: 2px solid #ff0000; border-radius: 10px; padding: 10px; margin-bottom: 20px;">
+                <h2 style="margin: 0; color: #ff0000;">⏳ {mins:02d}:{secs:02d}</h2>
+            </div>
+        """, unsafe_allow_html=True)
+        
         if remaining <= 0:
             st.error("🚨 TEMPS ÉCOULÉ !")
-            if st.button("Voir le score"): st.session_state.page = 'score'; st.rerun()
+            if st.button("Voir le score"): 
+                st.session_state.page = 'score'
+                st.rerun()
             st.stop()
 
-    idx = st.session_state.current_q
-    q = st.session_state.quiz_data[idx]
+    # --- AFFICHAGE QUESTION ---
+    st.subheader(f"Question {idx + 1} / {len(st.session_state.quiz_data)}")
     
-    st.subheader(f"Question {idx + 1} / 11")
+    # Affichage du graphique si présent
     if q.get('has_graph') and q.get('graph_data'):
         tracer_graphique_automatisme(q['graph_data'])
 
     st.markdown(f"### {q['question']}")
 
     # --- SYSTÈME DE RÉPONSE ---
-    ans_key = f"ans_{idx}"
+    ans_key = f"answered_{idx}"
+    
     if ans_key not in st.session_state:
-        with st.form(key=f"f_{idx}"):
+        # On utilise une clé de formulaire unique pour éviter les conflits
+        with st.form(key=f"form_question_{idx}"):
             choix = st.radio("Options :", q['options'], index=None)
-            if st.form_submit_button("VÉRIFIER"):
-                if choix:
-                    st.session_state[ans_key] = choix
-                    if choix == q['reponse']: st.session_state.score += 1
-                    st.rerun()
+            valider = st.form_submit_button("VÉRIFIER")
+            
+            if valider and choix:
+                st.session_state[ans_key] = choix
+                if choix == q['reponse']:
+                    st.session_state.score += 1
+                st.rerun()
     else:
-        # Affichage Correction
-        if st.session_state[ans_key] == q['reponse']:
-            st.success(f"✅ BRAVO ! {q['reponse']}")
+        # Phase Correction
+        choix_fait = st.session_state[ans_key]
+        if choix_fait == q['reponse']:
+            st.success(f"✅ BIEN JOUÉ ! La réponse était : {q['reponse']}")
         else:
-            st.error(f"❌ MAUVAISE RÉPONSE. C'était : {q['reponse']}")
-        st.info(f"💡 {q['explication']}")
+            st.error(f"❌ DOMMAGE... La réponse était : {q['reponse']}")
+        
+        st.info(f"**💡 EXPLICATION :** {q['explication']}")
 
-        if st.button("SUIVANT ➡️"):
-            if idx < 10:
+        # Navigation vers la suite
+        if st.button("QUESTION SUIVANTE ➡️"):
+            if idx < (len(st.session_state.quiz_data) - 1):
                 st.session_state.current_q += 1
                 st.rerun()
             else:
