@@ -764,6 +764,7 @@ def generer_quiz_tableaux_signes(nb_questions=11, difficulte="Moyen"):
     """
     questions = []
 
+
     # Répartition selon le nombre de questions
     themes = (
         ["affine"] * 3 +
