@@ -6,7 +6,9 @@ import numpy as np
 import random
 import json
 
+from generateur_questions import generer_quiz_tableaux_signes
 from openai import OpenAI
+from generateur_questions import generer_quiz_tableaux_signes
 
 # Initialisation du client OpenAI (beaucoup plus simple)
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
@@ -155,57 +157,71 @@ def tracer_graphique_automatisme(graph_data):
     ax.set_ylim(-5, 5)
     st.pyplot(fig)
 
+def fmt_label_matplotlib(label):
+    """Convertit un label pour affichage correct dans matplotlib (fractions, entiers)."""
+    from fractions import Fraction
+    label = str(label)
+    if '\\frac' in label:
+        return f"${label}$"
+    try:
+        val = float(label)
+        if val == int(val):
+            return str(int(val))
+        f = Fraction(val).limit_denominator(10)
+        if abs(float(f) - val) < 1e-9:
+            if f.denominator == 1:
+                return str(f.numerator)
+            signe = "-" if f < 0 else ""
+            return f"${signe}\\frac{{{abs(f.numerator)}}}{{{f.denominator}}}$"
+        return str(round(val, 2))
+    except (ValueError, TypeError):
+        return label
+
 def tracer_tableau_automatisme(data):
     """Dessine un tableau de signes dynamique (1 ou 2 racines)"""
+    plt.rcParams['mathtext.fontset'] = 'cm'
     fig, ax = plt.subplots(figsize=(6, 3))
     fig.patch.set_facecolor('#0e1117')
     ax.set_facecolor('#161b22')
     ax.axis('off')
-    
-    # 1. Normalisation des données (on transforme tout en listes)
-    racines = data.get('racines', [data.get('racine')]) 
-    # On filtre les None au cas où
-    racines = [str(r) for r in racines if r is not None]
-    
+
+    racines = data.get('racines', [data.get('racine')])
+    racines = [r for r in racines if r is not None]
+
+    labels_bruts = data.get('racines_labels', None)
+    if labels_bruts and len(labels_bruts) == len(racines):
+        racines_labels = [fmt_label_matplotlib(l) for l in labels_bruts]
+    else:
+        racines_labels = [fmt_label_matplotlib(r) for r in racines]
+
     signes = data.get('signes', [data.get('signe1'), data.get('signe2')])
     signes = [s for s in signes if s is not None]
-    
     fonction_nom = data.get('fonction', 'f(x)')
 
-    # --- STRUCTURE DE BASE ---
-    ax.axhline(0.7, color='white', lw=1) # Sous la ligne x
-    ax.axvline(0.2, color='white', lw=1) # Après le titre f(x)
-
-    # Titres
+    ax.axhline(0.7, color='white', lw=1)
+    ax.axvline(0.2, color='white', lw=1)
     ax.text(0.1, 0.85, "x", color='white', fontweight='bold', ha='center')
     ax.text(0.1, 0.35, fonction_nom, color='white', fontweight='bold', ha='center')
-
-    # Bornes infinies
     ax.text(0.25, 0.85, "-∞", color='white', ha='center')
     ax.text(0.95, 0.85, "+∞", color='white', ha='center')
 
-    # --- DESSIN DYNAMIQUE ---
     n_racines = len(racines)
-    
     if n_racines == 1:
-        positions_x = [0.6] # Position de la racine unique
+        positions_x = [0.6]
         positions_signes = [0.4, 0.8]
     else:
-        positions_x = [0.45, 0.75] # Positions des deux racines
+        positions_x = [0.45, 0.75]
         positions_signes = [0.32, 0.6, 0.88]
 
-    # Affichage des racines et des zéros
-    for i, r in enumerate(racines):
+    for i, label in enumerate(racines_labels):
         pos = positions_x[i]
-        ax.text(pos, 0.85, r, color='white', ha='center')
+        ax.text(pos, 0.85, label, color='white', ha='center', fontsize=10)
         ax.text(pos, 0.35, "0", color='white', ha='center')
-        # Pointillés sous le zéro
         ax.axvline(pos, ymin=0.2, ymax=0.6, color='white', lw=0.5, ls='--')
 
-    # Affichage des signes
     for i, s in enumerate(signes):
         if i < len(positions_signes):
-            ax.text(positions_signes[i], 0.35, s, color='#ff0000', 
+            ax.text(positions_signes[i], 0.35, s, color='#ff0000',
                     fontsize=20, ha='center', fontweight='bold')
 
     st.pyplot(fig)
@@ -219,10 +235,8 @@ def generer_automatisme_openai():
         "Calcul littéral (développement, factorisation simple)",
         "Équations du premier degré",
         "Lecture graphique d'images et d'antécédents",
-        "Signe d'une expression affine",
         "Probabilités (fréquences, tableaux croisés)",
         "Suites (calcul des premiers termes)",
-        "Tableaux de signes",
         "Tableaux de variation",
         "Dérivations",
         "équation de tangentes à un polynôme du 2nd degré",
@@ -308,6 +322,11 @@ def generer_automatisme_openai():
             
             q['options'] = nouvelles_options # Ici, l'ordre sera toujours A, B, C, D
 
+        # --- INJECTION DE 3 QUESTIONS FIABLES DU GÉNÉRATEUR ---
+        questions_generateur = generer_quiz_tableaux_signes(nb_questions=3, difficulte="Moyen")
+        questions = questions[:8] + questions_generateur
+        random.shuffle(questions)
+
         return questions
 
     except Exception as e:
@@ -323,12 +342,10 @@ def generer_automatisme_generale_openai():
         "Calcul littéral (développement, factorisation simple)",
         "Équations du premier degré",
         "Lecture graphique d'images et d'antécédents",
-        "Signe d'une expression affine",
         "Probabilités (fréquences, tableaux croisés), indépendance",
         "Vecteurs et produits scalaires",
         "Trigonométrie (cercle trigonométrique, valeurs remarquables)",
         "Suites (calcul des premiers termes)",
-        "Tableaux de signes",
         "Tableaux de variation",
         "Dérivations",
         "équation de tangentes à un polynôme du 2nd degré",
@@ -576,15 +593,29 @@ def afficher_interface_quiz():
         )
 
         
+        chapitres_generateur = ["chap0", "chap3", "chap5"]
+
         if st.button("🔦 Lancer la Mission Eleven", use_container_width=True):
             with st.spinner(f"Eleven scanne l'Upside Down pour préparer tes 11 défis (Niveau {difficulte_choisie})..."):
-                quiz = generer_mission_openai(theme_actuel, difficulte_choisie)
+                page_actuelle = st.session_state.page
+                if page_actuelle in chapitres_generateur:
+                    quiz_gpt = generer_mission_openai(theme_actuel, difficulte_choisie)
+                    quiz_gen = generer_quiz_tableaux_signes(nb_questions=6, difficulte=difficulte_choisie)
+                    if quiz_gpt and quiz_gen:
+                        quiz = quiz_gpt[:5] + quiz_gen
+                        random.shuffle(quiz)
+                    elif quiz_gpt:
+                        quiz = quiz_gpt
+                    else:
+                        quiz = quiz_gen
+                else:
+                    quiz = generer_mission_openai(theme_actuel, difficulte_choisie)
+
                 if quiz:
                     st.session_state.quiz_dynamique = quiz
                     st.session_state.index_question = 0
                     st.session_state.score = 0
                     st.session_state.repondu = False
-                    # On stocke la difficulté pour le message final
                     st.session_state.difficulte_active = difficulte_choisie
                     st.rerun()
 
@@ -1589,4 +1620,3 @@ elif st.session_state.page == 'chap5':
     with tab5:
         # Pense à ajouter 'chap5' dans ton dictionnaire 'themes' de la fonction afficher_interface_quiz
         afficher_interface_quiz()
-

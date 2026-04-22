@@ -1,0 +1,240 @@
+{
+  "tableaux_de_signes": {
+    "affines": [
+      {
+        "id": "aff_01",
+        "type_question": "T1",
+        "question": "D'après le tableau de signes, quelle fonction lui correspond ?",
+        "options": ["A. f(x) = 2x - 6", "B. f(x) = -2x + 6", "C. f(x) = 2x + 6", "D. f(x) = -2x - 6"],
+        "reponse": "A. f(x) = 2x - 6",
+        "explication": "Racine x=3, signe - puis + donc a>0. f(x) = 2x-6 s'annule en x=3 et a=2>0.",
+        "has_graph": true,
+        "graph_data": {"type": "signes", "fonction": "f(x)", "racines": [3], "signes": ["-", "+"]}
+      },
+      {
+        "id": "aff_02",
+        "type_question": "T2",
+        "question": "D'après le tableau de signes de f(x) = 3x - 9, quelle est la racine de f ?",
+        "options": ["A. x = 3", "B. x = -3", "C. x = 9", "D. x = -9"],
+        "reponse": "A. x = 3",
+        "explication": "On résout 3x - 9 = 0 donc x = 3. C'est la valeur où f s'annule sur le tableau.",
+        "has_graph": true,
+        "graph_data": {"type": "signes", "fonction": "f(x)", "racines": [3], "signes": ["-", "+"]}
+      },
+      {
+        "id": "aff_03",
+        "type_question": "T3",
+        "question": "D'après le tableau de signes ci-contre, quel est le signe de f(-1) ?",
+        "options": ["A. Négatif", "B. Positif", "C. Nul", "D. Impossible à déterminer"],
+        "reponse": "A. Négatif",
+        "explication": "x=-1 est à gauche de la racine x=2, donc dans la zone de signe -.",
+        "has_graph": true,
+        "graph_data": {"type": "signes", "fonction": "f(x)", "racines": [2], "signes": ["-", "+"]}
+      },
+      {
+        "id": "aff_04",
+        "type_question": "T3",
+        "question": "D'après le tableau de signes ci-contre, quel est le signe de f(5) ?",
+        "options": ["A. Négatif", "B. Positif", "C. Nul", "D. Impossible à déterminer"],
+        "reponse": "A. Négatif",
+        "explication": "x=5 est à droite de la racine x=-1, donc dans la zone de signe -.",
+        "has_graph": true,
+        "graph_data": {"type": "signes", "fonction": "f(x)", "racines": [-1], "signes": ["+", "-"]}
+      },
+      {
+        "id": "aff_05",
+        "type_question": "T5",
+        "question": "Le tableau de signes ci-contre montre un signe + à gauche de la racine et - à droite. Que peut-on dire du coefficient a ?",
+        "options": ["A. a < 0 car la fonction est décroissante", "B. a > 0 car la fonction est positive avant la racine", "C. a = 0 car la fonction s'annule", "D. Impossible à déterminer"],
+        "reponse": "A. a < 0 car la fonction est décroissante",
+        "explication": "Pour une fonction affine f(x) = ax+b, si le signe passe de + à -, c'est que a<0 : la fonction est décroissante.",
+        "has_graph": true,
+        "graph_data": {"type": "signes", "fonction": "f(x)", "racines": [2], "signes": ["+", "-"]}
+      }
+    ],
+    "produits": [
+      {
+        "id": "prod_01",
+        "type_question": "calcul",
+        "question": "Quel est le signe de (x-3) × (x+1) pour x = 5 ?",
+        "options": ["A. Positif", "B. Négatif", "C. Nul", "D. Impossible à déterminer"],
+        "reponse": "A. Positif",
+        "explication": "Pour x=5 : (5-3) × (5+1) = 2 × 6 = 12 > 0.",
+        "has_graph": false,
+        "graph_data": null
+      },
+      {
+        "id": "prod_02",
+        "type_question": "calcul",
+        "question": "Pour quelles valeurs de x le produit (2x-4)(x+3) est-il strictement négatif ?",
+        "options": ["A. x ∈ ]-3 ; 2[", "B. x ∈ ]-∞ ; -3[ ∪ ]2 ; +∞[", "C. x ∈ [-3 ; 2]", "D. x ∈ ]-∞ ; -3["],
+        "reponse": "A. x ∈ ]-3 ; 2[",
+        "explication": "Racines : x=2 et x=-3. Le coefficient a=2>0 donc parabole vers le haut : le produit est strictement négatif entre les deux racines.",
+        "has_graph": false,
+        "graph_data": null
+      },
+      {
+        "id": "prod_03",
+        "type_question": "calcul",
+        "question": "Pour quelles valeurs de x le produit (-x+1)(x+2) est-il strictement positif ?",
+        "options": ["A. x ∈ ]-2 ; 1[", "B. x ∈ ]-∞ ; -2[ ∪ ]1 ; +∞[", "C. x ∈ [-2 ; 1]", "D. x ∈ ]1 ; +∞["],
+        "reponse": "A. x ∈ ]-2 ; 1[",
+        "explication": "Racines : x=1 et x=-2. Le coefficient dominant est a=-1<0 donc parabole vers le bas : le produit est strictement positif entre les deux racines.",
+        "has_graph": false,
+        "graph_data": null
+      },
+      {
+        "id": "prod_04",
+        "type_question": "calcul",
+        "question": "Quel est le signe de (x+4) × (x-4) pour x = 3 ?",
+        "options": ["A. Négatif", "B. Positif", "C. Nul", "D. Impossible à déterminer"],
+        "reponse": "A. Négatif",
+        "explication": "Pour x=3 : (3+4) × (3-4) = 7 × (-1) = -7 < 0.",
+        "has_graph": false,
+        "graph_data": null
+      },
+      {
+        "id": "prod_05",
+        "type_question": "calcul",
+        "question": "Pour quelles valeurs de x le produit (3x-6)(x+1) est-il positif ou nul ?",
+        "options": ["A. x ∈ ]-∞ ; -1] ∪ [2 ; +∞[", "B. x ∈ ]-1 ; 2[", "C. x ∈ [-1 ; 2]", "D. x ∈ ]-∞ ; -1["],
+        "reponse": "A. x ∈ ]-∞ ; -1] ∪ [2 ; +∞[",
+        "explication": "Racines : x=2 et x=-1. Le coefficient a=3>0 donc parabole vers le haut : le produit est positif ou nul à l'extérieur des racines (crochets fermés car nul aux racines).",
+        "has_graph": false,
+        "graph_data": null
+      },
+      {
+        "id": "prod_06",
+        "type_question": "T1",
+        "question": "D'après le tableau de signes, quelle fonction lui correspond ?",
+        "options": ["A. f(x) = (x+1)(x-4)", "B. f(x) = -(x+1)(x-4)", "C. f(x) = (x-1)(x+4)", "D. f(x) = (x+1)(x+4)"],
+        "reponse": "A. f(x) = (x+1)(x-4)",
+        "explication": "Racines x=-1 et x=4, signes +/-/+ donc a=1>0, parabole tournée vers le haut.",
+        "has_graph": true,
+        "graph_data": {"type": "signes", "fonction": "f(x)", "racines": [-1, 4], "signes": ["+", "-", "+"]}
+      },
+      {
+        "id": "prod_07",
+        "type_question": "T1",
+        "question": "D'après le tableau de signes, quelle fonction lui correspond ?",
+        "options": ["A. f(x) = -(x+3)(x-2)", "B. f(x) = (x+3)(x-2)", "C. f(x) = -(x-3)(x+2)", "D. f(x) = (x-3)(x-2)"],
+        "reponse": "A. f(x) = -(x+3)(x-2)",
+        "explication": "Racines x=-3 et x=2, signes -/+/- donc a<0, parabole tournée vers le bas.",
+        "has_graph": true,
+        "graph_data": {"type": "signes", "fonction": "f(x)", "racines": [-3, 2], "signes": ["-", "+", "-"]}
+      },
+      {
+        "id": "prod_08",
+        "type_question": "T2",
+        "question": "Le tableau de signes ci-contre correspond à f(x) = 2(x-a)(x-b) avec a < b. Quelles sont les valeurs de a et b ?",
+        "options": ["A. a=1 et b=5", "B. a=-1 et b=-5", "C. a=5 et b=1", "D. a=-5 et b=-1"],
+        "reponse": "A. a=1 et b=5",
+        "explication": "Les racines se lisent directement sur le tableau : x=1 et x=5. Comme a<b, on a a=1 et b=5.",
+        "has_graph": true,
+        "graph_data": {"type": "signes", "fonction": "f(x)", "racines": [1, 5], "signes": ["+", "-", "+"]}
+      },
+      {
+        "id": "prod_09",
+        "type_question": "T2",
+        "question": "Le tableau de signes ci-contre correspond à f(x) = -(x-a)(x-b) avec a < b. Quelles sont les valeurs de a et b ?",
+        "options": ["A. a=-4 et b=2", "B. a=4 et b=-2", "C. a=-2 et b=4", "D. a=2 et b=-4"],
+        "reponse": "A. a=-4 et b=2",
+        "explication": "Les racines se lisent directement sur le tableau : x=-4 et x=2.",
+        "has_graph": true,
+        "graph_data": {"type": "signes", "fonction": "f(x)", "racines": [-4, 2], "signes": ["-", "+", "-"]}
+      },
+      {
+        "id": "prod_10",
+        "type_question": "T3",
+        "question": "D'après le tableau de signes ci-contre, quel est le signe de f(6) ?",
+        "options": ["A. Positif", "B. Négatif", "C. Nul", "D. Impossible à déterminer"],
+        "reponse": "A. Positif",
+        "explication": "x=6 est à droite de la racine x=4, donc dans la zone de signe +.",
+        "has_graph": true,
+        "graph_data": {"type": "signes", "fonction": "f(x)", "racines": [1, 4], "signes": ["+", "-", "+"]}
+      },
+      {
+        "id": "prod_11",
+        "type_question": "T3",
+        "question": "D'après le tableau de signes ci-contre, quel est le signe de f(0) ?",
+        "options": ["A. Positif", "B. Négatif", "C. Nul", "D. Impossible à déterminer"],
+        "reponse": "A. Positif",
+        "explication": "x=0 est entre les racines x=-2 et x=3, donc dans la zone de signe +.",
+        "has_graph": true,
+        "graph_data": {"type": "signes", "fonction": "f(x)", "racines": [-2, 3], "signes": ["-", "+", "-"]}
+      },
+      {
+        "id": "prod_12",
+        "type_question": "T5",
+        "question": "Le tableau de signes ci-contre montre les signes + | 0 | - | 0 | +. Que peut-on dire du coefficient a de la fonction du second degré associée ?",
+        "options": ["A. a > 0 car le signe est + à l'extérieur des racines", "B. a < 0 car le signe est - entre les racines", "C. a = 0 car la fonction s'annule", "D. Impossible à déterminer"],
+        "reponse": "A. a > 0 car le signe est + à l'extérieur des racines",
+        "explication": "Quand a>0, la parabole est tournée vers le haut : la fonction est positive à l'extérieur des racines et négative entre elles.",
+        "has_graph": true,
+        "graph_data": {"type": "signes", "fonction": "f(x)", "racines": [-1, 3], "signes": ["+", "-", "+"]}
+      },
+      {
+        "id": "prod_13",
+        "type_question": "T5",
+        "question": "Le tableau de signes ci-contre montre les signes - | 0 | + | 0 | -. Que peut-on dire du coefficient a de la fonction du second degré associée ?",
+        "options": ["A. a < 0 car le signe est - à l'extérieur des racines", "B. a > 0 car le signe est + entre les racines", "C. a = 1 car la fonction a deux racines", "D. Impossible à déterminer"],
+        "reponse": "A. a < 0 car le signe est - à l'extérieur des racines",
+        "explication": "Quand a<0, la parabole est tournée vers le bas : la fonction est négative à l'extérieur des racines et positive entre elles.",
+        "has_graph": true,
+        "graph_data": {"type": "signes", "fonction": "f(x)", "racines": [0, 4], "signes": ["-", "+", "-"]}
+      }
+    ],
+    "second_degre": [
+      {
+        "id": "sd_01",
+        "type_question": "calcul",
+        "question": "On donne f(x) = (x-2)(x-5). Pour quelles valeurs de x a-t-on f(x) < 0 ?",
+        "options": ["A. x ∈ ]2 ; 5[", "B. x ∈ ]-∞ ; 2[ ∪ ]5 ; +∞[", "C. x ∈ [2 ; 5]", "D. x ∈ ]-∞ ; 2["],
+        "reponse": "A. x ∈ ]2 ; 5[",
+        "explication": "Racines : x=2 et x=5. Le coefficient a=1>0 donc parabole tournée vers le haut : f(x) est strictement négatif entre les deux racines.",
+        "has_graph": false,
+        "graph_data": null
+      },
+      {
+        "id": "sd_02",
+        "type_question": "calcul",
+        "question": "On donne f(x) = -(x+1)(x-3). Pour quelles valeurs de x a-t-on f(x) > 0 ?",
+        "options": ["A. x ∈ ]-1 ; 3[", "B. x ∈ ]-∞ ; -1[ ∪ ]3 ; +∞[", "C. x ∈ [-1 ; 3]", "D. x ∈ ]-3 ; 1["],
+        "reponse": "A. x ∈ ]-1 ; 3[",
+        "explication": "Racines : x=-1 et x=3. Le coefficient a=-1<0 donc parabole tournée vers le bas : f(x) est strictement positif entre les deux racines.",
+        "has_graph": false,
+        "graph_data": null
+      },
+      {
+        "id": "sd_03",
+        "type_question": "calcul",
+        "question": "On donne f(x) = 2(x+3)(x-1). Pour quelles valeurs de x a-t-on f(x) ≥ 0 ?",
+        "options": ["A. x ∈ ]-∞ ; -3] ∪ [1 ; +∞[", "B. x ∈ [-3 ; 1]", "C. x ∈ ]-3 ; 1[", "D. x ∈ ]-∞ ; -3["],
+        "reponse": "A. x ∈ ]-∞ ; -3] ∪ [1 ; +∞[",
+        "explication": "Racines : x=-3 et x=1. Le coefficient a=2>0 donc parabole tournée vers le haut : f(x) est positif ou nul à l'extérieur des racines.",
+        "has_graph": false,
+        "graph_data": null
+      },
+      {
+        "id": "sd_04",
+        "type_question": "calcul",
+        "question": "On donne f(x) = (x-4)². Quel est le signe de f(x) ?",
+        "options": ["A. Toujours positif ou nul, nul uniquement en x=4", "B. Toujours négatif ou nul", "C. Positif pour x > 4, négatif pour x < 4", "D. Toujours strictement positif"],
+        "reponse": "A. Toujours positif ou nul, nul uniquement en x=4",
+        "explication": "Un carré est toujours positif ou nul. Il vaut 0 uniquement quand x-4=0, soit x=4.",
+        "has_graph": false,
+        "graph_data": null
+      },
+      {
+        "id": "sd_05",
+        "type_question": "calcul",
+        "question": "On donne f(x) = -3(x+2)². Quel est le signe de f(x) ?",
+        "options": ["A. Toujours négatif ou nul, nul uniquement en x=-2", "B. Toujours positif ou nul", "C. Négatif pour x > -2, positif pour x < -2", "D. Toujours strictement négatif"],
+        "reponse": "A. Toujours négatif ou nul, nul uniquement en x=-2",
+        "explication": "(x+2)² ≥ 0 toujours, multiplié par -3 < 0 donne toujours ≤ 0. Nul uniquement en x=-2.",
+        "has_graph": false,
+        "graph_data": null
+      }
+    ]
+  }
+}
