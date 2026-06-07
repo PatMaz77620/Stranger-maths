@@ -8,7 +8,7 @@ import json
 
 from generateur_questions import generer_quiz_tableaux_signes
 from openai import OpenAI
-from generateur_questions import generer_quiz_tableaux_signes, generer_quiz_suites
+from generateur_questions import generer_quiz_tableaux_signes, generer_quiz_suites, generer_quiz_variations
 from generateur_questions import generer_quiz_tableaux_signes
 
 # Initialisation du client OpenAI (beaucoup plus simple)
@@ -226,7 +226,135 @@ def tracer_tableau_automatisme(data):
                     fontsize=20, ha='center', fontweight='bold')
 
     st.pyplot(fig)
-    
+
+def tracer_tableau_variations(data):
+    """
+    Dessine un tableau de variations avec flèches ↗↘.
+    data = {
+        "type": "variations",
+        "fonction": "f",
+        "derivee": "f'",
+        "x_vals": [-2, 1],         # points remarquables (sans ±∞)
+        "f_vals": [5, -3],         # valeurs de f à ces points
+        "signes_deriv": ["+", "-", "+"],  # signe de f' sur chaque intervalle
+        "extremums": [None, "min"]  # None, "max" ou "min"
+    }
+    """
+    plt.rcParams['mathtext.fontset'] = 'cm'
+    fig, ax = plt.subplots(figsize=(7, 3.5))
+    fig.patch.set_facecolor('#0e1117')
+    ax.set_facecolor('#161b22')
+    ax.axis('off')
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+
+    x_vals    = data.get('x_vals', [])
+    f_vals    = data.get('f_vals', [])
+    signes_fp = data.get('signes_deriv', [])
+    extremums = data.get('extremums', [None] * len(x_vals))
+    nom_f     = data.get('fonction', 'f')
+    nom_fp    = data.get('derivee', "f'")
+
+    n_points = len(x_vals)
+    x_debut, x_fin = 0.18, 0.97
+    largeur = x_fin - x_debut
+
+    # Positions horizontales des points remarquables
+    if n_points == 0:
+        positions_x = []
+    else:
+        positions_x = [x_debut + largeur * (i + 1) / (n_points + 1)
+                       for i in range(n_points)]
+
+    # Positions des intervalles
+    all_pos = [x_debut] + positions_x + [x_fin]
+    positions_interv = [(all_pos[i] + all_pos[i+1]) / 2
+                        for i in range(len(all_pos) - 1)]
+
+    y_haut, y_mid, y_bas = 0.82, 0.55, 0.15
+
+    # Lignes du tableau
+    for y in [y_haut, y_mid, y_bas]:
+        ax.axhline(y, color='white', lw=1, xmin=0.02, xmax=0.98)
+    ax.axvline(x_debut, color='white', lw=1, ymin=0.08, ymax=0.95)
+
+    # Entêtes
+    ax.text(0.09, (y_haut + 1.0) / 2, "x",
+            color='white', ha='center', va='center', fontsize=11, fontweight='bold')
+    ax.text(0.09, (y_mid + y_haut) / 2, nom_fp,
+            color='white', ha='center', va='center', fontsize=10, fontweight='bold')
+    ax.text(0.09, (y_bas + y_mid) / 2, nom_f,
+            color='white', ha='center', va='center', fontsize=10, fontweight='bold')
+
+    # ±∞
+    ax.text(x_debut + 0.01, (y_haut + 1.0) / 2, "-∞",
+            color='white', ha='left', va='center', fontsize=10)
+    ax.text(x_fin - 0.01, (y_haut + 1.0) / 2, "+∞",
+            color='white', ha='right', va='center', fontsize=10)
+
+    # Points remarquables
+    for i, (xv, pos) in enumerate(zip(x_vals, positions_x)):
+        ax.text(pos, (y_haut + 1.0) / 2, fmt_label_matplotlib(xv),
+                color='white', ha='center', va='center', fontsize=10)
+        ax.axvline(pos, color='white', lw=0.7, ls='--', ymin=0.08, ymax=0.95)
+        ax.text(pos, (y_mid + y_haut) / 2, "0",
+                color='#ff6666', ha='center', va='center', fontsize=11, fontweight='bold')
+
+    # Signes de f' sur les intervalles
+    for pos, signe in zip(positions_interv, signes_fp):
+        couleur = '#00cc66' if signe == '+' else '#ff4444'
+        ax.text(pos, (y_mid + y_haut) / 2, signe,
+                color=couleur, ha='center', va='center', fontsize=14, fontweight='bold')
+
+    # Flèches de variation
+    if f_vals:
+        # Zone disponible pour f
+        y_zone_bas = y_bas + 0.08
+        y_zone_haut = y_mid - 0.08
+        y_centre = (y_zone_bas + y_zone_haut) / 2
+        hauteur_zone = y_zone_haut - y_zone_bas
+
+        # Position y du sommet : toujours au centre de la zone
+        # Les bords ±∞ sont au bas ou en haut selon le sens de variation
+        y_sommet = y_centre
+        marge_fleche = hauteur_zone * 0.35
+
+        if signes_fp and len(signes_fp) == 2:
+            # Cas standard : un seul sommet
+            if signes_fp[0] == '+':
+                # f croissante puis décroissante → sommet = MAX
+                y_bord_g  = y_sommet - marge_fleche  # part du bas
+                y_bord_d  = y_sommet - marge_fleche  # repart vers le bas
+            else:
+                # f décroissante puis croissante → sommet = MIN
+                y_bord_g  = y_sommet + marge_fleche  # part du haut
+                y_bord_d  = y_sommet + marge_fleche  # repart vers le haut
+
+            all_y = [y_bord_g, y_sommet, y_bord_d]
+        else:
+            all_y = [y_centre] * (len(all_pos))
+
+        # Afficher valeur de f au sommet
+        for i, (fv, pos) in enumerate(zip(f_vals, positions_x)):
+            couleur_val = '#ffdd44' if extremums[i] in ['max', 'min'] else 'white'
+            ax.text(pos, y_sommet, fmt_label_matplotlib(fv),
+                    color=couleur_val, ha='center', va='center',
+                    fontsize=10, fontweight='bold')
+
+        # Tracer les flèches
+        for i, signe in enumerate(signes_fp):
+            x1 = all_pos[i] + 0.02
+            x2 = all_pos[i+1] - 0.02
+            y1 = all_y[i]
+            y2 = all_y[i+1]
+            ax.annotate("",
+                xy=(x2, y2), xytext=(x1, y1),
+                arrowprops=dict(arrowstyle="->", color='#4fc3f7', lw=1.8)
+            )
+
+    plt.tight_layout(pad=0.3)
+    st.pyplot(fig)
+
 def generer_automatisme_openai():
     # Liste des thèmes pour forcer la diversité
     themes = [
@@ -434,19 +562,28 @@ def aller_a_home():
     st.session_state.page = 'home'
 
 def nettoyer_latex(texte):
-    """Corrige les backslashes LaTeX mal échappés par GPT dans le JSON."""
+    """Corrige les backslashes LaTeX manquants après parsing JSON."""
     if not isinstance(texte, str):
         return texte
-    corrections = [
-        ("\\frac",  "§FR§"), ("rac{",   "\\frac{"), ("§FR§",  "\\frac"),
-        ("\\times", "§TI§"), ("imes",   "\\times"), ("§TI§",  "\\times"),
-        ("\\sqrt{", "§SQ§"), ("sqrt{",  "\\sqrt{"), ("§SQ§",  "\\sqrt{"),
-        ("\\leq",   "§LQ§"), ("leq",    "\\leq"),   ("§LQ§",  "\\leq"),
-        ("\\geq",   "§GQ§"), ("geq",    "\\geq"),   ("§GQ§",  "\\geq"),
-        ("\\infty", "§IN§"), ("infty",  "\\infty"), ("§IN§",  "\\infty"),
+    import re
+    # (pattern, commande_cible) — orall est le résidu de \forall quand \f est mangé
+    commandes = [
+        (r'(?<!\\)(?<![a-zA-Z])frac(?=\{)',            'frac'),
+        (r'(?<!\\)(?<![a-zA-Z])forall(?=[\s\{$])',     'forall'),
+        (r'(?<!\\)(?<![a-zA-Z])orall(?=[\s\{$;])',     'forall'),  # \f mangé → orall
+        (r'(?<!\\)(?<![a-zA-Z])times(?=[\s\{$])',      'times'),
+        (r'(?<!\\)(?<![a-zA-Z])sqrt(?=\{)',             'sqrt'),
+        (r'(?<!\\)(?<![a-zA-Z])leq(?=[\s\{$])',        'leq'),
+        (r'(?<!\\)(?<![a-zA-Z])geq(?=[\s\{$])',        'geq'),
+        (r'(?<!\\)(?<![a-zA-Z])neq(?=[\s\{$])',        'neq'),
+        (r'(?<!\\)(?<![a-zA-Z])infty(?=[\s\}\{\)$;])', 'infty'),
+        (r'(?<!\\)(?<![a-zA-Z])cdot(?=[\s\{$])',       'cdot'),
+        (r'(?<!\\)(?<![a-zA-Z])cup(?=[\s\{$])',        'cup'),
+        (r'(?<!\\)(?<![a-zA-Z])cap(?=[\s\{$])',        'cap'),
+        (r'(?<!\\)(?<![a-zA-Z])pm(?=[\s\{$])',         'pm'),
     ]
-    for mauvais, bon in corrections:
-        texte = texte.replace(mauvais, bon)
+    for pattern, cmd in commandes:
+        texte = re.sub(pattern, '\\\\' + cmd, texte)
     return texte
 
 def corriger_notation_suites(texte):
@@ -468,6 +605,32 @@ def nettoyer_question(q):
             q[champ] = corriger_notation_suites(nettoyer_latex(q[champ]))
     if 'options' in q:
         q['options'] = [corriger_notation_suites(nettoyer_latex(opt)) for opt in q['options']]
+    return q
+
+def verifier_coherence(q):
+    """
+    Vérifie que la réponse déclarée est bien dans les options.
+    Si la réponse n'est pas dans les options, on prend la première option
+    et on la marque comme "à vérifier".
+    """
+    reponse = q.get('reponse', '')
+    options = q.get('options', [])
+
+    # Vérifier que la réponse est bien dans les options
+    if reponse not in options:
+        # Chercher l'option qui ressemble le plus à la réponse
+        for opt in options:
+            # Comparer en ignorant le préfixe A. B. C. D.
+            reponse_corps = reponse[3:].strip() if len(reponse) > 2 else reponse
+            opt_corps = opt[3:].strip() if len(opt) > 2 else opt
+            if reponse_corps == opt_corps:
+                q['reponse'] = opt
+                return q
+        # Si toujours pas trouvé, on garde la première option
+        # et on ajoute un warning dans l'explication
+        if options:
+            q['reponse'] = options[0]
+            q['explication'] = "⚠️ " + q.get('explication', '')
     return q
 
 def generer_mission_openai(theme_maths, difficulte):
@@ -533,6 +696,7 @@ def generer_mission_openai(theme_maths, difficulte):
 
         if questions:
             questions = [nettoyer_question(q) for q in questions]
+            questions = [verifier_coherence(q) for q in questions]
 
         return questions
 
@@ -571,6 +735,8 @@ def afficher_interface_quiz():
                     type_g = graph_data.get('type', '')
                     if type_g == 'signes':
                         tracer_tableau_automatisme(graph_data)
+                    elif type_g == 'variations':
+                        tracer_tableau_variations(graph_data)
                     elif type_g == 'line':
                         tracer_droite(graph_data)
                     elif type_g == 'parabola':
@@ -673,8 +839,9 @@ def afficher_interface_quiz():
         )
 
         
-        chapitres_generateur_signes = ["chap0", "chap3", "chap5"]
+        chapitres_generateur_signes = ["chap0", "chap3"]
         chapitres_generateur_suites = ["chap2"]
+        chapitres_generateur_variations = ["chap5"]
 
         if st.button("🔦 Lancer la Mission Eleven", use_container_width=True):
             with st.spinner(f"Eleven scanne l'Upside Down pour préparer tes 11 défis (Niveau {difficulte_choisie})..."):
@@ -701,6 +868,17 @@ def afficher_interface_quiz():
                         quiz = quiz_gpt
                     else:
                         quiz = quiz_gen
+
+                elif page_actuelle in chapitres_generateur_variations:
+                    # Dérivation : mix GPT + tableaux de variations + signe de f'
+                    quiz_gpt = generer_mission_openai(theme_actuel, difficulte_choisie)
+                    quiz_gen_var = generer_quiz_variations(nb_questions=4, difficulte=difficulte_choisie)
+                    quiz_gen_sig = generer_quiz_tableaux_signes(nb_questions=2, difficulte=difficulte_choisie)
+                    if quiz_gpt:
+                        quiz = quiz_gpt[:5] + quiz_gen_var + quiz_gen_sig
+                        random.shuffle(quiz)
+                    else:
+                        quiz = quiz_gen_var + quiz_gen_sig
 
                 else:
                     quiz = generer_mission_openai(theme_actuel, difficulte_choisie)

@@ -156,15 +156,78 @@ def melanger_options(bonne_reponse, mauvaises_reponses):
     """
     Mélange les options et retourne (options_formatées, bonne_reponse_formatée).
     """
+    def nettoyer(texte):
+        """Corrige les doubles backslashes et applique fmt_option."""
+        if isinstance(texte, str):
+            # Corriger \\\\frac → \frac etc
+            texte = texte.replace('\\\\', '\\')
+        return fmt_option(texte)
+
     lettres = ["A", "B", "C", "D"]
     toutes = [bonne_reponse] + mauvaises_reponses[:3]
     random.shuffle(toutes)
-    options = [f"{lettres[i]}. {toutes[i]}" for i in range(len(toutes))]
+    options = [f"{lettres[i]}. {nettoyer(toutes[i])}" for i in range(len(toutes))]
     idx_bonne = toutes.index(bonne_reponse)
-    reponse = f"{lettres[idx_bonne]}. {bonne_reponse}"
+    reponse = f"{lettres[idx_bonne]}. {nettoyer(bonne_reponse)}"
     return options, reponse
 
 def to_graph_val(val):
+    """
+    Convertit une valeur pour graph_data.
+    Retourne (valeur_float, label_str).
+    """
+    if isinstance(val, Fraction):
+        return float(val), fmt_latex(val)
+    return val, str(val)
+
+def fmt_option(texte):
+    """
+    S'assure que les fractions LaTeX dans les options sont bien rendues
+    par st.markdown en les entourant de $...$.
+    Corrige aussi les doubles backslashes \\\\frac → \\frac.
+    """
+    import re
+    if not isinstance(texte, str):
+        return str(texte)
+    # Corriger les doubles backslashes
+    texte = texte.replace('\\\\frac', '\\frac')
+    # Si déjà entièrement dans $...$, on ne touche pas
+    if texte.startswith('$') and texte.endswith('$'):
+        return texte
+    # Entoure \frac{}{} de $ si pas déjà dans $
+    def entourer(m):
+        return f"${m.group(0)}$"
+    texte = re.sub(r'(?<!\$)\\frac\{[^}]*\}\{[^}]*\}(?!\$)', entourer, texte)
+    return texte
+
+def fmt_calcul_facteur(x_test, racine):
+    """
+    Formate (x_test - racine) proprement pour les explications.
+    Evite x - (-1) → écrit x + 1 directement.
+    """
+    resultat = x_test - racine
+    if isinstance(racine, Fraction) or (not isinstance(racine, Fraction) and racine < 0):
+        r_abs = abs(racine) if not isinstance(racine, Fraction) else Fraction(abs(racine.numerator), racine.denominator)
+        return f"({fmt_latex(x_test)} + {fmt_latex(r_abs)})", fmt_latex(resultat)
+    elif racine == 0:
+        return f"({fmt_latex(x_test)})", fmt_latex(resultat)
+    else:
+        return f"({fmt_latex(x_test)} - {fmt_latex(racine)})", fmt_latex(resultat)
+    """
+    Formate (x_test - racine) proprement pour les explications.
+    Evite x - (-1) → écrit x + 1 directement.
+    Ex: x_test=−7, racine=−1 → "−7 + 1 = −6"
+    Ex: x_test=−7, racine=3  → "−7 − 3 = −10"
+    """
+    resultat = x_test - racine
+    if isinstance(racine, Fraction) or racine < 0:
+        # racine négative → signe +
+        r_abs = abs(racine) if not isinstance(racine, Fraction) else Fraction(abs(racine.numerator), racine.denominator)
+        return f"({fmt_latex(x_test)} + {fmt_latex(r_abs)})", fmt_latex(resultat)
+    elif racine == 0:
+        return f"({fmt_latex(x_test)})", fmt_latex(resultat)
+    else:
+        return f"({fmt_latex(x_test)} - {fmt_latex(racine)})", fmt_latex(resultat)
     """
     Convertit une valeur pour graph_data.
     Les fractions sont converties en float pour matplotlib,
@@ -415,13 +478,26 @@ def generer_question_produit(difficulte="Moyen", type_question=None):
 
         f1_val = x_test - r1
         f2_val = x_test - r2
-        produit = f1_val * f2_val
-        explication = (
-            f"Pour $x={x_test}$ : "
-            f"$({x_test} - ({r1_str})) \\times ({x_test} - ({r2_str})) = "
-            f"{fmt_latex(f1_val)} \\times {fmt_latex(f2_val)} = {fmt_latex(produit)}$, "
-            f"ce qui est {signe_reel.lower()}."
-        )
+        produit_sans_a = f1_val * f2_val
+        produit = a * produit_sans_a
+        f1_str, f1_res = fmt_calcul_facteur(x_test, r1)
+        f2_str, f2_res = fmt_calcul_facteur(x_test, r2)
+        a_str = fmt_latex(a)
+
+        if a == 1:
+            explication = (
+                f"Pour $x={x_test}$ : "
+                f"${f1_str} \\times {f2_str} = "
+                f"{f1_res} \\times {f2_res} = {fmt_latex(produit)}$, "
+                f"ce qui est {signe_reel.lower()}."
+            )
+        else:
+            explication = (
+                f"Pour $x={x_test}$ : "
+                f"${a_str} \\times {f1_str} \\times {f2_str} = "
+                f"{a_str} \\times {f1_res} \\times {f2_res} = {fmt_latex(produit)}$, "
+                f"ce qui est {signe_reel.lower()}."
+            )
         graph_data = None
         has_graph = False
 
@@ -1098,6 +1174,357 @@ def generer_quiz_suites(nb_questions=6, difficulte="Moyen"):
 
 
 # ================================================================
+# GÉNÉRATEUR : TABLEAUX DE VARIATIONS + DÉRIVATION
+# ================================================================
+
+def _params_variation(difficulte):
+    """
+    Génère les paramètres d'une fonction du second degré f(x) = a(x-s)² + t
+    avec son tableau de variations.
+    Retourne (a, sommet_x, sommet_y, x_vals_supplementaires)
+    """
+    if difficulte == "Facile":
+        a = random.choice([1, -1, 2, -2])
+        s = random.choice([-2, -1, 0, 1, 2])
+        t = random.choice([-4, -3, -2, -1, 0, 1, 2, 3, 4])
+    elif difficulte == "Moyen":
+        a = random.choice([1, -1, 2, -2, 3, -3])
+        s = random.choice(range(-3, 4))
+        t = random.choice(range(-6, 7))
+    else:
+        a = random.choice([1, -1, 2, -2, 3, -3,
+                           Fraction(1,2), Fraction(-1,2)])
+        s = random.choice(range(-3, 4))
+        t = random.choice(range(-6, 7))
+
+    return a, s, t
+
+def _generer_tableau_variations_data(a, s, t, x_supplementaires=None):
+    """
+    Génère le graph_data pour un tableau de variations de f(x) = a(x-s)² + t.
+    """
+    extremum_type = "min" if a > 0 else "max"
+    signes = ["-", "+"] if a > 0 else ["+", "-"]
+
+    return {
+        "type": "variations",
+        "fonction": "f",
+        "derivee": "f'",
+        "x_vals": [s],
+        "f_vals": [t],
+        "signes_deriv": signes,
+        "extremums": [extremum_type],
+        "a": float(a) if not isinstance(a, Fraction) else float(a),
+        "s": s,
+        "t": t
+    }
+
+
+# ---- TV1 : Lire la valeur au sommet (visible dans le tableau) ----
+
+def generer_question_tv1_lire_valeur(difficulte="Moyen"):
+    """
+    Option B : l'élève lit uniquement les valeurs VISIBLES dans le tableau
+    → valeur de f au sommet, ou valeur de x au sommet.
+    """
+    a, s, t = _params_variation(difficulte)
+    graph_data = _generer_tableau_variations_data(a, s, t)
+
+    extremum_type = "minimum" if a > 0 else "maximum"
+    type_q = random.choice(["lire_f_sommet", "lire_x_sommet"])
+
+    if type_q == "lire_f_sommet":
+        question = (
+            f"D'après le tableau de variations ci-contre, "
+            f"quelle est la valeur du {extremum_type} de $f$ ?"
+        )
+        bonne = f"${fmt_latex(t)}$"
+        mauvaises = [
+            f"${fmt_latex(t + random.choice([1, 2, -1, -2]))}$",
+            f"${fmt_latex(s)}$",
+            f"${fmt_latex(t + random.choice([3, -3, 4, -4]))}$",
+        ]
+        explication = (
+            f"Le {extremum_type} de $f$ se lit directement sur le tableau : "
+            f"$f({fmt_latex(s)}) = {fmt_latex(t)}$."
+        )
+    else:
+        question = (
+            f"D'après le tableau de variations ci-contre, "
+            f"en quelle valeur de $x$ le {extremum_type} de $f$ est-il atteint ?"
+        )
+        bonne = f"$x = {fmt_latex(s)}$"
+        mauvaises = [
+            f"$x = {fmt_latex(s + 1)}$",
+            f"$x = {fmt_latex(s - 1)}$",
+            f"$x = {fmt_latex(t)}$",
+        ]
+        explication = (
+            f"Le {extremum_type} est atteint en $x = {fmt_latex(s)}$ "
+            f"(valeur où $f'$ s'annule et change de signe)."
+        )
+
+    options, reponse = melanger_options(bonne, mauvaises)
+
+    return {
+        "question": question,
+        "options": options,
+        "reponse": reponse,
+        "explication": explication,
+        "has_graph": True,
+        "graph_data": graph_data,
+        "type_question": "TV1",
+        "theme": "variations"
+    }
+
+
+# ---- TV2 : Identifier l'extremum ----
+
+def generer_question_tv2_extremum(difficulte="Moyen"):
+    """
+    Donne un tableau de variations → l'élève identifie le maximum ou minimum.
+    """
+    a, s, t = _params_variation(difficulte)
+    graph_data = _generer_tableau_variations_data(a, s, t)
+
+    extremum_type = "minimum" if a > 0 else "maximum"
+    extremum_type_opp = "maximum" if a > 0 else "minimum"
+
+    # Question au choix
+    type_q = random.choice(["valeur", "position", "nature"])
+
+    if type_q == "valeur":
+        question = f"D'après le tableau de variations ci-contre, quelle est la valeur du {extremum_type} de $f$ ?"
+        bonne = f"${fmt_latex(t)}$"
+        s_faux = s + random.choice([1, -1, 2])
+        t_faux1 = a * (s_faux - s)**2 + t
+        mauvaises = [
+            f"${fmt_latex(s)}$",
+            f"${fmt_latex(t_faux1)}$",
+            f"${fmt_latex(t + random.choice([1,-1,2,-2]))}$"
+        ]
+        explication = (
+            f"Le {extremum_type} de $f$ est atteint en $x = {fmt_latex(s)}$ "
+            f"et vaut $f({fmt_latex(s)}) = {fmt_latex(t)}$."
+        )
+
+    elif type_q == "position":
+        question = f"D'après le tableau de variations ci-contre, en quelle valeur de $x$ le {extremum_type} de $f$ est-il atteint ?"
+        bonne = f"$x = {fmt_latex(s)}$"
+        mauvaises = [
+            f"$x = {fmt_latex(s + 1)}$",
+            f"$x = {fmt_latex(s - 1)}$",
+            f"$x = {fmt_latex(t)}$"
+        ]
+        explication = (
+            f"D'après le tableau, $f'$ s'annule en $x = {fmt_latex(s)}$ "
+            f"et change de signe : c'est donc là que $f$ atteint son {extremum_type}."
+        )
+
+    else:  # nature
+        question = "D'après le tableau de variations ci-contre, la fonction $f$ admet :"
+        bonne = f"Un {extremum_type} en $x = {fmt_latex(s)}$"
+        mauvaises = [
+            f"Un {extremum_type_opp} en $x = {fmt_latex(s)}$",
+            f"Un {extremum_type} en $x = {fmt_latex(t)}$",
+            f"Ni maximum ni minimum"
+        ]
+        explication = (
+            f"$f'$ change de signe en $x = {fmt_latex(s)}$ : "
+            f"de {'$-$ à $+$' if a > 0 else '$+$ à $-$'}, "
+            f"donc $f$ admet un {extremum_type} en ce point."
+        )
+
+    options, reponse = melanger_options(bonne, mauvaises)
+
+    return {
+        "question": question,
+        "options": options,
+        "reponse": reponse,
+        "explication": explication,
+        "has_graph": True,
+        "graph_data": graph_data,
+        "type_question": "TV2",
+        "theme": "variations"
+    }
+
+
+# ---- TV3 : Sens de variation sur un intervalle ----
+
+def generer_question_tv3_sens(difficulte="Moyen"):
+    """
+    Donne un tableau de variations → l'élève lit le sens de variation.
+    """
+    a, s, t = _params_variation(difficulte)
+    graph_data = _generer_tableau_variations_data(a, s, t)
+
+    # Choisir un intervalle
+    x1 = s - random.randint(1, 3)
+    x2 = s + random.randint(1, 3)
+    intervalles = [
+        (f"$]-\\infty ; {fmt_latex(s)}[$", "croissante" if a < 0 else "décroissante"),
+        (f"$]{fmt_latex(s)} ; +\\infty[$", "décroissante" if a < 0 else "croissante"),
+    ]
+    intervalle_str, sens_correct = random.choice(intervalles)
+    sens_oppose = "décroissante" if sens_correct == "croissante" else "croissante"
+
+    question = (
+        f"D'après le tableau de variations ci-contre, "
+        f"sur l'intervalle {intervalle_str}, la fonction $f$ est :"
+    )
+    bonne = sens_correct.capitalize()
+    mauvaises = [
+        sens_oppose.capitalize(),
+        "Constante",
+        "Ni croissante ni décroissante"
+    ]
+    options, reponse = melanger_options(bonne, mauvaises)
+
+    if sens_correct == "croissante":
+        explication = f"Sur cet intervalle, $f'(x) > 0$ donc $f$ est **croissante**."
+    else:
+        explication = f"Sur cet intervalle, $f'(x) < 0$ donc $f$ est **décroissante**."
+
+    return {
+        "question": question,
+        "options": options,
+        "reponse": reponse,
+        "explication": explication,
+        "has_graph": True,
+        "graph_data": graph_data,
+        "type_question": "TV3",
+        "theme": "variations"
+    }
+
+
+# ---- Dérivation : signe de f' → croissance ----
+
+def generer_question_derivation_signe(difficulte="Moyen"):
+    """
+    Donne f'(x) = ax + b → l'élève détermine sur quel intervalle f est croissante/décroissante.
+    """
+    # f'(x) = 2ax (dérivée de ax²+b) ou f'(x) = a (affine)
+    type_q = random.choice(["affine_derivee", "second_degre_derivee"])
+
+    if type_q == "affine_derivee":
+        # f(x) = ax + b → f'(x) = a
+        if difficulte == "Facile":
+            a = random.choice([1, 2, 3, -1, -2])
+        else:
+            a = random.choice([1, 2, 3, -1, -2, -3,
+                               Fraction(1,2), Fraction(-1,2)])
+
+        fp_str = fmt_latex(a)
+        if a > 0:
+            sens = "croissante"
+            intervalle = "$\\mathbb{R}$ tout entier"
+        else:
+            sens = "décroissante"
+            intervalle = "$\\mathbb{R}$ tout entier"
+
+        question = (
+            f"Soit $f$ une fonction dont la dérivée est $f'(x) = {fp_str}$. "
+            f"Sur quel intervalle $f$ est-elle {sens} ?"
+        )
+        bonne = intervalle
+        mauvaises = [
+            f"$]-\\infty ; 0[$",
+            f"$]0 ; +\\infty[$",
+            f"$f$ n'est {'pas ' if a > 0 else ''}croissante sur $\\mathbb{{R}}$"
+        ]
+        explication = (
+            f"$f'(x) = {fp_str}$ {'$> 0$' if a > 0 else '$< 0$'} pour tout $x$, "
+            f"donc $f$ est {sens} sur $\\mathbb{{R}}$."
+        )
+
+    else:
+        # f(x) = ax² + b → f'(x) = 2ax
+        if difficulte == "Facile":
+            a = random.choice([1, 2, -1, -2])
+        else:
+            a = random.choice([1, 2, 3, -1, -2, -3])
+
+        deux_a = 2 * a
+        fp_str = f"{fmt_latex(deux_a)}x"
+
+        if a > 0:
+            sens_pos = "croissante"
+            interv_pos = "$]0 ; +\\infty[$"
+            sens_neg = "décroissante"
+            interv_neg = "$]-\\infty ; 0[$"
+        else:
+            sens_pos = "décroissante"
+            interv_pos = "$]0 ; +\\infty[$"
+            sens_neg = "croissante"
+            interv_neg = "$]-\\infty ; 0[$"
+
+        choix = random.choice(["pos", "neg"])
+        if choix == "pos":
+            sens, intervalle = sens_pos, interv_pos
+            sens_opp, interv_opp = sens_neg, interv_neg
+        else:
+            sens, intervalle = sens_neg, interv_neg
+            sens_opp, interv_opp = sens_pos, interv_pos
+
+        question = (
+            f"Soit $f$ une fonction dont la dérivée est $f'(x) = {fp_str}$. "
+            f"Sur quel intervalle $f$ est-elle {sens} ?"
+        )
+        bonne = intervalle
+        mauvaises = [
+            interv_opp,
+            "$\\mathbb{R}$ tout entier",
+            f"$f$ n'est pas {sens} sur ces intervalles"
+        ]
+        explication = (
+            f"$f'(x) = {fp_str}$ : on résout $f'(x) {'>' if choix == 'pos' and a > 0 or choix == 'neg' and a < 0 else '<'} 0$. "
+            f"$f$ est {sens} sur {intervalle}."
+        )
+
+    options, reponse = melanger_options(bonne, mauvaises)
+
+    return {
+        "question": question,
+        "options": options,
+        "reponse": reponse,
+        "explication": explication,
+        "has_graph": False,
+        "graph_data": None,
+        "type_question": "derivation_signe",
+        "theme": "derivation"
+    }
+
+
+def generer_quiz_variations(nb_questions=6, difficulte="Moyen"):
+    """
+    Génère un quiz sur les tableaux de variations et la dérivation.
+    Mélange TV1, TV2, TV3 et questions sur le signe de f'.
+    """
+    questions = []
+    types = (
+        ["TV1"] * 2 +
+        ["TV2"] * 2 +
+        ["TV3"] * 1 +
+        ["deriv"] * 1
+    )
+    random.shuffle(types)
+    types = types[:nb_questions]
+
+    for t in types:
+        if t == "TV1":
+            q = generer_question_tv1_lire_valeur(difficulte)
+        elif t == "TV2":
+            q = generer_question_tv2_extremum(difficulte)
+        elif t == "TV3":
+            q = generer_question_tv3_sens(difficulte)
+        else:
+            q = generer_question_derivation_signe(difficulte)
+        questions.append(q)
+
+    return questions
+
+
+# ================================================================
 # FONCTION PRINCIPALE : GÉNÉRER UN QUIZ COMPLET
 # ================================================================
 
@@ -1163,5 +1590,3 @@ if __name__ == "__main__":
         print(f"Q : {q['question']}")
         print(f"R : {q['reponse']}")
         print(f"Explication : {q['explication']}\n")
-
-# mise à jour
