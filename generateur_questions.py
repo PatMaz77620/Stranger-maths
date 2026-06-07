@@ -754,6 +754,350 @@ def generer_question_second_degre(difficulte="Moyen", type_question=None):
 
 
 # ================================================================
+# GÉNÉRATEUR : SUITES NUMÉRIQUES
+# ================================================================
+
+def _params_suite(difficulte):
+    """
+    Génère des paramètres aléatoires pour une suite.
+    Retourne (u0, nature, r_ou_q) où nature = 'arithmetique' ou 'geometrique'.
+    """
+    # Valeur initiale u0
+    if difficulte == "Facile":
+        u0 = random.choice([1, 2, 3, 4, 5, 10])
+    elif difficulte == "Moyen":
+        u0 = random.choice([1, 2, 3, 5, 10, 20, -1, -2])
+    else:
+        u0 = random.choice([1, 2, 3, 5, 10, -1, -2, -5,
+                            Fraction(1,2), Fraction(3,2)])
+
+    nature = random.choice(["arithmetique", "geometrique"])
+
+    if nature == "arithmetique":
+        if difficulte == "Facile":
+            r = random.choice([1, 2, 3, 5, -1, -2])
+        elif difficulte == "Moyen":
+            r = random.choice([1, 2, 3, 5, -1, -2, -3, 10])
+        else:
+            r = random.choice([1, 2, 3, -1, -2, -3,
+                               Fraction(1,2), Fraction(-1,2), Fraction(3,2)])
+        return u0, nature, r
+    else:
+        if difficulte == "Facile":
+            q = random.choice([2, 3, -1])
+        elif difficulte == "Moyen":
+            q = random.choice([2, 3, -2, -1, 10])
+        else:
+            q = random.choice([2, 3, -2, -1,
+                               Fraction(1,2), Fraction(1,3), Fraction(-1,2)])
+        return u0, nature, q
+
+def _calculer_termes(u0, nature, r_ou_q, n=5):
+    """Calcule les n+1 premiers termes de la suite."""
+    termes = [u0]
+    for _ in range(n):
+        if nature == "arithmetique":
+            termes.append(termes[-1] + r_ou_q)
+        else:
+            termes.append(termes[-1] * r_ou_q)
+    return termes
+
+def _fmt_relation_recurrence(u0, nature, r_ou_q):
+    """
+    Formate la relation de récurrence en LaTeX.
+    Ex: u0=2, arithmetique, r=3 → "$u_0 = 2$ et $u_{n+1} = u_n + 3$"
+    """
+    u0_str = fmt_latex(u0)
+    r_str = fmt_latex(r_ou_q)
+
+    if nature == "arithmetique":
+        if r_ou_q >= 0:
+            rel = f"$u_{{n+1}} = u_n + {r_str}$"
+        else:
+            r_abs = abs(r_ou_q) if not isinstance(r_ou_q, Fraction) else Fraction(abs(r_ou_q.numerator), r_ou_q.denominator)
+            rel = f"$u_{{n+1}} = u_n - {fmt_latex(r_abs)}$"
+    else:
+        rel = f"$u_{{n+1}} = {r_str} \\times u_n$"
+
+    return f"$u_0 = {u0_str}$ et {rel} pour tout $n \\geq 0$"
+
+def _fmt_forme_explicite(u0, nature, r_ou_q):
+    """
+    Formate la forme explicite en LaTeX.
+    Arithmétique : u_n = u0 + n*r
+    Géométrique  : u_n = u0 * q^n
+    """
+    u0_str = fmt_latex(u0)
+    r_str = fmt_latex(r_ou_q)
+
+    if nature == "arithmetique":
+        if r_ou_q == 0:
+            return f"$u_n = {u0_str}$"
+        elif r_ou_q == 1:
+            return f"$u_n = {u0_str} + n$"
+        elif r_ou_q == -1:
+            return f"$u_n = {u0_str} - n$"
+        elif r_ou_q > 0:
+            return f"$u_n = {u0_str} + {r_str} \\times n$"
+        else:
+            r_abs = abs(r_ou_q) if not isinstance(r_ou_q, Fraction) else Fraction(abs(r_ou_q.numerator), r_ou_q.denominator)
+            return f"$u_n = {u0_str} - {fmt_latex(r_abs)} \\times n$"
+    else:
+        if r_ou_q == 1:
+            return f"$u_n = {u0_str}$"
+        # Parenthèses autour des raisons négatives ou fractionnaires
+        if isinstance(r_ou_q, Fraction) or r_ou_q < 0:
+            q_str = f"\\left({fmt_latex(r_ou_q)}\\right)"
+        else:
+            q_str = r_str
+        return f"$u_n = {u0_str} \\times {q_str}^n$"
+
+
+# ---- TYPE A : Identifier la nature ----
+
+def generer_question_suite_nature(difficulte="Moyen"):
+    """
+    Donne une relation de récurrence → l'élève identifie arithmétique / géométrique / ni l'un ni l'autre.
+    """
+    # On choisit aléatoirement entre les 3 cas
+    cas = random.choice(["arithmetique", "geometrique", "autre"])
+
+    if cas == "arithmetique":
+        u0, _, r = _params_suite(difficulte)
+        while _ != "arithmetique":
+            u0, _, r = _params_suite(difficulte)
+        u0, nature, r_ou_q = u0, "arithmetique", r
+        recurrence = _fmt_relation_recurrence(u0, nature, r_ou_q)
+        bonne = "Arithmétique"
+        explication = (
+            f"On calcule $u_{{n+1}} - u_n = {fmt_latex(r_ou_q)}$ : "
+            f"c'est constant, donc la suite est **arithmétique** de raison $r = {fmt_latex(r_ou_q)}$."
+        )
+
+    elif cas == "geometrique":
+        u0, _, q = _params_suite(difficulte)
+        while _ != "geometrique":
+            u0, _, q = _params_suite(difficulte)
+        u0, nature, r_ou_q = u0, "geometrique", q
+        recurrence = _fmt_relation_recurrence(u0, nature, r_ou_q)
+        bonne = "Géométrique"
+        explication = (
+            f"On calcule $\\frac{{u_{{n+1}}}}{{u_n}} = {fmt_latex(r_ou_q)}$ : "
+            f"c'est constant, donc la suite est **géométrique** de raison $q = {fmt_latex(r_ou_q)}$."
+        )
+
+    else:  # ni arithmétique ni géométrique → on utilise (-1)^n
+        u0 = random.choice([1, 2, 3])
+        u0_str = fmt_latex(u0)
+        recurrence = f"$u_0 = {u0_str}$ et $u_{{n+1}} = (-1) \\times u_n + 1$ pour tout $n \\geq 0$"
+        bonne = "Ni arithmétique ni géométrique"
+        explication = (
+            "La différence $u_{n+1} - u_n$ n'est pas constante et "
+            "le rapport $\\frac{u_{n+1}}{u_n}$ n'est pas constant non plus : "
+            "la suite n'est ni arithmétique ni géométrique."
+        )
+
+    question = f"La suite $(u_n)$ est définie par {recurrence}. Quelle est la nature de cette suite ?"
+
+    bonne_rep = bonne
+    mauvaises = [r for r in ["Arithmétique", "Géométrique", "Ni arithmétique ni géométrique"] if r != bonne]
+    mauvaises.append("Constante")
+    mauvaises = mauvaises[:3]
+
+    options, reponse = melanger_options(bonne_rep, mauvaises)
+
+    return {
+        "question": question,
+        "options": options,
+        "reponse": reponse,
+        "explication": explication,
+        "has_graph": False,
+        "graph_data": None,
+        "type_question": "nature",
+        "theme": "suites"
+    }
+
+
+# ---- TYPE B : Sens de variation ----
+
+def generer_question_suite_variation(difficulte="Moyen"):
+    """
+    Donne une relation de récurrence → l'élève identifie croissante / décroissante / ni l'un ni l'autre.
+    """
+    cas = random.choice(["croissante", "decroissante", "alternee"])
+
+    if cas == "croissante":
+        # Suite arithmétique r > 0 ou géométrique q > 1
+        choix = random.choice(["arithmetique", "geometrique"])
+        if choix == "arithmetique":
+            u0 = random.choice([1, 2, 3, 5])
+            r = random.choice([1, 2, 3])
+            recurrence = _fmt_relation_recurrence(u0, "arithmetique", r)
+            explication = (
+                f"La raison $r = {fmt_latex(r)} > 0$ donc chaque terme est plus grand que le précédent : "
+                f"la suite est **croissante**."
+            )
+        else:
+            u0 = random.choice([1, 2, 3])
+            q = random.choice([2, 3])
+            recurrence = _fmt_relation_recurrence(u0, "geometrique", q)
+            explication = (
+                f"$u_0 = {fmt_latex(u0)} > 0$ et $q = {fmt_latex(q)} > 1$ donc "
+                f"chaque terme est multiplié par {fmt_latex(q)} : la suite est **croissante**."
+            )
+        bonne = "Croissante"
+
+    elif cas == "decroissante":
+        choix = random.choice(["arithmetique", "geometrique"])
+        if choix == "arithmetique":
+            u0 = random.choice([10, 20, 100])
+            r = random.choice([-1, -2, -3])
+            recurrence = _fmt_relation_recurrence(u0, "arithmetique", r)
+            explication = (
+                f"La raison $r = {fmt_latex(r)} < 0$ donc chaque terme est plus petit que le précédent : "
+                f"la suite est **décroissante**."
+            )
+        else:
+            u0 = random.choice([10, 20, 100])
+            q = Fraction(1, 2)
+            recurrence = _fmt_relation_recurrence(u0, "geometrique", q)
+            explication = (
+                f"$u_0 = {fmt_latex(u0)} > 0$ et $0 < q = {fmt_latex(q)} < 1$ donc "
+                f"chaque terme est multiplié par $\\frac{{1}}{{2}}$ : la suite est **décroissante**."
+            )
+        bonne = "Décroissante"
+
+    else:  # alternée → (-1)^n classique
+        u0 = random.choice([1, 2, 3])
+        recurrence = f"$u_0 = {fmt_latex(u0)}$ et $u_{{n+1}} = -u_n$ pour tout $n \\geq 0$"
+        explication = (
+            f"Les termes alternent entre ${fmt_latex(u0)}$ et $-{fmt_latex(u0)}$ : "
+            f"la suite est **ni croissante ni décroissante**."
+        )
+        bonne = "Ni croissante ni décroissante"
+
+    question = f"La suite $(u_n)$ est définie par {recurrence}. Cette suite est :"
+
+    mauvaises = [r for r in ["Croissante", "Décroissante", "Ni croissante ni décroissante"] if r != bonne]
+    mauvaises.append("Constante")
+    mauvaises = mauvaises[:3]
+
+    options, reponse = melanger_options(bonne, mauvaises)
+
+    return {
+        "question": question,
+        "options": options,
+        "reponse": reponse,
+        "explication": explication,
+        "has_graph": False,
+        "graph_data": None,
+        "type_question": "variation",
+        "theme": "suites"
+    }
+
+
+# ---- TYPE C : Forme explicite ----
+
+def generer_question_suite_explicite(difficulte="Moyen"):
+    """
+    Donne une relation de récurrence → l'élève trouve la forme explicite u_n = ...
+    Toujours avec u_0 comme indice de départ.
+    """
+    u0, nature, r_ou_q = _params_suite(difficulte)
+    # On force une suite arithmétique ou géométrique (pas "autre")
+    while True:
+        u0, nature, r_ou_q = _params_suite(difficulte)
+        if nature in ["arithmetique", "geometrique"]:
+            break
+
+    recurrence = _fmt_relation_recurrence(u0, nature, r_ou_q)
+    bonne = _fmt_forme_explicite(u0, nature, r_ou_q)
+
+    # Mauvaises réponses : erreurs classiques
+    # 1. Mauvais u0
+    u0_faux = u0 + random.choice([1, 2, -1, -2])
+    mauvaise_1 = _fmt_forme_explicite(u0_faux, nature, r_ou_q)
+
+    # 2. Mauvaise raison
+    if nature == "arithmetique":
+        r_faux = r_ou_q + random.choice([1, 2, -1])
+        mauvaise_2 = _fmt_forme_explicite(u0, nature, r_faux)
+        # 3. Confondre arithmétique et géométrique
+        mauvaise_3 = _fmt_forme_explicite(u0, "geometrique", r_ou_q)
+    else:
+        q_faux = r_ou_q + random.choice([1, -1])
+        if q_faux == 0:
+            q_faux = 2
+        mauvaise_2 = _fmt_forme_explicite(u0, nature, q_faux)
+        # 3. Confondre géométrique et arithmétique
+        mauvaise_3 = _fmt_forme_explicite(u0, "arithmetique", r_ou_q)
+
+    question = (
+        f"La suite $(u_n)$ est définie par {recurrence}. "
+        f"Quelle est la forme explicite de $u_n$ ?"
+    )
+
+    if nature == "arithmetique":
+        explicite = _fmt_forme_explicite(u0, nature, r_ou_q)
+        # On extrait la partie droite de u_n = ...
+        partie_droite = explicite.replace("$u_n = ", "").replace("$", "")
+        explication = (
+            f"Suite arithmétique de premier terme $u_0 = {fmt_latex(u0)}$ "
+            f"et de raison $r = {fmt_latex(r_ou_q)}$. "
+            f"Formule : $u_n = u_0 + n \\times r = {partie_droite}$."
+        )
+    else:
+        explicite = _fmt_forme_explicite(u0, nature, r_ou_q)
+        partie_droite = explicite.replace("$u_n = ", "").replace("$", "")
+        explication = (
+            f"Suite géométrique de premier terme $u_0 = {fmt_latex(u0)}$ "
+            f"et de raison $q = {fmt_latex(r_ou_q)}$. "
+            f"Formule : $u_n = u_0 \\times q^n = {partie_droite}$."
+        )
+
+    options, reponse = melanger_options(bonne, [mauvaise_1, mauvaise_2, mauvaise_3])
+
+    return {
+        "question": question,
+        "options": options,
+        "reponse": reponse,
+        "explication": explication,
+        "has_graph": False,
+        "graph_data": None,
+        "type_question": "explicite",
+        "theme": "suites"
+    }
+
+
+# ---- FONCTION PRINCIPALE SUITES ----
+
+def generer_quiz_suites(nb_questions=6, difficulte="Moyen"):
+    """
+    Génère un quiz sur les suites numériques.
+    Mélange les 3 types : nature, variation, explicite.
+    """
+    questions = []
+    types = (
+        ["nature"] * 2 +
+        ["variation"] * 2 +
+        ["explicite"] * 2
+    )
+    random.shuffle(types)
+    types = types[:nb_questions]
+
+    for t in types:
+        if t == "nature":
+            q = generer_question_suite_nature(difficulte)
+        elif t == "variation":
+            q = generer_question_suite_variation(difficulte)
+        else:
+            q = generer_question_suite_explicite(difficulte)
+        questions.append(q)
+
+    return questions
+
+
+# ================================================================
 # FONCTION PRINCIPALE : GÉNÉRER UN QUIZ COMPLET
 # ================================================================
 
@@ -763,7 +1107,6 @@ def generer_quiz_tableaux_signes(nb_questions=11, difficulte="Moyen"):
     Mélange affines, produits et second degré.
     """
     questions = []
-
 
     # Répartition selon le nombre de questions
     themes = (
@@ -792,11 +1135,31 @@ def generer_quiz_tableaux_signes(nb_questions=11, difficulte="Moyen"):
 
 if __name__ == "__main__":
     print("=== TEST DU GÉNÉRATEUR ===\n")
+
+    print("--- Tableaux de signes ---")
     for diff in ["Facile", "Moyen", "Difficile"]:
-        print(f"\n--- Difficulté : {diff} ---")
+        print(f"\nDifficulté : {diff}")
         q = generer_question_produit(difficulte=diff)
         print(f"Question : {q['question']}")
-        print(f"Options  : {q['options']}")
         print(f"Réponse  : {q['reponse']}")
-        print(f"Explication : {q['explication']}")
-        print(f"Graph : {q['graph_data']}")
+
+    print("\n\n--- Suites : Nature ---")
+    for _ in range(3):
+        q = generer_question_suite_nature("Moyen")
+        print(f"Q : {q['question']}")
+        print(f"R : {q['reponse']}")
+        print(f"Explication : {q['explication']}\n")
+
+    print("\n--- Suites : Variation ---")
+    for _ in range(3):
+        q = generer_question_suite_variation("Moyen")
+        print(f"Q : {q['question']}")
+        print(f"R : {q['reponse']}")
+        print(f"Explication : {q['explication']}\n")
+
+    print("\n--- Suites : Forme explicite ---")
+    for _ in range(3):
+        q = generer_question_suite_explicite("Moyen")
+        print(f"Q : {q['question']}")
+        print(f"R : {q['reponse']}")
+        print(f"Explication : {q['explication']}\n")

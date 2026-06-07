@@ -8,6 +8,7 @@ import json
 
 from generateur_questions import generer_quiz_tableaux_signes
 from openai import OpenAI
+from generateur_questions import generer_quiz_tableaux_signes, generer_quiz_suites
 from generateur_questions import generer_quiz_tableaux_signes
 
 # Initialisation du client OpenAI (beaucoup plus simple)
@@ -432,53 +433,114 @@ def aller_a_home():
     st.session_state.clear()
     st.session_state.page = 'home'
 
-def generer_mission_openai(theme_maths, difficulte):  # Vous pouvez garder le nom ou le changer
+def nettoyer_latex(texte):
+    """Corrige les backslashes LaTeX mal échappés par GPT dans le JSON."""
+    if not isinstance(texte, str):
+        return texte
+    corrections = [
+        ("\\frac",  "§FR§"), ("rac{",   "\\frac{"), ("§FR§",  "\\frac"),
+        ("\\times", "§TI§"), ("imes",   "\\times"), ("§TI§",  "\\times"),
+        ("\\sqrt{", "§SQ§"), ("sqrt{",  "\\sqrt{"), ("§SQ§",  "\\sqrt{"),
+        ("\\leq",   "§LQ§"), ("leq",    "\\leq"),   ("§LQ§",  "\\leq"),
+        ("\\geq",   "§GQ§"), ("geq",    "\\geq"),   ("§GQ§",  "\\geq"),
+        ("\\infty", "§IN§"), ("infty",  "\\infty"), ("§IN§",  "\\infty"),
+    ]
+    for mauvais, bon in corrections:
+        texte = texte.replace(mauvais, bon)
+    return texte
+
+def corriger_notation_suites(texte):
+    """Corrige u_n = u_{n-1} + r → u_{n+1} = u_n + r"""
+    if not isinstance(texte, str):
+        return texte
+    import re
+    def remplacer(m):
+        lettre = m.group(1)
+        return f"{lettre}_{{n+1}} = {lettre}_n"
+    texte = re.sub(r'([a-zA-Z])_n\s*=\s*\1_\{n-1\}', remplacer, texte)
+    texte = re.sub(r'([a-zA-Z])_n\s*=\s*\1_n-1', remplacer, texte)
+    return texte
+
+def nettoyer_question(q):
+    """Nettoie tous les champs texte d'une question."""
+    for champ in ['question', 'reponse', 'explication']:
+        if champ in q:
+            q[champ] = corriger_notation_suites(nettoyer_latex(q[champ]))
+    if 'options' in q:
+        q['options'] = [corriger_notation_suites(nettoyer_latex(opt)) for opt in q['options']]
+    return q
+
+def generer_mission_openai(theme_maths, difficulte):
     niveaux = {
         "Facile": "Niveau 1 : Applications directes du cours, calculs simples et évidents.",
         "Moyen": "Niveau 2 : Niveau standard STMG, mélanger lecture d'énoncés et calculs à 2 étapes.",
         "Difficile": "Niveau 3 : Questions type Bac, cas particuliers, et raisonnements plus poussés."
     }
 
+    consignes_theme = ""
+    if "suite" in theme_maths.lower():
+        consignes_theme = """
+    CONSIGNES SPÉCIFIQUES AUX SUITES (ABSOLUMENT OBLIGATOIRE) :
+    - La relation de récurrence s'écrit TOUJOURS $u_{n+1} = f(u_n)$
+    - INTERDIT d'écrire $u_n = u_{n-1} + r$ ou toute variante avec n-1
+    - Exemples CORRECTS :
+        * $u_0 = 2$ et $u_{n+1} = u_n + 3$ pour tout $n \\geq 0$
+        * $u_1 = 5$ et $u_{n+1} = 2 \\times u_n$ pour tout $n \\geq 1$
+    """
+
     prompt = f"""Génère une LISTE de 11 questions de mathématiques (niveau 1ERE STMG) sur le thème : {theme_maths}.
     Difficulté : {difficulte} ({niveaux[difficulte]}).
-     Format JSON strict : une liste d'objets [{{...}}, {{...}}] contenant :
-    - 'question': texte de la question
-    - 'options': liste de 4 choix
-    - 'reponse': la réponse exacte parmi les options
-    - 'explication': une courte explication pédagogique
+
+    CONSIGNES GÉNÉRALES (OBLIGATOIRES) :
+    - Toutes les expressions mathématiques DOIVENT être en LaTeX entre $ : exemple $u_n$, $f(x) = 2x+1$
+    - Pour les fractions : \\\\frac{{a}}{{b}} (double backslash obligatoire)
+    - INTERDIT : écrire des maths sans LaTeX
+    - INTERDIT : toute question sur les tableaux de signes
+    - INTERDIT : utiliser le discriminant $\\Delta$ ou la formule $x = \\frac{{-b \\pm \\sqrt{{\\Delta}}}}{{2a}}$
+    - Pour les racines d'un polynôme du 2nd degré : proposer des valeurs candidates à tester
+
+    FORMAT JSON : liste d'objets contenant :
+    - 'question' : texte avec LaTeX obligatoire
+    - 'options' : liste de 4 choix avec LaTeX
+    - 'reponse' : réponse exacte parmi les options
+    - 'explication' : explication avec LaTeX
+    {consignes_theme}
     """
 
     try:
-        # --- CHANGEMENT ICI POUR OPENAI ---
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system",
-                 "content": "Tu es un expert en mathématiques pédagogiques pour le niveau STMG. Tu réponds uniquement en JSON."},
+                {"role": "system", "content": "Tu es un expert en mathématiques pédagogiques pour le niveau STMG. Tu réponds uniquement en JSON. TOUTES les expressions mathématiques sont en LaTeX entre $. INTERDIT : discriminant, formule quadratique. Pour les suites : TOUJOURS $u_{n+1} = f(u_n)$."},
                 {"role": "user", "content": prompt}
             ],
             response_format={"type": "json_object"}
         )
 
-        # Extraction du contenu texte
         data = response.choices[0].message.content
         quiz_data = json.loads(data)
 
-        # Sécurité : OpenAI peut parfois encapsuler la liste dans une clé "questions"
         if isinstance(quiz_data, dict) and "questions" in quiz_data:
-            return quiz_data["questions"]
+            questions = quiz_data["questions"]
         elif isinstance(quiz_data, dict) and not isinstance(quiz_data, list):
-            # Si c'est un dictionnaire mais pas une liste, on cherche la première liste dedans
+            questions = None
             for val in quiz_data.values():
-                if isinstance(val, list): return val
+                if isinstance(val, list):
+                    questions = val
+                    break
+        else:
+            questions = quiz_data
 
-        return quiz_data
+        if questions:
+            questions = [nettoyer_question(q) for q in questions]
+
+        return questions
+
     except Exception as e:
         st.error(f"Erreur de connexion avec OpenAI : {e}")
         return None
 
 def afficher_interface_quiz():
-    # 1. Initialisation des variables de session si elles n'existent pas
     if 'index_question' not in st.session_state:
         st.session_state.index_question = 0
     if 'score' not in st.session_state:
@@ -486,45 +548,63 @@ def afficher_interface_quiz():
     if 'repondu' not in st.session_state:
         st.session_state.repondu = False
 
-    # CAS A : La mission est en cours
     if 'quiz_dynamique' in st.session_state and st.session_state.quiz_dynamique:
         questions = st.session_state.quiz_dynamique
         idx = st.session_state.index_question
 
-        # A.1. Il reste des questions à poser
         if idx < len(questions):
             q = questions[idx]
-            
-            # Barre de progression visuelle
+
             progress = idx / len(questions)
             st.progress(progress)
             st.write(f"### 🛰️ Mission Eleven : Question {idx + 1} / {len(questions)}")
-            
-            st.markdown(f"**{q['question']}**")
-            st.write("") # Petit espace
 
-            # --- AFFICHAGE DES RÉPONSES (LISTE DE BOUTONS SIMPLE) ---
-            if not st.session_state.repondu:
-                # On affiche simplement les boutons les uns sous les autres
-                for option in q['options']:
-                    if st.button(option, key=f"opt_{idx}_{option}", use_container_width=True):
-                        st.session_state.dernière_reponse = option
-                        st.session_state.repondu = True
-                        if option == q['reponse']:
-                            st.session_state.score += 1
-                        st.rerun()
+            # Layout : question + graphique éventuel
+            has_graph = q.get('has_graph', False)
+            graph_data = q.get('graph_data', None)
+
+            if has_graph and graph_data:
+                col_q, col_g = st.columns([1, 1])
+                with col_q:
+                    st.markdown(f"**{q['question']}**")
+                with col_g:
+                    type_g = graph_data.get('type', '')
+                    if type_g == 'signes':
+                        tracer_tableau_automatisme(graph_data)
+                    elif type_g == 'line':
+                        tracer_droite(graph_data)
+                    elif type_g == 'parabola':
+                        tracer_parabole(graph_data)
             else:
-                # Affichage après la sélection
-                st.write(f"Ton choix : **{st.session_state.dernière_reponse}**")
-                
+                st.markdown(f"**{q['question']}**")
+
+            st.write("")
+
+            if not st.session_state.repondu:
+                st.write("Sélectionnez votre réponse :")
+                # Pour chaque option : markdown (LaTeX) à gauche + bouton à droite
+                for i, option in enumerate(q['options']):
+                    col_txt, col_btn = st.columns([5, 1])
+                    with col_txt:
+                        st.markdown(option)
+                    with col_btn:
+                        if st.button(f"👆", key=f"btn_{idx}_{i}", use_container_width=True):
+                            st.session_state.dernière_reponse = option
+                            st.session_state.repondu = True
+                            if option == q['reponse']:
+                                st.session_state.score += 1
+                            st.rerun()
+            else:
+                st.markdown(f"Ton choix : **{st.session_state.dernière_reponse}**")
                 if st.session_state.dernière_reponse == q['reponse']:
-                    st.success(f"✅ Bravo ! {q['explication']}")
+                    st.success("✅ Bravo !")
+                    st.markdown(q['explication'])
                 else:
-                    st.error(f"❌ Erreur. La réponse était : {q['reponse']}")
-                    st.info(f"💡 **Explication :** {q['explication']}")
-                
+                    st.error(f"❌ C'était : {q['reponse']}")
+                    st.info(f"💡 {q['explication']}")
+
                 st.write("")
-                if st.button("Question suivante ➡️", use_container_width=True):
+                if st.button("SUIVANT ➡️", use_container_width=True):
                     st.session_state.index_question += 1
                     st.session_state.repondu = False
                     st.rerun()
@@ -593,12 +673,14 @@ def afficher_interface_quiz():
         )
 
         
-        chapitres_generateur = ["chap0", "chap3", "chap5"]
+        chapitres_generateur_signes = ["chap0", "chap3", "chap5"]
+        chapitres_generateur_suites = ["chap2"]
 
         if st.button("🔦 Lancer la Mission Eleven", use_container_width=True):
             with st.spinner(f"Eleven scanne l'Upside Down pour préparer tes 11 défis (Niveau {difficulte_choisie})..."):
                 page_actuelle = st.session_state.page
-                if page_actuelle in chapitres_generateur:
+
+                if page_actuelle in chapitres_generateur_signes:
                     quiz_gpt = generer_mission_openai(theme_actuel, difficulte_choisie)
                     quiz_gen = generer_quiz_tableaux_signes(nb_questions=6, difficulte=difficulte_choisie)
                     if quiz_gpt and quiz_gen:
@@ -608,6 +690,18 @@ def afficher_interface_quiz():
                         quiz = quiz_gpt
                     else:
                         quiz = quiz_gen
+
+                elif page_actuelle in chapitres_generateur_suites:
+                    quiz_gpt = generer_mission_openai(theme_actuel, difficulte_choisie)
+                    quiz_gen = generer_quiz_suites(nb_questions=5, difficulte=difficulte_choisie)
+                    if quiz_gpt and quiz_gen:
+                        quiz = quiz_gpt[:6] + quiz_gen
+                        random.shuffle(quiz)
+                    elif quiz_gpt:
+                        quiz = quiz_gpt
+                    else:
+                        quiz = quiz_gen
+
                 else:
                     quiz = generer_mission_openai(theme_actuel, difficulte_choisie)
 
