@@ -1590,3 +1590,5 @@ if __name__ == "__main__":
         print(f"Q : {q['question']}")
         print(f"R : {q['reponse']}")
         print(f"Explication : {q['explication']}\n")
+
+# mise à jour
