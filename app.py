@@ -9,6 +9,7 @@ import json
 from generateur_questions import generer_quiz_tableaux_signes
 from openai import OpenAI
 from generateur_questions import generer_quiz_tableaux_signes, generer_quiz_suites, generer_quiz_variations
+from stats_tracker import enregistrer_debut_session, mettre_a_jour_session, enregistrer_lancement_quiz, enregistrer_fin_quiz
 from generateur_questions import generer_quiz_tableaux_signes
 
 # Initialisation du client OpenAI (beaucoup plus simple)
@@ -26,6 +27,9 @@ st.set_page_config(
 # --- 🎯 INITIALISATION DU STATE ---
 if 'page' not in st.session_state:
     st.session_state.page = 'home'
+
+# --- 📊 TRACKING : début de session ---
+enregistrer_debut_session()
 
 # --- 2. STYLE CSS UNIFIÉ ET ROBUSTE ---
 st.markdown("""
@@ -785,6 +789,10 @@ def afficher_interface_quiz():
             total_q = len(st.session_state.quiz_dynamique)
             diff = st.session_state.get('difficulte_active', 'Moyen')
             
+            # 📊 TRACKING : fin du quiz
+            enregistrer_fin_quiz(score=score_final)
+            mettre_a_jour_session()
+
             # Affichage du score
             st.metric(f"Score Final (Niveau {diff})", f"{score_final} / {total_q}")
             
@@ -889,6 +897,12 @@ def afficher_interface_quiz():
                     st.session_state.score = 0
                     st.session_state.repondu = False
                     st.session_state.difficulte_active = difficulte_choisie
+                    # 📊 TRACKING
+                    enregistrer_lancement_quiz(
+                        chapitre=st.session_state.page,
+                        difficulte=difficulte_choisie,
+                        nb_questions=len(quiz)
+                    )
                     st.rerun()
 
 chemin_logo = "Stranger_Maths_Logo.png"
@@ -943,12 +957,13 @@ if st.session_state.page == 'home':
                 st.session_state.score = 0
                 st.session_state.start_time = pd.Timestamp.now()
                 st.session_state.page = 'quiz'
+                # 📊 TRACKING
+                enregistrer_lancement_quiz("automatismes_stmg", "BAC", len(quiz))
                 st.rerun()
 
-    # Nouveau Bouton GÉNÉRALE
     if st.button("🌀 MISSION QCM AUTOMATISMES type BAC niveau 1ERE GÉNÉRALE", use_container_width=True):
         with st.spinner("Ouverture du portail vers la Spécialité..."):
-            quiz = generer_automatisme_generale_openai() # On appelle la nouvelle fonction
+            quiz = generer_automatisme_generale_openai()
             if quiz:
                 st.session_state.quiz_data = quiz
                 st.session_state.quiz_type = 'automatisme'
@@ -956,6 +971,8 @@ if st.session_state.page == 'home':
                 st.session_state.score = 0
                 st.session_state.start_time = pd.Timestamp.now()
                 st.session_state.page = 'quiz'
+                # 📊 TRACKING
+                enregistrer_lancement_quiz("automatismes_generale", "BAC", len(quiz))
                 st.rerun()
     
     # --- SECTION PUB : LE PHARE ---
@@ -1892,5 +1909,3 @@ elif st.session_state.page == 'chap5':
     with tab5:
         # Pense à ajouter 'chap5' dans ton dictionnaire 'themes' de la fonction afficher_interface_quiz
         afficher_interface_quiz()
-
-# mise à jour
