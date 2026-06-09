@@ -8,7 +8,15 @@ import streamlit as st
 import gspread
 from google.oauth2.service_account import Credentials
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import traceback
+
+# Fuseau horaire France
+TZ_PARIS = ZoneInfo("Europe/Paris")
+
+def now_paris():
+    """Retourne l'heure actuelle en heure de Paris."""
+    return datetime.now(TZ_PARIS)
 
 # ID du Google Sheet
 SHEET_ID = "1uxpMlwvShuO_uxAePYpnmFz5CRKnLkgnIQ6oVL6OviA"
@@ -61,7 +69,7 @@ def enregistrer_debut_session():
     if 'session_debut' in st.session_state:
         return  # Déjà enregistré
 
-    now = datetime.now()
+    now = now_paris()
     st.session_state.session_debut = now
     st.session_state.session_pages = []
     st.session_state.session_row = None  # ligne dans Google Sheets
@@ -104,7 +112,7 @@ def mettre_a_jour_session(page_visitee=None):
     if 'session_debut' not in st.session_state:
         return
 
-    now = datetime.now()
+    now = now_paris()
     debut = st.session_state.session_debut
 
     # Calculer la durée en minutes
@@ -157,7 +165,7 @@ def enregistrer_lancement_quiz(chapitre, difficulte, nb_questions):
     Enregistre le lancement d'un quiz.
     Appelé quand l'élève clique sur "Lancer la Mission Eleven".
     """
-    now = datetime.now()
+    now = now_paris()
     nom_chapitre = NOMS_CHAPITRES.get(chapitre, chapitre)
 
     # Stocker dans session_state pour mise à jour du score plus tard
